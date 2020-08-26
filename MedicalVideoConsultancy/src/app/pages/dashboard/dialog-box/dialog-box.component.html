@@ -1,0 +1,19 @@
+<!-- dialog-box.component.html -->
+<div mat-dialog-content>
+  <div class="d-flex">
+    <mat-form-field class="mx-5"  *ngIf="action != 'Delete';">
+      <input  placeholder="New Room" matInput [(ngModel)]="local_data.room"  >
+    </mat-form-field>
+
+    <mat-form-field class="mx-5" *ngIf="action != 'Delete'">
+      <input  placeholder="New Role" matInput [(ngModel)]="local_data.role"  >
+    </mat-form-field>
+  </div>
+  <ng-template [ngIf]="action != 'Update'" >
+    <div class="font-20 text-center"><p>Are you sure to delete <b>{{local_data.name}}</b>?</p></div>
+  </ng-template>
+</div>
+<div mat-dialog-actions class="d-flex justify-content-around">
+  <button mat-button (click)="doAction()">{{action}}</button>
+  <button mat-button (click)="closeDialog()" mat-flat-button color="warn">Cancel</button>
+</div>

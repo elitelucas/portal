@@ -1,0 +1,27 @@
+<div class="vh-100  d-flex justify-content-center align-items-center">
+  <div>
+    <h1 style="text-align:center">
+      Welcome to MEVICO
+    </h1>
+    <ng-container *ngIf="isVerifyFailed">
+      <div class="text-center text-danger">
+        <h4>Verify failed. code is invalid</h4>
+      </div>
+    </ng-container>
+    <div class="login">
+      <h4 class="login-header">Please Enter your verification code</h4>
+      <form [formGroup]="smsForm" class="login-container" (ngSubmit)="smsVerify()">
+        <p [ngClass]="{ 'has-error': isSubmitted && formControls.smsCode.errors }">
+          <input type="number" placeholder="Verification code" formControlName="smsCode">
+        </p>
+        <div *ngIf="isSubmitted && formControls.smsCode.errors" class="help-block">
+          <div *ngIf="formControls.smsCode.errors.required">Code is required</div>
+          <div *ngIf="formControls.smsCode.errors.minlength || formControls.smsCode.error.maxlength">Please type 6 digits</div>
+        </div>
+        <p>
+          <input type="submit" value="Verify with code">
+        </p>
+      </form>
+    </div>
+  </div>
+</div>

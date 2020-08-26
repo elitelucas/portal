@@ -1,0 +1,29 @@
+<div mat-dialog-content>
+  <div>
+    <mat-label class="mb-3">Phone Number</mat-label>
+    <input type="text" ng2TelInput matInput [(ngModel)]="data.phoneNumber" id="phoneNumber" name="phoneNumber"
+           #phoneNumber = "ngModel" class="form-control text-dark w-p-350"
+           [ngClass]="{'is-invalid': (!isValidNumber || !data.phoneNumber) && (phoneNumber.dirty || phoneNumber.touched || isInvited),
+            'border-p-red': (!isValidNumber || !data.phoneNumber) && (phoneNumber.dirty || phoneNumber.touched || isInvited)}"
+           (hasError)="hasError($event)"
+           (ng2TelOutput)="getNumber($event)"/>
+    <ng-container *ngIf="(!isValidNumber) && (data.phoneNumber)">
+      <div class="d-block invalid-feedback mt-3">Phone Number is invalid.</div>
+    </ng-container>
+    <ng-container *ngIf="!data.phoneNumber && (phoneNumber.dirty || phoneNumber.touched || isInvited)">
+      <div class="d-block invalid-feedback mt-3">Phone Number is required.</div>
+    </ng-container>
+  </div>
+  <mat-form-field class="mt-3">
+    <mat-label>Invitation location</mat-label>
+    <input matInput  type="text" [(ngModel)]="data.room"/>
+  </mat-form-field>
+  <mat-form-field class="mt-3">
+    <mat-label>SMS Content</mat-label>
+    <textarea matInput type="text"  [(ngModel)]="data.smsContent"></textarea>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions class="d-flex justify-content-between">
+  <button mat-flat-button (click)="onCancelClick()" color="accent">Cancel</button>
+  <button mat-raised-button (click)="inviteBySms()" color="primary">Confirm</button>
+</div>

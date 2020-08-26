@@ -1,0 +1,101 @@
+<div class="container-fluid">
+  <div class="section-1 row bg-white p-5">
+    <div class="col-xl-6 col-lg-8 col-md-12 pt-5 ">
+      <div class="offset-2">
+        <div class="h2 line-height-md pl-5">
+          <div >
+            The user friendly, free,<br/>
+            and secure telemedicine<br/>
+            solution.®
+          </div>
+        </div>
+        <div class="h4 line-height-md pl-5">
+          <small class="justify-content-around">
+            We've made this platform friendly and easy<br/>
+            to use for user. Please create your personal room and<br/>
+            start the best experience in telemedicine today.
+          </small>
+        </div>
+        <div class="w-100 row ">
+          <div class=" pl-2 col-lg-6 col-md-12 text-center">
+            <button mat-raised-button  class="w-p-180 mt-3 p-3 text-black" color="primary" [matMenuTriggerFor]="afterMenu">Get Started - For Free</button>
+            <mat-menu #afterMenu="matMenu" class="w-p-180 text-center mt-2 mb-2" >
+            <!--  <a mat-raised-button class="bg-success w-p-150 mt-3 p-3 text-white " routerLink="/auth/sign-up/admin"><img class="w-25 ml-n3" src="https://img.icons8.com/dusk/48/000000/admin-settings-male.png" alt="admin"/>  I am a Admin</a> -->
+              <a mat-raised-button class="bg-primary w-p-150 mt-3 p-3 text-dark" routerLink="/auth/sign-up/provider"><img class="w-25 ml-n3" src="https://img.icons8.com/doodle/48/000000/doctor-male.png" alt="doctor"/>  I am a Provider</a>
+              <a mat-raised-button class="bg-info w-p-150 mt-3 p-3 text-white-50" routerLink="/auth/sign-in-patient"><img class="ml-n3" src="https://img.icons8.com/officel/16/000000/hospital-bed.png" alt="patient"/>  I am a Patient</a>
+            </mat-menu>
+          </div>
+          <div class=" col-lg-6 col-md-12 text-center">
+            <button mat-stroked-button class="mt-3 p-3 text-black-50" ><mat-icon>help_outline</mat-icon> Getting to know MEVICO</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-6 col-lg-8 col-md-12 pt-3 ">
+      <div class="h-100">
+        <img class="w-100 h-100 border-opacity " src="assets/images/front/consultation.jpg" alt="consultation"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-2 row p-5">
+    <div class="h3 w-100">
+      <div class="text-center w-100">
+        Users can make experiences easily <br/>
+        <small>
+          By keeping things simple
+        </small>
+      </div>
+    </div>
+    <div class="row w-100 p-5 ">
+      <div class="col-xl-3 col-lg-6">
+        <div class="text-center">
+          <i class="fa fa-download display-3 font-color"></i>
+          <h4 class="pt-4 font-weight-light">
+            NO DOWNLOAD REQUIRED
+          </h4>
+        </div>
+        <div class="p-3 justify-content-around line-height-xs">
+          With accessibility in mind,
+          we have made Doxy.me extremely
+          simple and  easy to use for
+          both clinicians and patients.
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-6">
+        <div class="text-center">
+          <i class="fa fa-money display-3 font-color"></i>
+          <h4 class="pt-4 font-weight-light">
+            FREE TO USE
+          </h4>
+        </div>
+        <div class="p-3 justify-content-around line-height-xs">
+          We believe cost shouldn't be a barrier to telemedicine. That’s why Doxy.me is free for all.
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-6">
+        <div class="text-center">
+          <i class="fa fa-globe display-3 font-color"></i>
+          <h4 class="pt-4 font-weight-light">
+            WORLDWIDE USAGE
+          </h4>
+        </div>
+        <div class="p-3 justify-content-around line-height-xs">
+          HIPAA, GDPR, PHIPA/PIPEDA, & HITECH compliant: We meet worldwide security requirements.
+        </div>
+      </div>
+      <div class="col-xl-3 col-lg-6">
+        <div class="text-center">
+          <img class="w-p-150 opacity-50" src="assets/images/front/handshake.png" alt="association">
+          <h4 class="pt-4 font-weight-light">
+            BAA INCLUDED
+          </h4>
+        </div>
+        <div class="p-3 justify-content-around line-height-xs">
+          All individual providers get a free Business Associate Agreement (BAA) with Doxy.me. Sign up for free to download your BAA.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

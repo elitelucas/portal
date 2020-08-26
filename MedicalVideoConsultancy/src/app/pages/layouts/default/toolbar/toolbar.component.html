@@ -1,0 +1,18 @@
+
+<!-- ============================================================== -->
+<!-- Profile - style you can find in header.scss -->
+<!-- ============================================================== -->
+<div class = "toolbar">
+  <a class="p-2 " routerLink = "/home" routerLinkActive="active-link" >Home</a>
+  <a class="p-2" routerLink = "/patient" routerLinkActive="active-link">For Patients</a>
+  <a class="p-2" routerLink = "/provider" routerLinkActive="active-link">For Providers</a>
+  <a class="p-2" routerLink = "/clinic" routerLinkActive="active-link">For Clinics</a>
+  <a class="p-2" routerLink = "/price" routerLinkActive="active-link">Pricing</a>
+  <a class=" m-r-20 hidden-sm-up bg-white text-black-50"  routerLink = "/auth/sign-in" mat-stroked-button >Sign in</a>
+  <a class=" m-r-20 hidden-sm-up bg-white text-black-50 w-p-180"  mat-stroked-button  [matMenuTriggerFor]="afterMenu">Sign up for free</a>
+  <mat-menu #afterMenu="matMenu" class="w-p-180 text-center mt-2 mb-2" >
+    <a mat-raised-button class="bg-primary w-p-150 mt-3 p-3 text-dark" routerLink="/auth/sign-up/provider"><img class="w-25 ml-n3" src="https://img.icons8.com/doodle/48/000000/doctor-male.png" alt="doctor"/>  I am a Provider</a>
+    <a mat-raised-button class="bg-info w-p-150 mt-3 p-3 text-white-50" routerLink="/auth/sign-in-patient"><img class="ml-n3" src="https://img.icons8.com/officel/16/000000/hospital-bed.png" alt="patient"/>  I am a Patient</a>
+  </mat-menu>
+</div>
+

@@ -1,0 +1,28 @@
+<ng-container *ngIf="data.providerName && data.role">
+  <form (ngSubmit)="f.form.valid && checkPatientEmail()" #f="ngForm">
+    <div mat-dialog-content>
+      <div>Please let &nbsp; {{data.role}} &nbsp; {{data.providerName}} knows your are here</div>
+      <mat-form-field class="mt-3">
+        <mat-label>Please enter your email</mat-label>
+        <input matInput  type="text" name="email"  [(ngModel)]="data.email" #email="ngModel" [ngClass]="{'is-invalid': f.submitted && email.invalid}" required email/>
+      </mat-form-field>
+<!--      <div *ngIf="f.submitted && email.invalid" class="d-block invalid-feedback">
+        <div *ngIf="email.errors.required">Email is required</div>
+        <div *ngIf="email.errors.email">Please input valid email</div>
+      </div>
+      <div *ngIf="f.submitted && !isAllowed" class="d-block invalid-feedback">
+        You don't have permission. Please check your email again
+      </div>-->
+    </div>
+    <div mat-dialog-actions class="d-flex justify-content-between">
+      <button mat-flat-button type="button" (click)="goHome()" color="accent">Previous</button>
+      <button mat-raised-button type="submit" color="primary">Check in</button>
+    </div>
+  </form>
+</ng-container>
+<ng-container *ngIf="!(data.providerName && data.role)">
+  <div class="text-center">
+    <div>No available room</div>
+    <button class="mt-3" mat-flat-button type="button" (click)="goHome()" color="accent">Previous</button>
+  </div>
+</ng-container>

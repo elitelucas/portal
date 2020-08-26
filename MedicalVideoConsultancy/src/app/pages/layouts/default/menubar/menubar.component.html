@@ -1,0 +1,12 @@
+<!-- ============================================================== -->
+<!-- sidebar -->
+<!-- ============================================================== -->
+<mat-nav-list appAccordion>
+  <mat-list-item appAccordionLink *ngFor="let menuitem of menuItems.getMenuitem('front')" routerLinkActive="selected" group="{{menuitem.state}}">
+    <a class="w-100 p-2" appAccordionToggle [routerLink]="['/', menuitem.state]" routerLinkActive="active-link" *ngIf="menuitem.type === 'link'">
+      <img class="super-icon-size" src="{{menuitem.icon}}">
+      <span class="ml-5">{{ menuitem.name }}</span>
+    </a>
+  </mat-list-item>
+
+</mat-nav-list>

@@ -1,0 +1,5 @@
+@media only screen and (max-width: 1295px) {
+  .mat-table-container {
+    width: 1200px;
+  }
+}

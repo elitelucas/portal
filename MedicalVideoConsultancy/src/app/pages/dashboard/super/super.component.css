@@ -1,0 +1,10 @@
+th.mat-sort-header-sorted {
+  color: black;
+}
+
+
+@media only screen and (max-width: 1478px) {
+  .mat-table-container {
+    width: 1200px;
+  }
+}

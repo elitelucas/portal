@@ -1,0 +1,35 @@
+<div class="vh-100  d-flex justify-content-center align-items-center">
+  <div>
+    <h1 style="text-align:center">
+      Welcome back, Admin
+    </h1>
+    <ng-container *ngIf="isLoginFailed">
+      <div  class="text-center text-danger" >
+        <h4>Login failed. Email or Password is invalid</h4>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="hasNotPermission">
+      <div  class="text-center text-danger" >
+        <h4>Only Super Admin can access to this page.</h4>
+      </div>
+    </ng-container>
+    <div class="login">
+      <h2 class="login-header">Log in</h2>
+      <form [formGroup]="authForm" class="login-container" (ngSubmit)="signIn()"> <p [ngClass]="{ 'has-error': isSubmitted && formControls.email.errors }">
+        <input type="email" placeholder="Email" formControlName="email">
+      </p> <div *ngIf="isSubmitted && formControls.email.errors" class="help-block">
+        <div *ngIf="formControls.email.errors.required">Email is required</div>
+        <div *ngIf="formControls.email.errors.email">Please type valid email</div>
+      </div> <p [ngClass]="{ 'has-error': isSubmitted && formControls.password.errors }">
+        <input type="password" placeholder="Password" formControlName="password">
+      </p> <div *ngIf="isSubmitted && formControls.password.errors" class="help-block">
+        <div *ngIf="formControls.password.errors.required">Password is required</div>
+        <div *ngIf="formControls.password.errors.minlength">Password must be over than 8 letters</div>
+        <div *ngIf="formControls.password.errors.maxlength">Password must be less than 100 letters</div>
+      </div> <p>
+        <input type="submit" value="Log in As Admin">
+      </p>
+      </form>
+    </div>
+  </div>
+</div>

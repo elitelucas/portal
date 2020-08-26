@@ -1,0 +1,69 @@
+/* You can add global styles to this file, and also import other style files */
+@import  url(https://fonts.googleapis.com/css?family=Open+Sans:400,700);
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+@import '~ngx-videogular/fonts/videogular.css';
+body {
+  background: #456;
+  font-family: 'Open Sans', sans-serif;
+}
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.cursor {
+  cursor: pointer;
+}
+.mat-sort-header-container {
+  display: flex;
+  justify-content: center;
+}
+
+.color-check-in, .copy-invite-url {
+  display: inline-block;
+  margin: 0 4px;
+  min-width: 94px;
+  max-height: 80px;
+  font-size: 20px;
+  text-align: center;
+  line-height: 44px;
+  color: #fff;
+  font-weight: 600;
+  background: #6cc;
+  box-shadow: 0 2px 0 #3cb0b0;
+  border-radius: 5px;
+  border: 0;
+  outline: none;
+  vertical-align: top;
+}
+.border-radius-5 {
+  border-radius: 5px;
+}
+
+.w-p-150 {
+  width: 150px;
+}
+.w-p-180 {
+  width: 180px;
+}
+.w-p-350 {
+  width: 350px!important;
+}
+
+.border-p-red {
+  border: 1px solid red!important;
+}
+.iti {
+  width: 100% !important;
+}
+
+.profile-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+
+.webcam-wrapper video {
+  width: 100% !important;
+  height: 350px;
+}

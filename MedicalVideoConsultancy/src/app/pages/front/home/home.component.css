@@ -1,0 +1,31 @@
+@media (max-width: 1200px) {
+  .section-1 {
+    display: flex;
+    justify-content: center;
+  }
+  .section-1 div.offset-2 {
+    margin-left: 4%;
+  }
+}
+.line-height-xs {
+  line-height: 2.2rem;
+}
+.line-height-md {
+  line-height: 3.2rem;
+}
+
+.border-opacity {
+  border: 1px solid rgba(255, 255, 255, .5);
+  border-radius: 30px;
+  -webkit-background-clip: padding-box; /* for Safari */
+  background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+}
+
+
+.font-color{
+  color: #6cc;
+}
+
+
+
+
