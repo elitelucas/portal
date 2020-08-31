@@ -1,0 +1,4 @@
+http://blog.davidjs.com/2018/09/insert-script-tags-in-angular-components/
+
+
+https://makitweb.com/capture-signature-in-the-webpage-with-jquery-plugins/

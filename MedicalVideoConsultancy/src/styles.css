@@ -1,4 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
+@import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+@import "../node_modules/chartist/dist/chartist.css";
+@import "../node_modules/intl-tel-input/build/css/intlTelInput.css";
+
 @import  url(https://fonts.googleapis.com/css?family=Open+Sans:400,700);
 @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
 @import '~ngx-videogular/fonts/videogular.css';

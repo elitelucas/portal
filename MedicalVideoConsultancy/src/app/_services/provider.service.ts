@@ -36,6 +36,8 @@ export class ProviderService {
   checkRoomExist(room) {
     const checkRoomUrl = baseUrl + 'provider/roomName/' + room;
     this.trace("checkRoomExist:", checkRoomUrl);
+    console.log('checkRoomUrl')
+    console.log(checkRoomUrl)
     return this.http.get<any>(checkRoomUrl)
   }
 

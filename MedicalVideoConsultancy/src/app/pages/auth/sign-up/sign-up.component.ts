@@ -1,5 +1,6 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+
 import {MustMatch} from "../../../_helpers/must-match.validator";
 import {AuthService} from "../../../_services/auth.service";
 
@@ -24,11 +25,11 @@ constructor(private formBuilder: FormBuilder, private auth: AuthService) { }
 
   ngOnInit() {
     this.registerForm = this.formBuilder.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      room: ['', Validators.required],
-      cmp: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+      firstName: ['', [Validators.required,Validators.pattern("[a-zA-Z ]*"), Validators.maxLength(100)]],
+      lastName: ['', [Validators.required,Validators.pattern("[a-zA-Z ]*"),Validators.maxLength(100)]],
+      room: ['', [Validators.required,Validators.pattern("[a-zA-Z ]*"), Validators.maxLength(40)]],
+      cmp: ['', [Validators.required,Validators.pattern("[0-9]*"), Validators.minLength(4), Validators.maxLength(8)]],
+      email: ['', [Validators.required, Validators.email,Validators.maxLength(100)]],
       phoneNumber: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required],

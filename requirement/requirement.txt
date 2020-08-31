@@ -1,0 +1,14 @@
+I propose the following:
+Divide into two milestones comprising:
+milestone 01: (1 week or 1 week and a half)
+Understanding of the project (source code) and deployed on the server.
+Complete web interfaces (angular) for patient and doctor profiles.
+* Correction of observations
+
+milestone 02: (1 week or 1 week and a half)
+
+Integrate the functionalities with the backend between angular and nodejs.
+
+* Correction of observations
+
+Interface improvements based on the material-angular-lite template.

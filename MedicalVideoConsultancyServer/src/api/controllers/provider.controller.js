@@ -124,9 +124,12 @@ exports.changeRoomField = (req, res, next) => {
  * @param next
  * */
 exports.checkRoomExist = (req, res, next) => {
-  //console.log("checkRoomExist:",req.params,req.query)
+  // console.log("checkRoomExist:",req.params,req.query)
+ 
   User.findOne(req.params).then(result => {
     if(result && result.status === 'active' ) {
+      console.log('result')
+      console.log(result)
       result['password'] = null;
       result['phoneNumber'] = null;
       result['cmp'] = null;

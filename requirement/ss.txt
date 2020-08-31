@@ -1,0 +1,27 @@
+
+userprovidertest@gmail.com
+qwaszx123
+
+
+servidor ip : 45.56.114.181
+user: root
+pass: Tumama2020 @@
+
+
+robo 3T
+
+name: xavdat
+address: 190.238.22.67
+
+authentication
+
+database: admin
+username:root
+pass:xavuserdata123
+
+superuser:
+
+email: 
+topwolf0808@gmail.com
+pass:
+zaq1!QAZ

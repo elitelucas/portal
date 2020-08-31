@@ -26,7 +26,6 @@ import { MeetRoomService } from "../_services/meet-room.service";
 import { VideoRoomComponent } from './video-room/video-room.component';
 import { MeetCallComponent } from './meet-room/meet-call/meet-call.component';
 
-
 @NgModule({
   declarations: [
     AppComponent,
