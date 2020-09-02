@@ -48,6 +48,11 @@ router.route('/roomName/:room')
  * @params field: value
  * */
 
+
+//I added 
+router.route('/allPacients')
+  .get(controller.getAllPatients);
+
 router.route('/patientByField')
   .get(controller.getPatient);
 

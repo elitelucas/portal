@@ -154,6 +154,44 @@ exports.checkRoomExist = (req, res, next) => {
  * @update patient's last seen
  * */
 
+//I added
+
+exports.getAllPatients = async (req, res, next) => {
+  try {
+    let sendArr=[];
+    patient = await Patient.find().exec();
+
+    consult= await Consult.find().exec();
+    consultCntArr=[];
+    for(let i=0;i<patient.length;i++){
+      let cnt=0;
+      for(let j=0; j<consult.length;j++){
+        if(patient[i].dni===consult[j].dni){
+          cnt++;
+        }
+      }
+      consultCntArr.push(cnt);
+    }
+    for(let i=0;i<patient.length;i++){
+      sendArr.push(
+        {
+          dni:patient[i].dni,
+          fullName:patient[i].fullName,
+          consultCnt:consultCntArr[i],
+          lastConsult:patient[i].lastSeen
+        }
+      )
+    }
+    console.log('sendArr')
+    console.log(sendArr)
+
+    res.status(httpStatus.OK).json(sendArr);
+  } catch (e) {
+    console.log("getAllPatients:",error);
+    return next(APIError(e));
+  }
+};
+
 exports.getPatient = async (req, res, next) => {
   try {
     const key = req.query.key;

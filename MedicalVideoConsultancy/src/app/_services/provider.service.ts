@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
+import{Observable} from 'rxjs'
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../../environments/environment";
 import { baseUrl } from "./auth.service";
 import { map } from "rxjs/operators";
 import { Patient, Consult } from '../_model/user';
+import { ArrayType } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +41,14 @@ export class ProviderService {
     console.log('checkRoomUrl')
     console.log(checkRoomUrl)
     return this.http.get<any>(checkRoomUrl)
+  }
+
+  //I added new func to get all pacients data.
+
+  getAllPatientsData(){
+    const patientUrl = baseUrl + 'provider/allPacients';
+    this.trace("getAllPatientsData:", patientUrl);
+    return this.http.get(patientUrl);
   }
 
   getPatient(value, field) {
@@ -82,3 +92,4 @@ export class ProviderService {
   }
 
 }
+
