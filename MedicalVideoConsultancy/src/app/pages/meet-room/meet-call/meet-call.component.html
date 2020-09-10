@@ -48,23 +48,21 @@
             </ng-container>
           </div>
           <div class="col-lg-4">
-            <mat-card>
               <mat-card>
                 <mat-card-title class="display-6 pt-5 d-flex justify-content-center">
                   <h3 class="font-weight-bold">Text Chat</h3>
                 </mat-card-title>
                 <mat-card-content>
                   <form [formGroup]="roomChatForm" (ngSubmit)="sendText()">
-                    <div class="w-100 p-10 border-radius-5 " id="chatText" #chatText>
-                    </div>
-                    <div>
-                      <input  formControlName="text" class="w-80 p-10 border-radius-5 " type="text">
-                      <button type="submit" style="bottom: 0;"
-                        class=" mb-3 text-white font-bold color-check-in">Send</button>
-                    </div>
+                      <div class="w-100 p-10 border-radius-5 scroll-div" id="chatText" #chatText>
+                      </div>
+                      <div>
+                          <input formControlName="text" class="border-radius-5 chat-input" type="text" placeholder="message">
+                          <button type="submit" style="bottom: 0;"
+                              class="btn btn-primary">Send</button>
+                      </div>
                   </form>
-                </mat-card-content>
-              </mat-card>
+              </mat-card-content>
             </mat-card>
           </div>
         </div>

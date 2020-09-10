@@ -29,6 +29,8 @@ topwolf0808@gmail.com
 pass:
 zaq1!QAZ
 
+/health-room/5f47f29a96cf8028bc4fc709
+
 It is the base path where the files are.
 We have an nginx service with ssl certificates
 pointing to frontend and backend

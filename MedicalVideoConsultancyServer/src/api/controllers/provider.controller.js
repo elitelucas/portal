@@ -158,8 +158,10 @@ exports.checkRoomExist = (req, res, next) => {
 
 exports.getAllPatients = async (req, res, next) => {
   try {
+    const key=req.query.key;
+    const value=req.query.value;
     let sendArr=[];
-    patient = await Patient.find().exec();
+    patient = await Patient.find({providerId:value}).exec();
 
     consult= await Consult.find().exec();
     consultCntArr=[];
@@ -175,6 +177,7 @@ exports.getAllPatients = async (req, res, next) => {
     for(let i=0;i<patient.length;i++){
       sendArr.push(
         {
+          id:patient[i]._id,
           dni:patient[i].dni,
           fullName:patient[i].fullName,
           consultCnt:consultCntArr[i],
@@ -191,6 +194,59 @@ exports.getAllPatients = async (req, res, next) => {
     return next(APIError(e));
   }
 };
+
+exports.getConsult = async (req, res, next) => {
+  try {
+    const key=req.query.key;
+    const value=req.query.value;
+    consult = await Consult.find({patientId:value}).exec();
+    console.log('consult')
+    console.log(consult)
+    res.status(httpStatus.OK).json(consult);
+  } catch (e) {
+    console.log("getConsult:",error);
+    return next(APIError(e));
+  }
+};
+
+exports.getConsultInChat = async (req, res, next) => {
+  try {
+    const patientId=req.query.patientId;
+    const providerId=req.query.providerId;
+    consult = await Consult.find({patientId:patientId, providerId:providerId}).exec();
+    console.log('consult')
+    console.log(consult)
+    res.status(httpStatus.OK).json(consult);
+  } catch (e) {
+    console.log("getConsult:",error);
+    return next(APIError(e));
+  }
+};
+
+exports.fileUpload = async (req, res) => {
+  const consult = await Consult.findOne({_id: req.body._id});
+  const file = req.files.file;
+  const fileType=req.files.file.mimetype.split('/')[0];
+
+  var savePosition='';
+  if(fileType==='image'){
+    savePosition='images';
+  }else if(fileType==='video'){
+    savePosition='videos';
+  }else{
+    savePosition='others';
+  }
+  const imagePath = path.join(__dirname + './../../public/'+savePosition+'/');
+  file.mv(imagePath + file.name, function (error) {
+    if (error) {
+      console.log("file upload error", error)
+    } else {
+      res.status(httpStatus.CREATED).json(file.name);
+    }
+  });
+};
+
+//I added end
 
 exports.getPatient = async (req, res, next) => {
   try {

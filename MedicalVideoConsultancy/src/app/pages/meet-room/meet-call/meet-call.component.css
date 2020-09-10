@@ -15,3 +15,13 @@
   border-radius: 5px;
   width: 300px;
 }
+.scroll-div{
+    border: 1px solid;
+    margin-bottom: 20px;
+    height: 150px;
+    overflow:auto;
+  }
+.chat-input{
+    width: 65%;
+    margin-right: 8%;
+  }

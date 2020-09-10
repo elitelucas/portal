@@ -3,7 +3,7 @@ var PeerServer = require('peer').PeerServer;
 // /etc/nginx/ssl
 
 var server = PeerServer({
-    port: 3001,
+    port: 3002,
     path: '/',
    /* ssl: {
         key: fs.readFileSync('/etc/letsencrypt/live/www.nemiac.com/privkey.pem', 'utf8'),

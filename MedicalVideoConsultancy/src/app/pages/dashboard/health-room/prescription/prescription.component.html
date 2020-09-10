@@ -1,0 +1,27 @@
+<div class="main">
+    <div class="bottom-mgn">Medical Prescription:</div>
+    <div class="bottom-mgn">
+        <input #prescriptionInput
+        class="input-stl"
+        placeholder="prescription"
+        (keyup.enter)="AddPrescription(prescriptionInput.value)"
+        (blur)="AddPrescription(prescriptionInput.value); prescriptionInput.value='' "
+        />
+        <button class="btn btn-primary" (click)="AddPrescription(prescriptionInput.value)">Add</button>
+    </div>
+
+    <div class="add-div bottom-mgn">
+        <div class="row literal-div" *ngFor="let pre of prescriptions; let i=index;" >
+            <div class="col-9 add-div-font">
+                {{i+1}}.-{{pre}}
+            </div>
+            <div class="col-3">
+                <button class="btn btn-danger  add-div-font pull-right" (click)="DeleteItem(i)">Remove</button>
+            </div>           
+        </div>
+    </div>
+    <div class="bottom-mgn">
+        <input type="text" class="input-stl" placeholder="Patients email by defaults or it can be edited" />
+        <button class="btn btn-primary">Send Prescription</button>
+    </div>
+</div>

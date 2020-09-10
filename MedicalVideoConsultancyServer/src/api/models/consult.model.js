@@ -19,7 +19,7 @@ const consultSchema = new Schema({
   objective: Object,
   assessment: Object,
   plan: Object,
-  files: Object,
+  files: Array,
   createDate: Date,
   patient: Object,
 });

@@ -8,7 +8,6 @@ import { timer } from 'rxjs';
 
 
 
-
 @Component({
   selector: 'app-health-room',
   templateUrl: './health-room.component.html',
@@ -23,6 +22,13 @@ export class HealthRoomComponent implements OnInit {
 
   patient: Patient;
   currentUser: User;
+  key={
+    Prescription:true,
+    Consults: false,
+    Files: false,
+    Charts: false
+  };
+
 
   constructor(
     public meetRoomService: MeetRoomService,
@@ -33,7 +39,6 @@ export class HealthRoomComponent implements OnInit {
     private renderer: Renderer2) {
     this.route.paramMap.subscribe(async (params) => {
       this.patient = JSON.parse(localStorage.getItem(params.get("patientId")));
-      //console.log(this.patient)
     });
     this.currentUser = Object.assign(new User(), JSON.parse(localStorage.getItem('provider_data')));
   }
@@ -83,6 +88,13 @@ export class HealthRoomComponent implements OnInit {
   public sendText() {
     const text = this.f.text.value;
     this.meetRoomService.sendtext(this.patient.socketId, "Provider: " + text);
+  }
+  changeBackground(kk){
+    this.key.Prescription=false;
+    this.key.Consults=false;
+    this.key.Files=false;
+    this.key.Charts=false;
+    this.key[kk]=true;
   }
 
   /*trace(...arg) {

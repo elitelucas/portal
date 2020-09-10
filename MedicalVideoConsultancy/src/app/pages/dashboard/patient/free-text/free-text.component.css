@@ -1,0 +1,31 @@
+.div-style{
+    background-color: #a5dbea;
+    padding: 20px;
+    width:90%;
+    margin: auto;
+    }
+.inp-margin{
+    margin-top:3px;
+    margin-bottom: 3px;
+}
+.div-padding{
+    padding:10px;
+}
+.containerDiv{
+    width:100%;
+}
+
+.input-wid{
+    width:94% !important;
+    margin-left:1%;
+}
+.last-wid{
+    width:94% !important;
+}
+.second-input-wid{
+    width:93% !important;
+    margin-left:1%;
+}
+.second-last-wid{
+    width:93% !important;
+}

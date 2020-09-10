@@ -1,0 +1,23 @@
+.main{
+    margin-left: 15%;
+    margin-right: 15%;
+    margin-top: 40px;
+}
+.input-stl{
+    margin-right: 2%;
+    width: 75%;
+}
+.bottom-mgn{
+    margin-bottom: 20px;
+}
+.add-div-font{
+    font-size:0.8rem;
+}
+.add-div{
+    background-color: #756e6e82;
+    width: 82%;
+    padding: 2%;
+}
+.literal-div{
+    margin-bottom:3px;
+}

@@ -53,6 +53,16 @@ router.route('/roomName/:room')
 router.route('/allPacients')
   .get(controller.getAllPatients);
 
+router.route('/consult')
+  .get(controller.getConsult);
+
+router.route('/consultInChat')
+  .get(controller.getConsultInChat);
+
+router.route('/uploadFile')
+  .post(controller.fileUpload); 
+
+//I added end
 router.route('/patientByField')
   .get(controller.getPatient);
 

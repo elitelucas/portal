@@ -8,7 +8,9 @@ import {ProfileComponent} from "./profile/profile.component";
 import {EditRoomComponent} from "./edit-room/edit-room.component";
 import { HealthRoomComponent } from './health-room/health-room.component';
 import { PatientChartsComponent } from './patient-charts/patient-charts.component';
-import { PatientComponent } from './patient/patient/patient.component';
+import { PatientComponent } from './patient/patient.component';
+import { NewConsultComponent } from './new-consult/new-consult.component';
+
 
 
 const routes:Routes = [{
@@ -49,8 +51,12 @@ const routes:Routes = [{
       component: SuperComponent,
     },
     {
-      path: 'patient/:id',
+      path: 'patient/:id/:fullName',
       component: PatientComponent
+    },
+    {
+      path: 'newConsult/:id/:date',
+      component: NewConsultComponent
     },
     {
       path: 'patient-charts',
