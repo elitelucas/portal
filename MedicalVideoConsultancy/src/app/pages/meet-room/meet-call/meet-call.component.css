@@ -25,3 +25,23 @@
     width: 65%;
     margin-right: 8%;
   }
+  .super{
+    padding-top: 25px;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+.main-div{
+    background-color:#808080b3;
+    padding:2%;
+}
+.sub-div{
+    background-color:#70d6cf99;
+    padding:2%;
+    margin-bottom:10px;
+}
+.button-div{
+    text-align:right;
+}
+.list{
+    cursor: pointer;
+}

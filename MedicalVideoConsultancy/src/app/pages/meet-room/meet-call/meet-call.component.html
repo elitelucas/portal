@@ -66,6 +66,42 @@
             </mat-card>
           </div>
         </div>
+     
+        <div class="super">
+          <p>File share to consults!</p>
+          <div class="main-div">
+              <div class="sub-div">
+                  <div>
+                      <p class="list">sdfsfsdf</p>
+                  </div>
+                  <div class="button-div">
+                      <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleDownload()">
+                          <mat-icon>file_download</mat-icon>
+                          Download
+                        </button>
+                  </div>
+              </div>
+              <div class="sub-div">
+                  <div *ngFor="let name of fileName;let i=index">
+                      {{i+1}}.{{name}}
+                  </div>
+                  <div class="form-file-upload button-div">
+                      <ng-container *ngFor="let file of files">
+                        <mat-progress-bar [value]="file.progress"></mat-progress-bar>
+                      </ng-container>
+                      <div class="upload-btn">
+                        <input type="file" #fileUpload id="fileUpload" name="fileUpload" multiple="multiple" accept="*" style="display:none;" />
+                        <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleUpload()">
+                          <mat-icon>file_upload</mat-icon>
+                          Upload
+                        </button>
+                      </div>
+                    </div>
+              </div>
+          </div>
+    
+      
+        </div>
       </div>
     </mat-sidenav-content>
   </mat-sidenav-container>

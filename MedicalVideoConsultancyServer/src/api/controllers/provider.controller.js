@@ -224,19 +224,14 @@ exports.getConsultInChat = async (req, res, next) => {
 };
 
 exports.fileUpload = async (req, res) => {
-  const consult = await Consult.findOne({_id: req.body._id});
   const file = req.files.file;
-  const fileType=req.files.file.mimetype.split('/')[0];
-
-  var savePosition='';
-  if(fileType==='image'){
-    savePosition='images';
-  }else if(fileType==='video'){
-    savePosition='videos';
-  }else{
-    savePosition='others';
+  console.log('req.body');
+  console.log(req.body);
+  var folderName='provider';
+  if(req.body._id===undefined){
+    folderName='patient';
   }
-  const imagePath = path.join(__dirname + './../../public/'+savePosition+'/');
+  const imagePath = path.join(__dirname + './../../public/'+folderName+'/');
   file.mv(imagePath + file.name, function (error) {
     if (error) {
       console.log("file upload error", error)

@@ -1,5 +1,0 @@
-F:\>git clone https://github.com/daniel-dev-peru/mevico-private.git tttttt
-
-	//copy from 
-		https://github.com/daniel-dev-		peru/mevico-private.git
-	to tttttt 
