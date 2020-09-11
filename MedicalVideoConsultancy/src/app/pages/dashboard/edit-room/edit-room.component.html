@@ -1,121 +1,57 @@
-<div class="container-fluid">
-  <mat-card class="text-center">
-    <mat-card-title class="display-6 pt-5 d-flex justify-content-center">
-      <h3 class="font-weight-bold">Welcome to</h3>&nbsp;<div>Waiting Room of / {{currentUser.role}}&nbsp;{{currentUser.firstName}} !</div>
-    </mat-card-title>
-    <mat-card-content>
-      <br/>
-      <h4>I will start the video call in a moment</h4>
-    </mat-card-content>
-  </mat-card>
-
-  <div class="edit ">
-
-    <div class="row">
-      <div class="col-xl-6 col-lg-12">
-        <mat-card class="image-edit p-5">
-          <div class="form-file-upload p-3">
-            <div class="row">
-              <div class="col-md-6 d-block ">
-                <div class="mt-3 text-center font-weight-bold display-6">
-                  Image Upload
-                </div>
-                <div class="text-center mt-3">
-                  <input type="file" #imageUpload id="imageUpload" name="fileUpload" multiple="multiple" accept="*" style="display:none;" />
-                  <button type="button" mat-button color="warn" class="mt-5 p-2 h-p-40" (click)="handleUpload('image')">
-                    <mat-icon>file_upload</mat-icon>
-                    Upload your image
-                  </button>
-                </div>
-                <ng-container *ngIf="file.length">
-                  <mat-progress-bar [value]="file.progress" class="mt-3"></mat-progress-bar>
-                </ng-container>
-              </div>
-              <div class="col-md-6 text-center">
-                <img src="{{defaultImage}}" class="edit-room-img w-100 border-radius-5" alt="Health provider avatar">
-              </div>
-            </div>
-          </div>
-        </mat-card>
-      </div>
-      <div class="col-xl-6 col-lg-12">
-        <mat-card class="video-edit p-5">
-          <div class="form-file-upload p-3">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="mt-3 text-center font-weight-bold display-6">
-                  Video Upload
-                </div>
-                <div class="mt-3 text-center">
-                  <input type="file" #videoUpload id="videoUpload" name="fileUpload" multiple="multiple" accept="*" style="display:none;" />
-                  <button type="button" mat-button color="warn" class="mt-5 mx-auto p-2 h-p-40" (click)="handleUpload('video')">
-                    <mat-icon>file_upload</mat-icon>
-                    Upload your video
-                  </button>
-                </div>
-                <ng-container *ngIf="file.length">
-                  <mat-progress-bar [value]="file.progress" class="mt-3"></mat-progress-bar>
-                </ng-container>
-              </div>
-              <div class="col-md-6">
-                <vg-player class="edit-room-video border-radius-5">
-                  <vg-overlay-play></vg-overlay-play>
-                  <vg-buffering></vg-buffering>
-                  <vg-controls>
-                    <vg-play-pause></vg-play-pause>
-
-                    <vg-time-display vgProperty="current" vgFormat="mm:ss"></vg-time-display>
-
-                    <vg-scrub-bar>
-                      <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
-                      <vg-scrub-bar-buffering-time></vg-scrub-bar-buffering-time>
-                    </vg-scrub-bar>
-
-                    <vg-time-display vgProperty="total" vgFormat="mm:ss"></vg-time-display>
-
-                    <vg-mute></vg-mute>
-                    <vg-volume></vg-volume>
-
-                    <vg-fullscreen></vg-fullscreen>
-                  </vg-controls>
-
-                  <video class="singleVideo" #media [vgMedia]="media" id="singleVideo" preload="auto" crossorigin >
-                    <ng-container *ngIf="defaultVideo">
-                      <source [src]="defaultVideo" type="video/mp4">
-                      <source [src]="defaultVideo" type="video/ogg">
-                    </ng-container>
-                  </video>
-                </vg-player>
-              </div>
-            </div>
-          </div>
-        </mat-card>
-      </div>
+<div class="main">
+  <div class="description">
+    <h3>Personalize your waiting room</h3>
+    <div>
+      Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui
+ratione voluptatem sequi nesciunt. Neque porro quisquam est.
     </div>
-
-    <div class="tips-edit row">
-      <div class="col-xl-6 col-md-12">
-        <mat-card class="tips">
-          <mat-card-content>
-            <img class="w-100" src="{{tipsImage}}" alt="Tips for video call"/>
-          </mat-card-content>
-        </mat-card>
-      </div>
-      <div class="col-xl-6 col-md-12">
-        <mat-card class="text-edit ">
-          <div class="mt-5  display-5">
-            About you and Nemiac
-          </div>
-          <div class="mt-3 p-5 text-center">
-            <textarea rows="10" [(ngModel)]="defaultText" class="w-75 p-2"></textarea>
-          </div>
-          <div class="p-3 d-flex justify-content-around">
-            <button mat-raised-button color="warn" (click)="resetText()"> Reset</button>
-            <button mat-raised-button color="primary" (click)="changeText(defaultText)">Change text</button>
-          </div>
-        </mat-card>
-      </div>
+  </div>
+  <div class='new-post'>
+    <div class="post-title">
+      <input #postTitle type="text" class="title-input" />
+      <button class="btn btn-primary publish-button" 
+      (click)="publishPost(postTitle.value, postBody.editorInstance.getData())">
+        Publish
+      </button>
+      <p *ngIf="postTitle.value===''&& clickKey" style="color:red">required*</p>
+    </div>
+    <div class="post-body">
+      <ckeditor #postBody [editor]="Editor"></ckeditor>
     </div>
   </div>
 
+  <div class='post-list' *ngFor="let item of literalArr; let i=index;" >
+    <div [class]="kk[i]===false?'switch':''">
+      <div class="head-bar">
+        <h3 class="each-post-title pull-left">{{item.postTitle}}</h3>
+        <button class="btn btn-primary edit-button edit-margin" (click)="edit(i)">Edit</button>
+        <button class="btn btn-danger edit-button" (click)="delete(i)">Delete</button>
+      </div>
+      <div class="each-post-body" [innerHTML]="item.postBody">
+      </div>
+    </div>
+    <div [class]="kk[i]?'switch':''">
+      <div class="post-title">
+
+        <input #editTitle type="text" class="edit-title-input" [value]="item.postTitle" />
+        <button class="btn btn-primary edit-button edit-margin" 
+        (click)="editOk(editTitle.value, editBody.editorInstance.getData(),i)">
+          Ok
+        </button>
+
+        <button class="btn btn-danger edit-button"
+        (click)="editCancel(i)">Cancel
+        </button>
+
+        <p *ngIf="editTitle.value===''&& clickKey" style="color:red">required*</p>
+
+      </div>
+
+      <div class="post-body">
+        <ckeditor #editBody [editor]="Editor" [data]="item.postBody"></ckeditor>
+      </div>
+    </div>
+    
+
+  </div>
 </div>

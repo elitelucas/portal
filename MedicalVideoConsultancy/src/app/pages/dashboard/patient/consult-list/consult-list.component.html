@@ -4,23 +4,23 @@ Consult List
     </div>
     <div class="col-8">
         <div class="div-align">
-            <input type="date" name="startDate" id="startDate"  (change)="applyFilter($event)">
+            <input #startDate type="date" name="startDate" id="startDate">
         </div>
         <div class="div-align">
-            <input type="date" name="endDate" id="endDate"  (change)="applyFilter($event)">
+            <input #endDate type="date" name="endDate" id="endDate">
         </div>
         <div class="div-align">
-            <button class="btn btn-primary" (click)="search()">search</button>
+            <button class="btn btn-primary" (click)="search(startDate.value, endDate.value)">search</button>
         </div>
     </div>
 </div>
 
 <!-- patient-charts.component.html -->
 <div class="container-fluid text-center mt-5  justify-content-center p-20 mat-table-container">
-    <!-- <mat-form-field>
-      <mat-label>Please search(DNI or FullName) ...</mat-label>
+    <mat-form-field>
+      <mat-label>Please search(date) ...</mat-label>
       <input matInput (keyup)="applyFilter($event)" placeholder="Jone Doe">
-    </mat-form-field> -->
+    </mat-form-field>
     <table mat-table [dataSource]="dataSource" matSort #mytable class="admin-table mat-elevation-z8 w-100">
   
       <!--- Note that these columns can be defined in any order.

@@ -25,6 +25,8 @@ import { PrescriptionComponent } from './health-room/prescription/prescription.c
 import { ConsultsComponent } from './health-room/consults/consults.component';
 import { FilesComponent } from './health-room/files/files.component';
 import { ChartsComponent } from './health-room/charts/charts.component';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+
 
 @NgModule({
   declarations: [AdminComponent, SuperComponent, HealthProviderComponent, 
@@ -37,6 +39,7 @@ import { ChartsComponent } from './health-room/charts/charts.component';
     Ng2TelInputModule,
     DashboardRoutingModule,
     DataTablesModule,
+    CKEditorModule,
   ],
   providers: [],
   entryComponents: [DialogBoxComponent]

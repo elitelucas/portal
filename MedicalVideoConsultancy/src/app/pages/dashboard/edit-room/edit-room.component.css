@@ -1,4 +1,49 @@
 .edit-room-img, .edit-room-video, #singleVideo {
   height: 350px;
 }
-
+.title-input{
+  width: 80%;
+  margin-right: 5%;
+}
+.publish-button{
+  width:15%;
+}
+.main{
+  padding:3%
+}
+.description{
+  margin-bottom:20px;
+}
+.post-title{
+  margin-bottom: 20px;
+}
+.new-post{
+  border-bottom:1px solid black;
+  padding-bottom:50px;
+}
+.each-post-body{
+  border:1px solid black;
+}
+.post-list{
+  padding-top: 20px;
+    padding-bottom: 20px;
+}
+.head-bar{
+  margin-bottom:10px;
+}
+.each-post-title{
+  width:77%;
+}
+.edit-button{
+  width:10%;
+}
+.edit-margin{
+  margin-right:3%;
+}
+.switch{
+  display: none;
+}
+.edit-title-input{
+  width:73%;
+  margin-right:4%
+}

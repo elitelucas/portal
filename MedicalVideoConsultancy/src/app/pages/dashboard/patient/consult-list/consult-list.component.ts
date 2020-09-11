@@ -25,6 +25,7 @@ export class ConsultListComponent implements OnInit {
   displayedColumns: string[] = [ 'id', 'fullName','date','consult'];
   noDataToDisplay: boolean = false;
   dataSource: any;
+  sourceData=[];
   @Input() idName: IdName;
   @ViewChild(MatTable)  table: MatTable<any>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -40,6 +41,7 @@ export class ConsultListComponent implements OnInit {
     this.ProviderService.getConsult(this.idName.id,'id').subscribe(res=> {
       if(res) {
         console.log("consult data s>>>>>>>>>>>>>", res)
+        this.sourceData=res;
         this.initDataSource(res)
         this.noDataToDisplay = false;
       } else{
@@ -68,7 +70,7 @@ export class ConsultListComponent implements OnInit {
     const filterValue = (event.target as HTMLInputElement).value;
     console.log('filterValue')
     console.log(filterValue)
-    // this.dataSource.filter = filterValue.trim().toLowerCase();
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
   arrangeDataSource() {
     this.dataSource.paginator = this.paginator;
@@ -77,7 +79,13 @@ export class ConsultListComponent implements OnInit {
   detail(data){
     this.router.navigateByUrl('/dashboard/newConsult/'+data.id+'/'+data.date);
   }
-  search(){
+  search(start,end){
+    console.log('start')
+    console.log(start)
+    console.log('end')
+    console.log(end)
+    console.log('this.sourceData')
+    console.log(this.sourceData)
 
   }
 }
