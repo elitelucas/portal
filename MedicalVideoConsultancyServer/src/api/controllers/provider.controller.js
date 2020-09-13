@@ -11,6 +11,8 @@ const Transaction = require('../models/transaction.model');
 const Consult = require('../models/consult.model');
 const Chart = require('../models/chart.model');
 const { date } = require('joi');
+var nodemailer = require('nodemailer');
+
 
 /**
  * @api v1/provider/invite-by-sms.
@@ -124,9 +126,12 @@ exports.changeRoomField = (req, res, next) => {
  * @param next
  * */
 exports.checkRoomExist = (req, res, next) => {
-  //console.log("checkRoomExist:",req.params,req.query)
+  // console.log("checkRoomExist:",req.params,req.query)
+ 
   User.findOne(req.params).then(result => {
     if(result && result.status === 'active' ) {
+      console.log('result')
+      console.log(result)
       result['password'] = null;
       result['phoneNumber'] = null;
       result['cmp'] = null;
@@ -150,6 +155,124 @@ exports.checkRoomExist = (req, res, next) => {
  * @api v1/provider/patientByField
  * @update patient's last seen
  * */
+
+//I added
+
+exports.getAllPatients = async (req, res, next) => {
+  try {
+    const key=req.query.key;
+    const value=req.query.value;
+    let sendArr=[];
+    patient = await Patient.find({providerId:value}).exec();
+
+    consult= await Consult.find().exec();
+    consultCntArr=[];
+    for(let i=0;i<patient.length;i++){
+      let cnt=0;
+      for(let j=0; j<consult.length;j++){
+        if(patient[i].dni===consult[j].dni){
+          cnt++;
+        }
+      }
+      consultCntArr.push(cnt);
+    }
+    for(let i=0;i<patient.length;i++){
+      sendArr.push(
+        {
+          id:patient[i]._id,
+          dni:patient[i].dni,
+          fullName:patient[i].fullName,
+          consultCnt:consultCntArr[i],
+          lastConsult:patient[i].lastSeen
+        }
+      )
+    }
+    console.log('sendArr')
+    console.log(sendArr)
+
+    res.status(httpStatus.OK).json(sendArr);
+  } catch (e) {
+    console.log("getAllPatients:",error);
+    return next(APIError(e));
+  }
+};
+
+exports.getConsult = async (req, res, next) => {
+  try {
+    const key=req.query.key;
+    const value=req.query.value;
+    consult = await Consult.find({patientId:value}).exec();
+    console.log('consult')
+    console.log(consult)
+    res.status(httpStatus.OK).json(consult);
+  } catch (e) {
+    console.log("getConsult:",error);
+    return next(APIError(e));
+  }
+};
+
+exports.getConsultInChat = async (req, res, next) => {
+  try {
+    const patientId=req.query.patientId;
+    const providerId=req.query.providerId;
+    consult = await Consult.find({patientId:patientId, providerId:providerId}).exec();
+    console.log('consult')
+    console.log(consult)
+    res.status(httpStatus.OK).json(consult);
+  } catch (e) {
+    console.log("getConsult:",error);
+    return next(APIError(e));
+  }
+};
+
+exports.fileUpload = async (req, res) => {
+  const file = req.files.file;
+  console.log('req.body');
+  console.log(req.body);
+  var folderName='provider';
+  if(req.body._id===undefined){
+    folderName='patient';
+  }
+  const imagePath = path.join(__dirname + './../../public/'+folderName+'/');
+  file.mv(imagePath + file.name, function (error) {
+    if (error) {
+      console.log("file upload error", error)
+    } else {
+      res.status(httpStatus.CREATED).json(file.name);
+    }
+  });
+};
+
+exports.mail = async (req, res) => {
+  console.log('**********dddddddddddddd********')
+  console.log('req.body')
+  console.log(req.body)
+
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'dremova.yulya1@mail.ru',
+        pass: 'sufdhk7k7bJABDFKer'
+      }
+    });
+
+    var mailOptions = {
+      from: 'dremova.yulya1@mail.ru',
+      to: 'vovochkaperepelkin@yandex.ru',
+      subject: 'Sending Email using Node.js',
+      html: '<p>That was easy!</p>'
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+        res.status(httpStatus.CREATED).json('sent successfully');
+      }
+    });
+}
+//I added end
 
 exports.getPatient = async (req, res, next) => {
   try {

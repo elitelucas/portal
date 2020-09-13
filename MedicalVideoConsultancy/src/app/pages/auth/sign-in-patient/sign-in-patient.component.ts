@@ -45,9 +45,9 @@ export class SignInPatientComponent implements OnInit {
       dni: ['', Validators.required]
     });
     
-    /*this.f.dni.setValue("12312323");
-    this.f.room.setValue(this.domain+"testroom2");*/
-    this.f.room.setValue(this.domain);
+    this.f.dni.setValue("12312323");
+    this.f.room.setValue(this.domain+"testroom2");
+    // this.f.room.setValue(this.domain);
 
     this.joinForm = this.formBuilder.group({
       fullName: ['', Validators.required],
@@ -69,15 +69,17 @@ export class SignInPatientComponent implements OnInit {
     this.submitted = true;
     const room = this.f.room.value.substring(this.domain.length);
     const dniPatient = this.f.dni.value;
-    if(this.roomForm.invalid) {
-      return;
-    }
-    if(!this.f.room.value.includes(this.domain)) {
-      this.isInvalidDomain = true;
-      return;
-    }
+    // if(this.roomForm.invalid) {
+    //   console.log('sssss')
+    //   return;
+    // }
+    // if(!this.f.room.value.includes(this.domain)) {
+    //   this.isInvalidDomain = true;
+    //   return;
+    // }
     this.providerService.checkRoomExist(room)
       .subscribe(result => {
+        console.log('eee')
         if(result)   {
           this.providerService.getPatient(dniPatient, 'dni').subscribe(resultPatient  => {
             console.log("getPatients dni:", resultPatient)

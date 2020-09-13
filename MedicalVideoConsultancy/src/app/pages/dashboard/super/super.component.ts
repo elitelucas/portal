@@ -66,6 +66,7 @@ export class SuperComponent implements OnInit {
       }
     });
 
+    console.log('userData')
     console.log(userData)
     this.dataSource = new MatTableDataSource<UsersData>(userData);
     this.dataSource.paginator = this.paginator;

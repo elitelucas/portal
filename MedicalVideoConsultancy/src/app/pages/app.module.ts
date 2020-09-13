@@ -14,6 +14,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DemoMaterialModule } from './demo-material-module';
 import { SharedModule } from './shared/shared.module';
 import { SpinnerComponent } from './shared/spinner.component';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 
 import { DefaultComponent } from "./layouts/default/default.component";
 import { ToolbarComponent } from './layouts/default/toolbar/toolbar.component';
@@ -25,7 +26,6 @@ import { FormsModule , ReactiveFormsModule} from "@angular/forms";
 import { MeetRoomService } from "../_services/meet-room.service";
 import { VideoRoomComponent } from './video-room/video-room.component';
 import { MeetCallComponent } from './meet-room/meet-call/meet-call.component';
-
 
 @NgModule({
   declarations: [
@@ -51,6 +51,7 @@ import { MeetCallComponent } from './meet-room/meet-call/meet-call.component';
     FlexLayoutModule,
     HttpClientModule,
     SharedModule,
+    CKEditorModule,
     RouterModule.forRoot(
       AppRoutes,
       { useHash: true },

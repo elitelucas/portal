@@ -17,6 +17,16 @@ export class FileUploadService {
     });
   }
 
+  //I added
+  public uploadFile(formData) {
+    const fileUrl = this.baseUrl + "provider/uploadFile";
+    return this.http.post<any>(fileUrl, formData, {
+      reportProgress: true,
+      observe: 'events'
+    });
+  }
+  //I added end
+
   public uploadEditRoomMedia(formData) {
     const imageUrl = this.baseUrl + "provider/mediaUpload";
     return this.http.post<any>(imageUrl, formData, {

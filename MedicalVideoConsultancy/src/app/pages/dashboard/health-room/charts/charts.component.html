@@ -1,0 +1,157 @@
+<div class="row big-mgn">
+    <div class="col-xl-6 col-md-12 col-sm-12 div-padding">
+        <div class="div-style">
+            <div>
+                <h5>Chronic Diseases:</h5>
+            </div>
+          <div> 
+            <div class="containerDiv">
+                <input type="text" #diseaseItem 
+                class="inp-margin second-input-wid"
+                (keyup.enter)="AddItem(diseaseItem.value,'disease')"
+                (blur)="AddItem(diseaseItem.value,'disease'); diseaseItem.value='' ">
+                <button class="btn btn-primary" (click)="AddItem(diseaseItem.value,'disease')">Add</button>
+            </div>
+            <div class="containerDiv add-div">
+                <div class="row literal-div" *ngFor="let pre of diseaseArr; let i=index;">
+                    <div class="col-9 add-div-font">
+                        {{i+1}}.-{{pre}}
+                    </div>
+                    <div class="col-3">
+                        <button class="btn btn-danger  add-div-font pull-right" (click)="DeleteItem(i,'disease')" >Remove</button>
+                    </div>           
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="col-xl-6 col-md-12 col-sm-12 div-padding">
+        <div class="div-style">
+            <div>
+                <h5>Medications:</h5>
+            </div>
+          <div>
+           
+            <div> 
+                <div class="containerDiv">
+                    <input type="text" #medicationItem 
+                    class="inp-margin second-input-wid"
+                    (keyup.enter)="AddItem(medicationItem.value,'medication')"
+                    (blur)="AddItem(medicationItem.value,'medication'); medicationItem.value='' ">
+                    <button class="btn btn-primary" (click)="AddItem(medicationItem.value,'medication')">Add</button>
+                </div>
+                <div class="containerDiv add-div">
+                    <div class="row literal-div" *ngFor="let pre of medicationArr; let i=index;">
+                        <div class="col-9 add-div-font">
+                            {{i+1}}.-{{pre}}
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-danger  add-div-font pull-right" (click)="DeleteItem(i,'medication')" >Remove</button>
+                        </div>           
+                    </div>
+                </div>
+              </div>
+          </div>
+        </div>
+    </div>
+  
+   
+</div>
+<div class="row">
+    <div class="col-xl-4 col-md-6 col-sm-12 div-padding">
+        <div class="div-style">
+            <div>
+                <h5>Surguries/Hospitalizations:</h5>
+            </div>
+          <div>
+            <div> 
+                <div class="containerDiv">
+                    <input type="text" #surgeryItem 
+                    class="inp-margin third-input-wid"
+                    (keyup.enter)="AddItem(surgeryItem.value,'surgery')"
+                    (blur)="AddItem(surgeryItem.value,'surgery'); surgeryItem.value='' ">
+                    <button class="btn btn-primary" (click)="AddItem(surgeryItem.value,'surgery')">Add</button>
+                </div>
+                <div class="containerDiv add-div">
+                    <div class="row literal-div" *ngFor="let pre of surgeryArr; let i=index;">
+                        <div class="col-9 add-div-font">
+                            {{i+1}}.-{{pre}}
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-danger  add-div-font pull-right" (click)="DeleteItem(i,'surgery')" >Remove</button>
+                        </div>           
+                    </div>
+                </div>
+              </div>
+          </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6 col-sm-12 div-padding">
+        <div class="div-style">
+            <div>
+                <h5>Family History</h5>
+            </div>
+          <div>
+            <div> 
+                <div class="containerDiv">
+                    <input type="text" #familyItem 
+                    class="inp-margin third-input-wid"
+                    (keyup.enter)="AddItem(familyItem.value,'family')"
+                    (blur)="AddItem(familyItem.value,'family'); familyItem.value='' ">
+                    <button class="btn btn-primary" (click)="AddItem(familyItem.value,'family')">Add</button>
+                </div>
+                <div class="containerDiv add-div">
+                    <div class="row literal-div" *ngFor="let pre of familyArr; let i=index;">
+                        <div class="col-9 add-div-font">
+                            {{i+1}}.-{{pre}}
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-danger  add-div-font pull-right" (click)="DeleteItem(i,'family')" >Remove</button>
+                        </div>           
+                    </div>
+                </div>
+              </div>
+          </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6 col-sm-12 div-padding">
+        <div class="div-style">
+            <div>
+                <h5>Toxic Substances Use:</h5>
+            </div>
+          <div>
+            <div class="containerDiv">
+                <div class="row">
+                    <div class="col-6">
+                        <span class="number-wid"> 1. Tobacco:</span> 
+                    </div>
+                    <div class="col-6">
+                        <input type="text" class="inp-margin second-input-wid">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <span class="number-wid"> 2. Alchol:</span> 
+                    </div>
+                    <div class="col-6">
+                        <input type="text" class="inp-margin second-input-wid">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <span class="number-wid"> 3. Illicit drugs:</span> 
+                    </div>
+                    <div class="col-6">
+                        <input type="text" class="inp-margin second-input-wid">
+                    </div>
+                </div>
+
+            </div>
+        
+          </div>
+        </div>
+    </div>
+
+</div>
+
+
