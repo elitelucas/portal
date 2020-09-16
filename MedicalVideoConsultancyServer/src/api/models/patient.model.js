@@ -14,6 +14,9 @@ const patientSchema = new Schema({
     type: String,
     required: true
   },
+  age:{
+    type:Number
+  },
   dni: {
     type: String,
     required: true,

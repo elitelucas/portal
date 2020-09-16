@@ -7,6 +7,8 @@ import {HttpErrorResponse, HttpEventType} from "@angular/common/http";
 import {of} from "rxjs";
 import {UserService} from "../../../_services/user.service";
 import {environment} from "../../../../environments/environment";
+import { DataService } from "../../../_services/data.service";
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-profile',
@@ -17,15 +19,27 @@ export class ProfileComponent implements OnInit {
   currentUser: any;
   profileForm: FormGroup;
   userData: any;
+  sigImgSrc:string;
+  payMethod:object;
   publicUrl = environment.baseUrl + "public/image/";
   @ViewChild("fileUpload", {static: false}) fileUpload: ElementRef; files = [] ;
   private isEmailDuplicated: boolean = false;
   private isRoomDuplicated: boolean= false;
-  constructor(private authService: AuthService, private formBuilder: FormBuilder, private fileUploadService: FileUploadService, private userService: UserService)
+  constructor(
+    private authService: AuthService, private formBuilder: FormBuilder, 
+    private fileUploadService: FileUploadService,
+    private userService: UserService,
+    private data: DataService)
   {this.currentUser = this.authService.getCurrentUser;}
 
   ngOnInit(): void {
     this.initProfile()
+    this.data.currentMessage.subscribe(message => {
+      if(typeof(message)==='string')
+      this.sigImgSrc = message;
+      if(typeof(message)==='object')
+      this.payMethod = message;    
+    });
   }
 
   initProfile() {
@@ -95,6 +109,12 @@ export class ProfileComponent implements OnInit {
         if(res.keyValue.room) {this.isRoomDuplicated = true;}
         else if(res.keyValue.email) {this.isEmailDuplicated = true;}
       }
+    })
+  }
+  saveAll(){
+    this.userService.updateSigPay(this.sigImgSrc, this.payMethod,this.currentUser.id).subscribe(res=>{
+      if(res.result==='success')
+      Swal.fire('Updated successfully');
     })
   }
 

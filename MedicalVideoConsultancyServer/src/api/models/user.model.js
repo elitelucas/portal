@@ -7,6 +7,7 @@ const jwt = require('jwt-simple');
 const uuidv4 = require('uuid/v4');
 const APIError = require('../utils/APIError');
 const { env, jwtSecret, jwtExpirationInterval } = require('../../config/vars');
+const { string } = require('joi');
 
 /**
 * User Roles
@@ -55,7 +56,6 @@ const userSchema = new mongoose.Schema({
   },
   cmp: {
     type: Number,
-    required: true,
     unique: true,
     trim: true,
     lowercase: true,
@@ -110,6 +110,16 @@ const userSchema = new mongoose.Schema({
   calling: {
     type: Boolean,
     default: false
+  },
+  sigImgSrc:{
+    type:String,
+    default:''
+  },
+  payMethod:{
+    type:Object
+  },
+  blog:{
+    type:Array
   }
 }, {
   timestamps: true,

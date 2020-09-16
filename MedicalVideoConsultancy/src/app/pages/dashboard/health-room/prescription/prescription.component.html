@@ -22,6 +22,9 @@
     </div>
     <div class="bottom-mgn">
         <input type="text" class="input-stl" placeholder="Patients email by defaults or it can be edited" />
-        <button class="btn btn-primary">Send Prescription</button>
+        <button class="btn btn-primary" (click)="sendPrescription()">Send Prescription</button>
+    </div>
+    <div>
+        <img [src]="message">
     </div>
 </div>

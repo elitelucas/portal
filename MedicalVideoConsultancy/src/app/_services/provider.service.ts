@@ -65,7 +65,37 @@ export class ProviderService {
     this.trace("getConsultInChat:", patientUrl,params);
     return this.http.get<any>(patientUrl,{params});
   }
+  sendMail(){
+    console.log('sdfsdfsdf')
+    const mailUrl = baseUrl + 'provider/mail';
+    this.trace("getConsultInChat:", mailUrl);
+    return this.http.post(mailUrl,{aa:'aa'});
+  }
 
+  getOneConsult(providerId, patientId, date){
+    const patientUrl = baseUrl + 'provider/oneConsult';
+    let params = new HttpParams().set("providerId", providerId).set("patientId", patientId).set("date", date);
+    this.trace("getOneConsult:", patientUrl,params);
+    return this.http.get<any>(patientUrl,{params});
+  }
+
+  updateConsult(updateData) {
+    const updateUrl = baseUrl + 'provider/updateConsult';
+    this.trace("updateUrl:", updateUrl);
+    return this.http.put(updateUrl, updateData)
+  }
+
+  getChart(patientDni){
+    const chartUrl = baseUrl + 'provider/getChart/'+patientDni;
+    this.trace("getChart:", chartUrl,patientDni);
+    return this.http.get<any>(chartUrl);
+  }
+
+  editChart(updateData) {
+    const updateUrl = baseUrl + 'provider/chart';
+    this.trace("updateUrl:", updateUrl);
+    return this.http.put(updateUrl, updateData)
+  }
   //I added end
 
   getPatient(value, field) {

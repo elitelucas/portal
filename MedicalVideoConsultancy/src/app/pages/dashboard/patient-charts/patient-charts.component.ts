@@ -74,7 +74,7 @@ export class PatientChartsComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
   detail(param){
-    this.router.navigateByUrl('/dashboard/patient/'+param.id+'/'+param.fullName);
+    this.router.navigateByUrl('/dashboard/patient/'+param.id+'/'+param.dni+'/'+param.fullName);
   }
 }
 

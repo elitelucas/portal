@@ -37,4 +37,36 @@ export class UserService {
     let profileUrl = baseUrl + "/update-profile/" + id;
     return this.http.put<any>(profileUrl, {profile})
   }
+  updateSigPay(sig, pay, id) {
+    let updateSigPayUrl = baseUrl + "/update-sigPay/" + id;
+    return this.http.put<any>(updateSigPayUrl, {sigImgSrc:sig,payMethod:pay})
+  }
+
+  getPayData(id) {
+    let paymentUrl=baseUrl+"/payment/"+id;
+    return this.http.get<any>(paymentUrl);
+  }
+  //Get blog data from user collection of current provider
+  getBlog(id) {
+    let getBlogUrl=baseUrl+"/getBlog/"+id;
+    return this.http.get<any>(getBlogUrl);
+  }
+
+  //Post blog data to user collection of current provider
+  postBlog(data) {
+    let postBlogUrl=baseUrl+"/postBlog/";
+    return this.http.post<any>(postBlogUrl,data);
+  }
+
+   //Updated blog data send to user collection of current provider
+   updateBlog(data) {
+    let updateBlog=baseUrl+"/updateBlog/";
+    return this.http.put<any>(updateBlog,data);
+  }
+
+   //Delete blog data of user collection of current provider
+   deleteBlog(data) {
+    let deleteBlog=baseUrl+"/deleteBlog/"+data.idx+'/'+data.userId;
+    return this.http.delete<any>(deleteBlog);
+  }
 }

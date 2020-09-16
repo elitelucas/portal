@@ -1,0 +1,59 @@
+With payoneer payment.
+Observations to be resolved:
+
+
+Chores:
+Medical profile:
+page 01:
+task01: the list of consultations made by patients (you get it from the consult collection).
+
+page 02:
+task02: When a new care is started, before sending you to the video call screen, it must show you this page to place the amount to be charged by the doctor and show the qr codes, bank accounts and payment links. Here you have the option "send", which sends the amount to the patient (patient profile page 02). The cancel button is like canceling the attention. And finally, the "payment confirmation" button must be disabled until the patient indicates that they have made the payment. When the patient makes the payment, the payment made is recorded in the payment collection (the doctor clicks the button).
+
+page 03:
+task 03: Complete the functionalities of the tabs with the backend. In the first tab, a mail is sent, the mail sending functionality exists for the physician approval flow. You can reuse the same. The other tabs I think you already know to complete the functionality. At this point when the page loads the query is registered.
+
+page 04:
+task 04: Save the image or signature made. Add payment methods for the doctor.
+
+page 05:
+task 05: List and search by ID or full name filter:
+
+page 06:
+task 06: The lists should be to add similar as is done for the article page to add the title and the article; and are registered in the database.
+
+page 07:
+task 07: record all data in the database.
+
+page 08:
+task 08: Save the articles in the database (we noticed that it did not work to upload images if we need it to work).
+
+Patient profile:
+
+Page 01
+Task 09: Show Doctor's Items
+
+page 02:
+Task 10: It is loaded when the doctor clicked on "send" and visualizes the amount to pay with the payment methods. The patient clicks on "pay" and the doctor enables the "confirm payment" button. When the doctor confirms the payment, he goes to the video call.
+
+page 03
+task 11: In the chat for both the doctor and the patient, the field needs to be cleared when writing. Likewise, we note that when the doctor writes to the patient, the message arrives, but not vice versa. Register the attached files in the query and be able to download the ones you require.
+
+Division of payment regarding tasks:
+
+payment of 75 dollars
+task 01
+task 04
+task 05
+task 06
+
+payment of 100 dollars
+task 02
+task 03
+task 10
+task 11
+
+payment of 75 dollars
+task 07
+task 08
+task 09

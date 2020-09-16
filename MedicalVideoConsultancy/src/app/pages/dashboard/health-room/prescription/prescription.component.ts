@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { DataService } from "../../../../_services/data.service";
+import { ProviderService } from "../../../../_services/provider.service";
+
 
 @Component({
   selector: 'app-prescription',
@@ -8,10 +10,13 @@ import { FormsModule } from '@angular/forms';
 })
 export class PrescriptionComponent implements OnInit {
   prescriptions=[];
-
-  constructor() { }
+  message:any;
+  constructor(private data: DataService,private providerService: ProviderService) { }
 
   ngOnInit(): void {
+    this.data.currentMessage.subscribe(message => {
+      this.message = message    
+    })
   }
   
   AddPrescription(prescriptionInput: string) {
@@ -21,6 +26,12 @@ export class PrescriptionComponent implements OnInit {
   }
   DeleteItem(idx){
     this.prescriptions.splice(idx,1);
+  }
+  sendPrescription(){
+    this.providerService.sendMail().subscribe(result=>{
+      console.log('result');
+      console.log(result);
+    })
   }
 
 }

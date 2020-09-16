@@ -4,13 +4,13 @@ Consult List
     </div>
     <div class="col-8">
         <div class="div-align">
-            <input type="date" name="startDate" id="startDate"  (change)="applyFilter($event)">
+            <input type="date" #startDate name="startDate">
         </div>
         <div class="div-align">
-            <input type="date" name="endDate" id="endDate"  (change)="applyFilter($event)">
+            <input type="date" #endDate name="endDate">
         </div>
         <div class="div-align">
-            <button class="btn btn-primary" (click)="search()">search</button>
+            <button class="btn btn-primary" (click)="search(startDate.value, endDate.value)">search</button>
         </div>
     </div>
 </div>
@@ -38,7 +38,7 @@ Consult List
       <!-- Role Date -->
       <ng-container matColumnDef="date">
         <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-center  font-bold font-20"> Date </th>
-        <td mat-cell *matCellDef="let element"> {{element.date}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.date.split('T')[0]}} </td>
       </ng-container>
   
       <!-- See Patient`s Chart -->

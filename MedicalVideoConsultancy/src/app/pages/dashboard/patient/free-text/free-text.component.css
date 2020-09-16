@@ -23,9 +23,39 @@
     width:94% !important;
 }
 .second-input-wid{
-    width:93% !important;
-    margin-left:1%;
+    width: 70% !important;
+    margin-left: 1%;
+    margin-right: 10%;
+}
+.third-input-wid{
+    width: 64% !important;
+    margin-left: 1%;
+    margin-right: 10%;
 }
 .second-last-wid{
     width:93% !important;
+}
+.add-div-font{
+    font-size:0.8rem;
+}
+.literal-div{
+    margin-bottom:3px;
+}
+.add-div{
+    margin-top:20px;
+}
+.big-mgn{
+    margin-top:30px;
+    margin-bottom:50px;
+}
+.bottom-border{
+    border-bottom: 1px solid;
+
+}
+.button-div{
+    text-align: center;
+    padding: 30px;
+}
+.button-left{
+    margin-left: 20%;
 }

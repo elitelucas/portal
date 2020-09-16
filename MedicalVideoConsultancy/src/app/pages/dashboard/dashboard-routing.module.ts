@@ -10,6 +10,7 @@ import { HealthRoomComponent } from './health-room/health-room.component';
 import { PatientChartsComponent } from './patient-charts/patient-charts.component';
 import { PatientComponent } from './patient/patient.component';
 import { NewConsultComponent } from './new-consult/new-consult.component';
+import { PayProviderComponent } from './pay-provider/pay-provider.component';
 
 
 
@@ -42,6 +43,10 @@ const routes:Routes = [{
     },
 
     {
+      path: 'pay-provider/:dni',
+      component: PayProviderComponent
+    },
+    {
       path: 'admin',
       component: AdminComponent
     },
@@ -51,11 +56,11 @@ const routes:Routes = [{
       component: SuperComponent,
     },
     {
-      path: 'patient/:id/:fullName',
+      path: 'patient/:id/:dni/:fullName',
       component: PatientComponent
     },
     {
-      path: 'newConsult/:id/:date',
+      path: 'newConsult/:index/:id/:date',
       component: NewConsultComponent
     },
     {

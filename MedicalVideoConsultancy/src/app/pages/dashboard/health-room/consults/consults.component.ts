@@ -20,6 +20,7 @@ export class ConsultsComponent implements OnInit {
   displayedColumns: string[] = [ 'id', 'fullName','date','consult'];
   noDataToDisplay: boolean = false;
   dataSource: any;
+  tmpData=[];
   @Input() patient: Patient;
   @ViewChild(MatTable)  table: MatTable<any>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -39,6 +40,7 @@ export class ConsultsComponent implements OnInit {
       if(res) {
         console.log("consult data s>>>>>>>>>>>>>", res)
         this.initDataSource(res)
+        this.tmpData=res;
         this.noDataToDisplay = false;
       } else{
         this.noDataToDisplay = true;
@@ -47,8 +49,6 @@ export class ConsultsComponent implements OnInit {
   }
 
   initDataSource(data) {
-    console.log('data')
-    console.log(data)
     const PatientData: PatientData[] = [];
     data.forEach(function(item){
       if(item) {
@@ -64,8 +64,7 @@ export class ConsultsComponent implements OnInit {
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
-    console.log('filterValue')
-    console.log(filterValue)
+
     // this.dataSource.filter = filterValue.trim().toLowerCase();
   }
   arrangeDataSource() {
@@ -75,8 +74,11 @@ export class ConsultsComponent implements OnInit {
   detail(data){
     this.router.navigateByUrl('/dashboard/newConsult/'+data.id+'/'+data.date);
   }
-  search(){
-
+  search(startDate,endDate){
+    this.dataSource.data = this.tmpData;
+    const fromDate = startDate;
+    const toDate = endDate;
+    this.dataSource.data = this.dataSource.data.filter(e=>e.date > fromDate && e.date < toDate ) ;
   }
 }
 

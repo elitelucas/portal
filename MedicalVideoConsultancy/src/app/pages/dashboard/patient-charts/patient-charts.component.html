@@ -36,7 +36,7 @@
     <!-- See Patient`s Chart -->
     <ng-container matColumnDef="detail">
       <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-center  font-bold font-20"> See Patient`s Chart </th>
-      <td mat-cell *matCellDef="let element"><i class="fa fa-envelope" (click)="detail({id:element.id,fullName:element.fullName})"></i></td>
+      <td mat-cell *matCellDef="let element"><i class="fa fa-envelope" (click)="detail({id:element.id,dni:element.dni,fullName:element.fullName})"></i></td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

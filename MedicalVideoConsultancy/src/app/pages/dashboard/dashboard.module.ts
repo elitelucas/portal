@@ -14,7 +14,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { EditRoomComponent } from './edit-room/edit-room.component';
 import { HealthRoomComponent } from './health-room/health-room.component';
 import { SignatureComponent } from './profile/signature/signature.component';
-import { DrawingComponent } from './profile/signature/drawing.component';
+import { DrawingComponent } from './profile/signature/drawing/drawing.component';
 import { DataTablesModule } from 'angular-datatables';
 import { PatientChartsComponent } from './patient-charts/patient-charts.component';
 import { PatientComponent } from './patient/patient.component';
@@ -26,12 +26,14 @@ import { ConsultsComponent } from './health-room/consults/consults.component';
 import { FilesComponent } from './health-room/files/files.component';
 import { ChartsComponent } from './health-room/charts/charts.component';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { PayProviderComponent } from './pay-provider/pay-provider.component';
+import { PayMethodComponent } from './profile/pay-method/pay-method.component';
 
 
 @NgModule({
   declarations: [AdminComponent, SuperComponent, HealthProviderComponent, 
     DialogBoxComponent, ProfileComponent, InviteBySms, EditRoomComponent, HealthRoomComponent, 
-    SignatureComponent,DrawingComponent,PatientChartsComponent, PatientComponent, ConsultListComponent, FreeTextComponent, NewConsultComponent, PrescriptionComponent, ConsultsComponent, FilesComponent, ChartsComponent],
+    SignatureComponent,DrawingComponent,PatientChartsComponent, PatientComponent, ConsultListComponent, FreeTextComponent, NewConsultComponent, PrescriptionComponent, ConsultsComponent, FilesComponent, ChartsComponent, PayProviderComponent, PayMethodComponent],
   imports: [
     SharedModule,
     ReactiveFormsModule,

@@ -107,9 +107,51 @@ router
     .post(controller.fileUpload);
 
   /**
+   * api/v1/users/sigImages
+   * */
+  router.route('/sigImages')
+  .post(controller.sigImgUpload);
+
+  /**
    * api/v1/users/update-profile/:userId
    * */
   router.route('/update-profile/:userId')
     .put(authorize(), controller.updateProfile);
+
+  /**
+   * api/v1/users/update-sigPay/:userId
+   * */
+  router.route('/update-sigPay/:userId')
+  .put(controller.updateSigPay);
+
+  /**
+   * api/v1/users/payment/:userId
+   * */
+  router.route('/payment/:userId')
+  .get(controller.getPayData);
+
+  /**
+   * api/v1/users/getBlog/:userId
+   * */
+  router.route('/getBlog/:userId')
+  .get(controller.getBlog);
+
+    /**
+   * api/v1/users/postBlog
+   * */
+  router.route('/postBlog')
+  .post(controller.postBlog);
+
+      /**
+   * api/v1/users/updateBlog
+   * */
+  router.route('/updateBlog')
+  .put(authorize(),controller.updateBlog);
+
+       /**
+   * api/v1/users/deleteBlog
+   * */
+  router.route('/deleteBlog/:idx/:userId')
+  .delete(authorize(),controller.deleteBlog);
 
 module.exports = router;
