@@ -1,0 +1,12 @@
+canvas {
+    border: 1px solid #000;
+  }
+  button {
+    margin-right:10px;
+  }
+.sig-image{
+  width:50%;
+}
+.display{
+  display:none;
+}

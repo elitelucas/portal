@@ -16,7 +16,7 @@ ratione voluptatem sequi nesciunt. Neque porro quisquam est.
       <p *ngIf="postTitle.value===''&& clickKey" style="color:red">required*</p>
     </div>
     <div class="post-body">
-      <ckeditor #postBody [editor]="Editor"></ckeditor>
+      <ckeditor #postBody [editor]="Editor" (ready)="onReady($event)"></ckeditor>
     </div>
   </div>
 

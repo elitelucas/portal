@@ -18,6 +18,15 @@ export class FileUploadService {
   }
 
   //I added
+
+  public sigImgUpload(formData) {
+    const imageUrl = this.baseUrl + "users/sigImages";
+    return this.http.post<any>(imageUrl, formData, {
+      reportProgress: true,
+      observe: 'events'
+    });
+  }
+
   public uploadFile(formData) {
     const fileUrl = this.baseUrl + "provider/uploadFile";
     return this.http.post<any>(fileUrl, formData, {

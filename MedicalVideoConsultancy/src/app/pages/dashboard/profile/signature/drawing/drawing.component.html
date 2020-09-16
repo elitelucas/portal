@@ -1,0 +1,24 @@
+
+  <div style="width:80%" [class]="switch?'display':''">
+    <div id="parent" style="width:100%;"  (window:resize)="onResize($event)">
+      <canvas #sigPad (mousedown)="onMouseDown($event)"
+      (mousemove)="onMouseMove($event)">
+      </canvas>
+    </div>
+  </div>
+ 
+  <div *ngIf="userData && switch" class="mx-3" style="text-align: center;">
+    <img class="sig-image" src="{{publicUrl + userData.fileName}}">
+  </div>
+ 
+  <br/>
+  <ng-container *ngFor="let file of files">
+    <mat-progress-bar [value]="file.progress"></mat-progress-bar>
+  </ng-container>
+  <input type="file" #fileUpload id="fileUpload" name="fileUpload" multiple="multiple" accept="*" style="display:none;" />
+  
+  <button (click)="save()" class="btn btn-primary pull-right">Update signature</button>
+  <button (click)="handleUpload()" class="btn btn-primary pull-right">Upload signature</button>
+  <button (click)="clear()" class="btn btn-danger pull-right">clear</button>
+  
+  <br/>

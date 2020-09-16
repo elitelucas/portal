@@ -56,13 +56,24 @@ router.route('/allPacients')
 router.route('/consult')
   .get(controller.getConsult);
 
+router.route('/oneConsult')
+  .get(controller.getOneConsult);
+
 router.route('/consultInChat')
   .get(controller.getConsultInChat);
 
 router.route('/uploadFile')
   .post(controller.fileUpload);
+
 router.route('/mail')
   .post(controller.mail);  
+
+
+router.route('/updateConsult')
+  .put(controller.updateConsult)
+
+router.route('/ckImage')
+  .post(controller.uploadCkImage)
 
 //I added end
 router.route('/patientByField')
@@ -129,7 +140,7 @@ router.route('/chart')
  * @api v1/provider/chart/:dni
  * @method get
  * */
-router.route('/chart/:dni')
+router.route('/getChart/:patientDni')
   .get(controller.getChart);
 
 /**

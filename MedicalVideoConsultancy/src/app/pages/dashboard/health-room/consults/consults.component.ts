@@ -49,8 +49,6 @@ export class ConsultsComponent implements OnInit {
   }
 
   initDataSource(data) {
-    console.log('data')
-    console.log(data)
     const PatientData: PatientData[] = [];
     data.forEach(function(item){
       if(item) {
@@ -66,8 +64,7 @@ export class ConsultsComponent implements OnInit {
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
-    console.log('filterValue')
-    console.log(filterValue)
+
     // this.dataSource.filter = filterValue.trim().toLowerCase();
   }
   arrangeDataSource() {
@@ -78,11 +75,6 @@ export class ConsultsComponent implements OnInit {
     this.router.navigateByUrl('/dashboard/newConsult/'+data.id+'/'+data.date);
   }
   search(startDate,endDate){
-    console.log('startDate')
-    console.log(startDate)
-    console.log(typeof(startDate))
-    console.log('this.tmpData')
-    console.log(this.tmpData)
     this.dataSource.data = this.tmpData;
     const fromDate = startDate;
     const toDate = endDate;

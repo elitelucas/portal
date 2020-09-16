@@ -31,35 +31,6 @@
       </mat-card>
     </div>
 
-<!--     <div class="user-video-call col-xl-4 col-lg-12">
-      <mat-card class="h-100">
-        <div id="meet-container" class="w-100 p-3">
-          <ng-container *ngIf="noDevice">
-            <div class=" w-10 bg-dark border-radius-5 h-100">
-              <div class="d-flex justify-content-end">
-                <div class="p-5">
-                  <img class="mr-5" src="https://img.icons8.com/color/48/000000/no-video.png" alt="video-offline "/>
-                  <img   src="https://img.icons8.com/ultraviolet/40/000000/no-audio.png"/>
-                </div>
-              </div>
-              <div class="d-flex justify-content-center">
-                <img src="https://img.icons8.com/officel/80/000000/change-user-male.png" alt="v-user-offline"/>
-              </div>
-            </div>
-            <div class="mt-3 font-weight-bold">You don't have camera</div>
-          </ng-container>
-
-          <ng-container *ngIf="!noDevice" class="w-100 text-center">
-            <webcam class="w-100 border-radius-5" [imageQuality]="1" (initError)="handleInitError($event)"></webcam>
-            <div class=" font-weight-bold">You can test your camera</div>
-          </ng-container>
-
-          <ng-container *ngIf="!patientsData.length">
-            <div class="mt-3 font-weight-bold">No available patients in waiting room</div>
-          </ng-container>
-        </div>
-      </mat-card>
-    </div> -->
   </div>
   <div class="row">
 
@@ -82,20 +53,26 @@
             </ng-container>
 
             <!-- createDate Column -->
-            <ng-container matColumnDef="createDate">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-center  font-bold font-20"> Date </th>
-              <td mat-cell *matCellDef="let element"> {{element.createDate}} </td>
+            <ng-container matColumnDef="paymentType">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-center  font-bold font-20"> Method of Payment </th>
+              <td mat-cell *matCellDef="let element"> {{element.patient.paymentType}} </td>
             </ng-container>
             
             <!-- Action Column -->
-            <ng-container matColumnDef="action">
+            <!-- <ng-container matColumnDef="action">
               <th mat-header-cell *matHeaderCellDef class="text-center  font-bold font-20"> Action </th>
               <td mat-cell *matCellDef="let element" class="action-link">
                 <div class="d-flex font-18 justify-content-center">
                   <a  [routerLink]="['/dashboard/patient/',element.patient._id]"  class="cursor"><img class="w-50" src="https://img.icons8.com/android/24/000000/search.png"/></a>
                 </div>
               </td>
+            </ng-container> -->
+            <!-- See Patient`s Chart -->
+            <ng-container matColumnDef="detail">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-center  font-bold font-20"> See Patient`s Chart </th>
+              <td mat-cell *matCellDef="let element"><i class="fa fa-envelope" (click)="detail({id:element.patient._id, fullName:element.patient.fullName})"></i></td>
             </ng-container>
+
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
           </table>

@@ -54,18 +54,29 @@ export class Consult {
   providerId : String;
   dni: String;
   birthDate: number;
-  allergy: Object;
-  complain: Object;
-  timeOfDisease: Object;
-  wayOfStart: Object;
-  symptom: Object;
-  historyId: Object;
-  subjective: Object;
-  objective: Object;
-  assessment: Object;
-  plan: Object;
-  files: Object;
+  allergy: String;
+  complain: String;
+  timeOfDisease: String;
+  wayOfStart: String;
+  symptom: Array<string>;
+  historyId: String;
+  subjective: String;
+  objective: String;
+  assessment: String;
+  plan: String;
+  providerFiles: Array<string>;
+  patientFiles: Array<string>;
   createDate: Date;
   patient: Object;
+  _id: String;
+}
+
+export class Chart {
+  dni: String;
+  disease:Array<string>;
+  medication:Array<string>;
+  surgery:Array<string>;
+  family:Array<string>;
+  toxic:Array<string>;
   _id: String;
 }

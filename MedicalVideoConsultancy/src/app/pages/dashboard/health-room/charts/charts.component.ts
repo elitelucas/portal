@@ -18,10 +18,6 @@ export class ChartsComponent implements OnInit {
   }
   AddItem(Item: string,key:string) {
     if (Item) {
-      console.log('Item')
-      console.log(Item)
-      console.log('key')
-      console.log(key)
       if(key==='disease')
       this.diseaseArr.push(Item);
       else if(key==='medication')

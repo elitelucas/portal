@@ -164,19 +164,47 @@ exports.sendSMS = (req, res) => {
  * */
 
 exports.fileUpload = async (req, res) => {
-  const user = await User.findOne({_id: req.body._id});
-  const userModel = user ? User : Admin;
+  if(req.body.key){
+    const file = req.files.file;
+  const imagePath = path.join(__dirname + './../../public/images/');
+  file.mv(imagePath + file.name, function (error) {
+    if (error) {
+      console.log("QRimage upload error", error)
+    } else {
+        res.status(httpStatus.CREATED).json({fileName:file.name});
+    }
+  });
+  }else{
+    const user = await User.findOne({_id: req.body._id});
+    const userModel = user ? User : Admin;
+    const file = req.files.file;
+    const imagePath = path.join(__dirname + './../../public/images/');
+    file.mv(imagePath + file.name, function (error) {
+      if (error) {
+        console.log("profile image upload error", error)
+      } else {
+        userModel.findOneAndUpdate({_id: req.body._id}, {image: file.name}, {new: true}).then(result => {
+          res.status(httpStatus.CREATED).json(result)
+        }).catch(e => {
+          console.log("image upload failed", e);
+        })
+      }
+    });
+  }
+};
+
+/**
+ * Upload signature image.
+ * */
+
+exports.sigImgUpload = async (req, res) => {
   const file = req.files.file;
   const imagePath = path.join(__dirname + './../../public/images/');
   file.mv(imagePath + file.name, function (error) {
     if (error) {
-      console.log("profile image upload error", error)
+      console.log("signature image upload error", error)
     } else {
-      userModel.findOneAndUpdate({_id: req.body._id}, {image: file.name}, {new: true}).then(result => {
-        res.status(httpStatus.CREATED).json(result)
-      }).catch(e => {
-        console.log("image upload failed", e);
-      })
+        res.status(httpStatus.CREATED).json({fileName:file.name});
     }
   });
 };
@@ -204,3 +232,133 @@ exports.updateProfile = async (req, res) => {
     return res.send(e)
   })
 };
+
+/**
+ * Update signature and payment method in user profile page
+ * */
+
+exports.updateSigPay = async (req, res) => {
+  const imagePath = path.join(__dirname + './../../public/images/');
+  var signatureImgName="signature.png";
+  var sigImgSrc=req.body.sigImgSrc;
+  if (sigImgSrc){
+    var fs=require('fs');
+    if(sigImgSrc.indexOf(';base64,')!==-1){
+      let base64Image = sigImgSrc.split(';base64,').pop();
+      fs.writeFile(imagePath+signatureImgName, base64Image, {encoding: 'base64'}, function(err) {
+          console.log('File created');
+      });
+    }else{
+      signatureImgName=sigImgSrc;
+    }   
+  }
+  const payMethod=req.body.payMethod;
+ 
+  User.findOneAndUpdate(
+    {_id: req.params.userId}, 
+    {"$set":{sigImgSrc:signatureImgName,payMethod:payMethod,new: true}})
+    .then(result => {
+    res.status(httpStatus.OK).json({result:'success'});
+  }).catch(e => {
+    return res.send(e)
+  })
+};
+
+/**
+ * Get payment method field from users collection
+ * */
+
+exports.getPayData = async (req, res) => {
+  const id=req.params.userId;
+  User.findById(id).then(result=>{
+    res.status(httpStatus.OK).json(result.payMethod);
+  }).catch(e => {
+    return res.send(e)
+  })
+};
+
+/**
+ * Get blog field from users collection
+ * */
+
+exports.getBlog = async (req, res) => {
+  const id=req.params.userId;
+  User.findById(id).then(result=>{
+    res.status(httpStatus.OK).json(result.blog);
+  }).catch(e => {
+    return res.send(e)
+  })
+};
+
+/**
+ * Insert data to blog field of users collection
+ * */
+
+exports.postBlog = async (req, res) => {
+
+  const id=req.body.userId;
+  const postTitle=req.body.postTitle;
+  const postBody=req.body.postBody;
+
+  User.findOneAndUpdate(
+    { _id: id }, 
+    { $push: { blog: {postTitle,postBody}}},
+    {new:true})
+    .then(result=>{
+      res.status(httpStatus.OK).json(result.blog);
+    }).catch(e => {
+      return res.send(e)
+    })
+};
+
+/**
+ * Update blog field of users collection
+ * */
+
+exports.updateBlog = async (req, res, next) => {
+  const idx=req.body.idx;
+  const id=req.body.userId;
+  const postTitle=req.body.postTitle;
+  const postBody=req.body.postBody;
+  User.findOne({_id: id})
+    .then(result =>{
+      result.blog.splice(idx,1,{postTitle,postBody});
+      result.save(function(error) {
+        if (error) {
+            console.log(error);
+            return res.status(500).send(null);
+        } else {
+          return res.status(httpStatus.OK).json(result.blog);
+        }
+    });
+  })  
+    .catch(e =>{
+      return res.send(e)
+    });
+};
+
+/**
+ * Delete blog field of users collection
+ * */
+
+exports.deleteBlog = async (req, res, next) => {
+  const idx=req.params.idx;
+  const id=req.params.userId;
+  User.findById(id)
+    .then(result =>{
+      result.blog.splice(idx,1);
+      result.save(function(error) {
+        if (error) {
+            console.log(error);
+            return res.status(500).send(null);
+        } else {
+          return res.status(httpStatus.OK).json(result.blog);
+        }
+    });
+  })  
+    .catch(e =>{
+      return res.send(e)
+    });
+};
+
+

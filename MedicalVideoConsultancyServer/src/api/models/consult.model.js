@@ -9,19 +9,58 @@ const consultSchema = new Schema({
     type: String,
     required: true,
   },
-  allergy: Object,
-  complain: Object,
-  timeOfDisease: Object,
-  wayOfStart: Object,
-  symptom: Object,
-  history: Object,
-  subjective: Object,
-  objective: Object,
-  assessment: Object,
-  plan: Object,
-  files: Array,
+  allergy: {
+    type:String,
+    default:''
+  },
+  complain: {
+    type:String,
+    default:''
+  },
+  timeOfDisease: {
+    type:String,
+    default:''
+  },
+  wayOfStart: {
+    type:String,
+    default:''
+  },
+  symptom: {
+    type:Array,
+    default:[]
+  },
+  history: {
+    type:String,
+    default:''
+  },
+  subjective: {
+    type:String,
+    default:''
+  },
+  objective: {
+    type:String,
+    default:''
+  },
+  assessment: {
+    type:String,
+    default:''
+  },
+  plan: {
+    type:String,
+    default:''
+  },
+  providerFiles: {
+    type:Array,
+    default:[]
+  },
+  patientFiles: {
+    type:Array,
+    default:[]
+  },
   createDate: Date,
   patient: Object,
+},{
+  timestamps:true
 });
 
 module.exports = mongoose.model('Consult', consultSchema);

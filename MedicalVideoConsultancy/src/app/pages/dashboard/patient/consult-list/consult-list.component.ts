@@ -5,10 +5,12 @@ import {Router} from "@angular/router";
 
 export interface IdName {
   id:string;
+  dni:string;
   fullName: string;
 }
 
 export interface PatientData {
+  index:number;
   patientId:string;
   date: Date;
 }
@@ -22,7 +24,7 @@ export interface PatientData {
 
 export class ConsultListComponent implements OnInit {
 
-  displayedColumns: string[] = [ 'id', 'fullName','date','consult'];
+  displayedColumns: string[] = [ 'index', 'fullName','date','consult'];
   noDataToDisplay: boolean = false;
   dataSource: any;
   tmpData=[];
@@ -52,9 +54,9 @@ export class ConsultListComponent implements OnInit {
 
   initDataSource(data) {
     const PatientData: PatientData[] = [];
-    data.forEach(function(item){
+    data.forEach(function(item,idx){
       if(item) {
-        PatientData.push({ patientId:item.patientId, date: item.date});
+        PatientData.push({index:idx+1, patientId:item.patientId, date: item.date});
       }
     });
 
@@ -65,11 +67,7 @@ export class ConsultListComponent implements OnInit {
   }
 
   applyFilter(event: Event) {
-    console.log('event.target')
-    console.log(event.target)
     const filterValue = (event.target as HTMLInputElement).value;
-    console.log('filterValue')
-    console.log(filterValue)
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
   arrangeDataSource() {
@@ -77,7 +75,7 @@ export class ConsultListComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
   detail(data){
-    this.router.navigateByUrl('/dashboard/newConsult/'+data.id+'/'+data.date);
+    this.router.navigateByUrl('/dashboard/newConsult/'+data.index+'/'+data.id+'/'+data.date);
   }
   search(startDate,endDate){
     this.dataSource.data = this.tmpData;

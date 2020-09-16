@@ -26,7 +26,7 @@ export class HealthProviderComponent implements OnInit{
   private webCamError = [];
 
 
-  displayedColumns: string[] = ['dni', 'fullName', 'createDate', 'action'];
+  displayedColumns: string[] = ['dni', 'fullName', 'paymentType', 'detail'];
   noDataToDisplay: boolean = false;
   dataSource: any;
 
@@ -147,6 +147,9 @@ export class HealthProviderComponent implements OnInit{
     this.webCamError.push(error);
     console.log('camera error', this.webCamError)
   }
+  detail(param){
+    this.router.navigateByUrl('/dashboard/patient/'+param.id+'/'+param.fullName);
+  }
 
 
 }
@@ -182,5 +185,6 @@ export class InviteBySms {
   getNumber(phoneNumber: any) {
     this.data.phoneNumber = phoneNumber;
   }
+ 
 
 }

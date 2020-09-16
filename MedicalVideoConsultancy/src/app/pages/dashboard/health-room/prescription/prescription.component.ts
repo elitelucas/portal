@@ -10,15 +10,12 @@ import { ProviderService } from "../../../../_services/provider.service";
 })
 export class PrescriptionComponent implements OnInit {
   prescriptions=[];
-  message:string;
+  message:any;
   constructor(private data: DataService,private providerService: ProviderService) { }
 
   ngOnInit(): void {
     this.data.currentMessage.subscribe(message => {
-      this.message = message
-      console.log('message')
-      console.log(message)
-    
+      this.message = message    
     })
   }
   

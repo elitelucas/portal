@@ -130,8 +130,6 @@ exports.checkRoomExist = (req, res, next) => {
  
   User.findOne(req.params).then(result => {
     if(result && result.status === 'active' ) {
-      console.log('result')
-      console.log(result)
       result['password'] = null;
       result['phoneNumber'] = null;
       result['cmp'] = null;
@@ -187,8 +185,6 @@ exports.getAllPatients = async (req, res, next) => {
         }
       )
     }
-    console.log('sendArr')
-    console.log(sendArr)
 
     res.status(httpStatus.OK).json(sendArr);
   } catch (e) {
@@ -202,8 +198,6 @@ exports.getConsult = async (req, res, next) => {
     const key=req.query.key;
     const value=req.query.value;
     consult = await Consult.find({patientId:value}).exec();
-    console.log('consult')
-    console.log(consult)
     res.status(httpStatus.OK).json(consult);
   } catch (e) {
     console.log("getConsult:",error);
@@ -211,13 +205,66 @@ exports.getConsult = async (req, res, next) => {
   }
 };
 
+exports.getOneConsult = async (req, res, next) => {
+  try {
+    const providerId=req.query.providerId;
+    const patientId=req.query.patientId;
+    const date=req.query.date
+    patient=await Patient.findById(patientId).exec();
+    consult = await Consult.findOne({patientId:patientId, providerId:providerId, date:new Date(date)}).exec();
+    consult.patient=patient;  
+    res.status(httpStatus.OK).json(consult);
+  } catch (e) {
+    console.log("getConsult:",error);
+    return next(APIError(e));
+  }
+};
+
+exports.updateConsult = async (req, res, next) => {
+  try {
+    const providerId=req.body.providerId;
+    const patientId=req.body.patientId;
+    const date=req.body.date;
+    const updateData=req.body.updateData;
+    const symptom=[updateData.symptom0,updateData.symptom1,updateData.symptom2,updateData.symptom3];
+
+    const updatedConsult = await Consult.findOneAndUpdate(
+      {patientId:patientId, providerId:providerId, date:new Date(date)}, 
+      {"$set":{
+        allergy:updateData.allergy,
+        timeOfDisease:updateData.timeOfDisease,
+        wayOfStart:updateData.wayOfStart,
+        symptom:symptom,
+        history:updateData.history,
+        subjective:updateData.subjective,
+        objective:updateData.objective,
+        assessment:updateData.assessment,
+        plan:updateData.plan,
+        providerFiles:updateData.providerFiles,
+        new: true
+      }});
+
+
+    const updatedPatient = await Patient.findOneAndUpdate(
+      {_id: req.body.patientId}, 
+      {"$set":{
+        fullName:updateData.name,
+        age:updateData.age,
+        phoneNumber:updateData.phoneNumber,
+        new: true
+      }});
+    return res.status(httpStatus.OK).json('success');
+  } catch (e) {
+    return next(APIError(e))
+  }
+};
+
+
 exports.getConsultInChat = async (req, res, next) => {
   try {
     const patientId=req.query.patientId;
     const providerId=req.query.providerId;
     consult = await Consult.find({patientId:patientId, providerId:providerId}).exec();
-    console.log('consult')
-    console.log(consult)
     res.status(httpStatus.OK).json(consult);
   } catch (e) {
     console.log("getConsult:",error);
@@ -227,13 +274,23 @@ exports.getConsultInChat = async (req, res, next) => {
 
 exports.fileUpload = async (req, res) => {
   const file = req.files.file;
-  console.log('req.body');
-  console.log(req.body);
   var folderName='provider';
   if(req.body._id===undefined){
     folderName='patient';
   }
   const imagePath = path.join(__dirname + './../../public/'+folderName+'/');
+  file.mv(imagePath + file.name, function (error) {
+    if (error) {
+      console.log("file upload error", error)
+    } else {
+      res.status(httpStatus.CREATED).json(file.name);
+    }
+  });
+};
+
+exports.uploadCkImage = async (req, res) => {
+  const file = req.files.attachment;
+  const imagePath = path.join(__dirname + './../../public/images/');
   file.mv(imagePath + file.name, function (error) {
     if (error) {
       console.log("file upload error", error)
@@ -514,12 +571,11 @@ exports.editChart = async (req, res, next) => {
  * */
 exports.getChart = async (req, res, next) => {
   try {
-    const dni = req.params.dni;
-    const chart = await Chart.findOne({dni: dni});
-    if(chart) res.status(httpStatus.OK).json(chart)
-    else res.stats(httpStatus.NO_CONTENT);
+    const patientDni = req.params.patientDni;
+    const chart = await Chart.findOne({dni:patientDni});
+    res.status(httpStatus.OK).json(chart)
   } catch (e) {
-    return next(APIError(e))
+    console.log(e)
   }
 }
 

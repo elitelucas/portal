@@ -114,14 +114,14 @@ export class AppSidebarComponent implements OnInit {
   }
 
   startPreCall() {
-    //console.log("startPreCall")
+    // console.log("startPreCall")
     //console.log(this.waitingPatientsData)this.meetRoomService.init();
     if (this.waitingPatientsData && this.waitingPatientsData.length) {
       let patient = this.waitingPatientsData[0];
       //console.log(patient)
       localStorage.setItem('provider_data', JSON.stringify(this.currentUser));
       localStorage.setItem(patient._id, JSON.stringify(patient));
-      this.router.navigateByUrl('/dashboard/health-room/' + patient._id);
+      this.router.navigateByUrl('/dashboard/pay-provider/' + patient.dni);
     }
   }
 

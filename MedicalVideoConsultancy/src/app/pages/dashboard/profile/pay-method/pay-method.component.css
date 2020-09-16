@@ -1,0 +1,28 @@
+.right-pad{
+    padding-right:10%;
+}
+.img-pad{
+    padding: 2%;
+}
+.main{
+    padding:2%;
+    background-color: #8080808c;
+}
+.total{
+    padding:2%;
+}
+.input-width{
+    width:100%;
+}
+.add-url{
+    margin-bottom:10px;
+}
+.add-account{
+    margin-bottom:10px;
+}
+.small-font{
+    font-size: 0.8rem;
+}
+.qrImage{
+    width:100%;
+}
