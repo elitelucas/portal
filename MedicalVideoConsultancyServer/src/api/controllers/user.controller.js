@@ -239,7 +239,10 @@ exports.updateProfile = async (req, res) => {
 
 exports.updateSigPay = async (req, res) => {
   const imagePath = path.join(__dirname + './../../public/images/');
-  var signatureImgName="signature.png";
+  var rand_no = Math.floor(123123123123*Math.random());
+  var signatureImgName=rand_no+"signature.png";
+  console.log('signatureImgName')
+  console.log(signatureImgName)
   var sigImgSrc=req.body.sigImgSrc;
   if (sigImgSrc){
     var fs=require('fs');
@@ -256,8 +259,12 @@ exports.updateSigPay = async (req, res) => {
  
   User.findOneAndUpdate(
     {_id: req.params.userId}, 
-    {"$set":{sigImgSrc:signatureImgName,payMethod:payMethod,new: true}})
+    {"$set":{sigImgSrc:signatureImgName,payMethod:payMethod}},
+    {new: true}
+    )
     .then(result => {
+      console.log('result')
+      console.log(result)
     res.status(httpStatus.OK).json({result:'success'});
   }).catch(e => {
     return res.send(e)
