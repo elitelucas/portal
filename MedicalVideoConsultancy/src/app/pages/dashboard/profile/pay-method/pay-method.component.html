@@ -14,8 +14,8 @@
             <ng-container *ngFor="let file of files">
                 <mat-progress-bar [value]="file.progress"></mat-progress-bar>
             </ng-container>
-            <div *ngIf="displayKey">
-                <div class="row right-pad add-account" *ngIf="payData.QRimg[0]">
+            <div>
+                <div class="row right-pad add-account" *ngIf="QRimgKey[0]">
                     <div class="col-9">
                         <div class="row">
                             <div class="col-4">
@@ -30,7 +30,7 @@
                         <button class="btn btn-danger  small-font" (click)="RemoveItem(0,'qr')">Remove</button>
                     </div>
                 </div>
-                <div class="row right-pad add-account" *ngIf="payData.QRimg[1]">
+                <div class="row right-pad add-account" *ngIf="QRimgKey[1]">
                     <div class="col-9">
                         <div class="row">
                             <div class="col-4">
@@ -66,7 +66,7 @@
                     </button>
                 </div>
             </div>
-            <div *ngIf="displayKey">
+            <div *ngIf="accountKey">
                 <div class="row add-account" *ngFor="let item of payData.account; let i=index;">
                     <div class="col-4">
                         {{item}}
@@ -89,7 +89,7 @@
                      </button>
                  </div>
             </div>
-            <div *ngIf="displayKey">
+            <div *ngIf="urlKey">
                 <div class="row add-account" *ngFor="let item of payData.url; let i=index;">
                     <div class="col-4">
                     {{item}}

@@ -27,6 +27,10 @@ export class PayMethodComponent implements OnInit {
   changeKey=true;
   displayKey:boolean=false;
   uploadImageName=[];
+  QRimgKey=[];
+  QRimg1Key=false;
+  accountKey=false;
+  urlKey=false;
   @ViewChild("fileUpload", {static: false}) fileUpload: ElementRef; files = [] ;
 
   constructor(
@@ -36,6 +40,8 @@ export class PayMethodComponent implements OnInit {
     private authService:AuthService
     ) {
     this.currentUser = this.authService.getCurrentUser;
+    this.QRimgKey[0]=false;
+    this.QRimgKey[1]=false;
    }
 
   ngOnInit(): void {
@@ -45,17 +51,19 @@ export class PayMethodComponent implements OnInit {
       console.log(res)
       console.log(typeof(res))
       console.log(res.length)
-      if(this.payData && res.length){
-        console.log('lll')
-        this.displayKey=true;
-      }
-      else{
-        this.payData={
-          QRimg:[],
-          account:[],
-          url:[]
+      if(this.payData){
+        if(this.payData.QRimg[0]){
+          this.QRimgKey[0]=true;
         }
-        this.displayKey=false;
+        if(this.payData.QRimg[1]){
+          this.QRimgKey[1]=true;
+        }
+        if(this.payData.account){
+          this.accountKey=true;
+        }
+        if(this.payData.url){
+          this.urlKey=true;
+        }
       }
     })
   }
@@ -89,7 +97,12 @@ export class PayMethodComponent implements OnInit {
           return
         }else{
           this.payData.QRimg.push({name:event.body.fileName, description:this.qrDesc});
-          this.displayKey=true;
+          if(this.payData.QRimg[0]){
+            this.QRimgKey[0]=true;
+          }
+          if(this.payData.QRimg[1]){
+            this.QRimgKey[1]=true;
+          }
         }
       }
     });
@@ -119,10 +132,14 @@ export class PayMethodComponent implements OnInit {
   AddAcount(back, account){
     if(back!=='' && account!=='')
     this.payData.account.push(back+'-'+account);
+    if(this.payData.account)
+    this.accountKey=true;
   }
   AddUrl(url){
     if(url!=='')
     this.payData.url.push(url);
+    if(this.payData.url)
+    this.urlKey=true;
   }
   RemoveItem(idx,key){
     if (key==='accountKey')
@@ -130,9 +147,10 @@ export class PayMethodComponent implements OnInit {
     else if(key==='urlKey'){
       this.payData.url.splice(idx,1);
     }
-   
-    else if(key==='qr')
-    this.payData.QRimg.splice(idx,1);
+    else if(key==='qr'){
+      this.payData.QRimg.splice(idx,1);
+      this.QRimgKey[idx]=false;
+    }
   }
   Update(){
     console.log('this.payData')
