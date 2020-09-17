@@ -5,6 +5,7 @@
             <div class="row add-account">
                 <div class="col-9">
                     <input #qrDesc class="input-width" type="text" placeholder="QR description">
+                    <p style="color:red" *ngIf="descInputKey"> *required</p>
                 </div>
                 <div class="col-3">
                     <input type="file" #fileUpload id="fileUpload" name="fileUpload" multiple="multiple" accept="*" style="display:none;" />

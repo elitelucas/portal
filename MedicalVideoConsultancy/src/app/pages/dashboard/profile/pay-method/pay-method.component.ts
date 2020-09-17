@@ -28,9 +28,9 @@ export class PayMethodComponent implements OnInit {
   displayKey:boolean=false;
   uploadImageName=[];
   QRimgKey=[];
-  QRimg1Key=false;
   accountKey=false;
   urlKey=false;
+  descInputKey=false;
   @ViewChild("fileUpload", {static: false}) fileUpload: ElementRef; files = [] ;
 
   constructor(
@@ -49,8 +49,13 @@ export class PayMethodComponent implements OnInit {
       this.payData=res;
       console.log('res')
       console.log(res)
-      console.log(typeof(res))
-      console.log(res.length)
+      if(res===null){
+        this.payData={
+          QRimg:[],
+          account:[],
+          url:[]
+        }
+      }
       if(this.payData){
         if(this.payData.QRimg[0]){
           this.QRimgKey[0]=true;
@@ -92,16 +97,17 @@ export class PayMethodComponent implements OnInit {
           file.progress = 0;
           this.files = [];
         }, 1000);
-
-        if(this.payData.QRimg && this.payData.QRimg.length>=2){
-          return
-        }else{
-          this.payData.QRimg.push({name:event.body.fileName, description:this.qrDesc});
-          if(this.payData.QRimg[0]){
-            this.QRimgKey[0]=true;
-          }
-          if(this.payData.QRimg[1]){
-            this.QRimgKey[1]=true;
+        if(this.payData){
+          if(this.payData.QRimg && this.payData.QRimg.length>=2){
+            return        
+          }else{
+            this.payData.QRimg.push({name:event.body.fileName, description:this.qrDesc});   
+            if(this.payData.QRimg[0]){
+              this.QRimgKey[0]=true;
+            }
+            if(this.payData.QRimg[1]){
+              this.QRimgKey[1]=true;
+            }
           }
         }
       }
@@ -116,7 +122,12 @@ export class PayMethodComponent implements OnInit {
   }
 
   handleUpload(qrDesc) {
-    if(this.payData.QRimg && this.payData.QRimg.length>=2)
+    if(qrDesc===''){
+      this.descInputKey=true;
+      return;
+    }
+    this.descInputKey=false;
+    if(this.payData && this.payData.QRimg && this.payData.QRimg.length>=2)
     return;
     this.qrDesc=qrDesc;
     const fileUpload = this.fileUpload.nativeElement;
@@ -148,8 +159,8 @@ export class PayMethodComponent implements OnInit {
       this.payData.url.splice(idx,1);
     }
     else if(key==='qr'){
-      this.payData.QRimg.splice(idx,1);
       this.QRimgKey[idx]=false;
+      this.payData.QRimg.splice(idx,1);
     }
   }
   Update(){
