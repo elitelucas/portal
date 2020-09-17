@@ -10,9 +10,9 @@ export class PatientComponent implements OnInit {
 
   data:any;
   constructor(
-    private activatedroute: ActivatedRoute
+    private activatedRoute: ActivatedRoute
   ) {
-    this.activatedroute.params.subscribe(data => {
+    this.activatedRoute.params.subscribe(data => {
       this.data=data;
     })
   }

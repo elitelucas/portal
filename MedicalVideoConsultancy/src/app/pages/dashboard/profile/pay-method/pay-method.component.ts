@@ -41,7 +41,12 @@ export class PayMethodComponent implements OnInit {
   ngOnInit(): void {
     this.userService.getPayData(this.currentUser.id).subscribe(res=>{
       this.payData=res;
-      if(this.payData && res.length!==0){
+      console.log('res')
+      console.log(res)
+      console.log(typeof(res))
+      console.log(res.length)
+      if(this.payData && res.length){
+        console.log('lll')
         this.displayKey=true;
       }
       else{

@@ -185,6 +185,8 @@ exports.getAllPatients = async (req, res, next) => {
         }
       )
     }
+    console.log('sendArr')
+    console.log(sendArr)
 
     res.status(httpStatus.OK).json(sendArr);
   } catch (e) {
@@ -600,7 +602,7 @@ exports.getLastAttetions = async (req, res, next) => {
   try {
     const userId =  req.params.userId;  
    // console.log("getLastAttetions providerId userId: ", userId)
-    const lastConsultAttetions = await Consult.find({providerId: userId}).sort({createDate: -1}).limit(10).map( async (list) =>{      
+    const lastConsultAttetions = await Consult.find({providerId: userId}).sort({date: -1}).limit(10).map( async (list) =>{      
       await Promise.all(list.map(async (c) => {
         const patient = await Patient.find({_id: c.patientId});
         c["patient"] = patient[0]

@@ -5,9 +5,10 @@ import { ProviderService } from './../../../../_services/provider.service';
 import {Router} from "@angular/router";
 
 export interface PatientData {
+  index:number;
+  patientId:string;
   date: Date;
 }
-
 
 @Component({
   selector: 'app-consults',
@@ -17,7 +18,7 @@ export interface PatientData {
 
 export class ConsultsComponent implements OnInit {
 
-  displayedColumns: string[] = [ 'id', 'fullName','date','consult'];
+  displayedColumns: string[] = [ 'index', 'fullName','date','consult'];
   noDataToDisplay: boolean = false;
   dataSource: any;
   tmpData=[];
@@ -36,11 +37,11 @@ export class ConsultsComponent implements OnInit {
   }
 
   initData() {
-    this.ProviderService.getConsultInChat(this.patient._id, this.patient.providerId).subscribe(res=> {
+    this.ProviderService.getConsult(this.patient._id,'id').subscribe(res=> {
       if(res) {
         console.log("consult data s>>>>>>>>>>>>>", res)
-        this.initDataSource(res)
         this.tmpData=res;
+        this.initDataSource(res)
         this.noDataToDisplay = false;
       } else{
         this.noDataToDisplay = true;
@@ -50,9 +51,10 @@ export class ConsultsComponent implements OnInit {
 
   initDataSource(data) {
     const PatientData: PatientData[] = [];
-    data.forEach(function(item){
+    data.forEach(function(item,idx){
       if(item) {
-        PatientData.push({ date: item.date});
+        console.log
+        PatientData.push({index:idx+1, patientId:item.patientId, date: item.date});
       }
     });
 
@@ -72,13 +74,14 @@ export class ConsultsComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
   detail(data){
-    this.router.navigateByUrl('/dashboard/newConsult/'+data.id+'/'+data.date);
+    this.router.navigateByUrl('/dashboard/newConsult/'+data.index+'/'+data.id+'/'+data.date);
   }
   search(startDate,endDate){
     this.dataSource.data = this.tmpData;
     const fromDate = startDate;
     const toDate = endDate;
     this.dataSource.data = this.dataSource.data.filter(e=>e.date > fromDate && e.date < toDate ) ;
+    this.initDataSource(this.dataSource.data)
   }
 }
 

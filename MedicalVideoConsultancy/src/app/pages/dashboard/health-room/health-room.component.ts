@@ -39,6 +39,8 @@ export class HealthRoomComponent implements OnInit {
     private renderer: Renderer2) {
     this.route.paramMap.subscribe(async (params) => {
       this.patient = JSON.parse(localStorage.getItem(params.get("patientId")));
+      console.log('this.patient')
+      console.log(this.patient)
     });
     this.currentUser = Object.assign(new User(), JSON.parse(localStorage.getItem('provider_data')));
   }
@@ -62,6 +64,7 @@ export class HealthRoomComponent implements OnInit {
       this.meetRoomService.updatePatientState().subscribe(async (pt: Patient) => {
         this.patient = pt;
         console.log("this.patient provider----------------------")
+        console.log('this.patient222')
         console.log(this.patient)
         this.meetRoomService.callPatient(this.patient);
       });
