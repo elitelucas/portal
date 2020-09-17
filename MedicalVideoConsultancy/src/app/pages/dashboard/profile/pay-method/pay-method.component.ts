@@ -49,7 +49,7 @@ export class PayMethodComponent implements OnInit {
       this.payData=res;
       console.log('res')
       console.log(res)
-      if(res===null){
+      if(res===null || res.length===0){
         this.payData={
           QRimg:[],
           account:[],

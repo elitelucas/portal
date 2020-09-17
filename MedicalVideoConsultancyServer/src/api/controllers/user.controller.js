@@ -265,7 +265,7 @@ exports.updateSigPay = async (req, res) => {
     .then(result => {
       console.log('result')
       console.log(result)
-    res.status(httpStatus.OK).json({result:'success'});
+    res.status(httpStatus.OK).json(result.sigImgSrc);
   }).catch(e => {
     return res.send(e)
   })
@@ -283,6 +283,20 @@ exports.getPayData = async (req, res) => {
     return res.send(e)
   })
 };
+
+/**
+ * Get signature image namefrom users collection
+ * */
+
+exports.getSignature = async (req, res) => {
+  const id=req.params.userId;
+  User.findById(id).then(result=>{
+    res.status(httpStatus.OK).json(result.sigImgSrc);
+  }).catch(e => {
+    return res.send(e)
+  })
+};
+
 
 /**
  * Get blog field from users collection
