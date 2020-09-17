@@ -48,3 +48,14 @@
     margin-top:30px;
     margin-bottom:50px;
 }
+.bottom-border{
+    border-bottom: 1px solid;
+
+}
+.button-div{
+    text-align: center;
+    padding: 30px;
+}
+.button-left{
+    margin-left: 20%;
+}

@@ -82,6 +82,7 @@ export class ConsultListComponent implements OnInit {
     const fromDate = startDate;
     const toDate = endDate;
     this.dataSource.data = this.dataSource.data.filter(e=>e.date > fromDate && e.date < toDate ) ;
+    this.initDataSource(this.dataSource.data)
   }
 }
 

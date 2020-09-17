@@ -8,9 +8,9 @@
             <div class="containerDiv">
                 <input type="text" #diseaseItem 
                 class="inp-margin second-input-wid"
-                (keyup.enter)="AddItem(diseaseItem.value,'disease')"
-                (blur)="AddItem(diseaseItem.value,'disease'); diseaseItem.value='' ">
-                <button class="btn btn-primary" (click)="AddItem(diseaseItem.value,'disease')">Add</button>
+                (keyup.enter)="AddItem(diseaseItem.value,'disease'); diseaseItem.value=''"
+                >
+                <button class="btn btn-primary" (click)="AddItem(diseaseItem.value,'disease'); diseaseItem.value=''">Add</button>
             </div>
             <div class="containerDiv add-div">
                 <div class="row literal-div" *ngFor="let pre of diseaseArr; let i=index;">
@@ -36,9 +36,9 @@
                 <div class="containerDiv">
                     <input type="text" #medicationItem 
                     class="inp-margin second-input-wid"
-                    (keyup.enter)="AddItem(medicationItem.value,'medication')"
-                    (blur)="AddItem(medicationItem.value,'medication'); medicationItem.value='' ">
-                    <button class="btn btn-primary" (click)="AddItem(medicationItem.value,'medication')">Add</button>
+                    (keyup.enter)="AddItem(medicationItem.value,'medication'); medicationItem.value=''"
+                   >
+                    <button class="btn btn-primary" (click)="AddItem(medicationItem.value,'medication'); medicationItem.value=''">Add</button>
                 </div>
                 <div class="containerDiv add-div">
                     <div class="row literal-div" *ngFor="let pre of medicationArr; let i=index;">
@@ -68,9 +68,9 @@
                 <div class="containerDiv">
                     <input type="text" #surgeryItem 
                     class="inp-margin third-input-wid"
-                    (keyup.enter)="AddItem(surgeryItem.value,'surgery')"
-                    (blur)="AddItem(surgeryItem.value,'surgery'); surgeryItem.value='' ">
-                    <button class="btn btn-primary" (click)="AddItem(surgeryItem.value,'surgery')">Add</button>
+                    (keyup.enter)="AddItem(surgeryItem.value,'surgery'); surgeryItem.value=''"
+                    >
+                    <button class="btn btn-primary" (click)="AddItem(surgeryItem.value,'surgery'); surgeryItem.value=''">Add</button>
                 </div>
                 <div class="containerDiv add-div">
                     <div class="row literal-div" *ngFor="let pre of surgeryArr; let i=index;">
@@ -96,9 +96,9 @@
                 <div class="containerDiv">
                     <input type="text" #familyItem 
                     class="inp-margin third-input-wid"
-                    (keyup.enter)="AddItem(familyItem.value,'family')"
-                    (blur)="AddItem(familyItem.value,'family'); familyItem.value='' ">
-                    <button class="btn btn-primary" (click)="AddItem(familyItem.value,'family')">Add</button>
+                    (keyup.enter)="AddItem(familyItem.value,'family'); familyItem.value=''"
+                    >
+                    <button class="btn btn-primary" (click)="AddItem(familyItem.value,'family'); familyItem.value=''">Add</button>
                 </div>
                 <div class="containerDiv add-div">
                     <div class="row literal-div" *ngFor="let pre of familyArr; let i=index;">
@@ -126,7 +126,8 @@
                         <span class="number-wid"> 1. Tobacco:</span> 
                     </div>
                     <div class="col-6">
-                        <input type="text" class="inp-margin second-input-wid">
+                        <input #toxic0 type="text" class="inp-margin second-input-wid"
+                        [value]="toxicArr[0]? toxicArr[0] :''">
                     </div>
                 </div>
                 <div class="row">
@@ -134,7 +135,8 @@
                         <span class="number-wid"> 2. Alchol:</span> 
                     </div>
                     <div class="col-6">
-                        <input type="text" class="inp-margin second-input-wid">
+                        <input #toxic1 type="text" class="inp-margin second-input-wid"
+                        [value]="toxicArr[1]? toxicArr[1] :''">
                     </div>
                 </div>
                 <div class="row">
@@ -142,7 +144,8 @@
                         <span class="number-wid"> 3. Illicit drugs:</span> 
                     </div>
                     <div class="col-6">
-                        <input type="text" class="inp-margin second-input-wid">
+                        <input #toxic2 type="text" class="inp-margin second-input-wid"
+                        [value]="toxicArr[2]? toxicArr[2] :''">
                     </div>
                 </div>
 
@@ -152,6 +155,10 @@
         </div>
     </div>
 
+</div>
+<div class="bottom-border button-div">
+    <button class="btn btn-primary" (click)="saveAll(toxic0.value, toxic1.value, toxic2.value)">Save</button>
+    <button class="btn btn-danger button-left" (click)="Cancel()">Cancel</button>
 </div>
 
 

@@ -46,6 +46,8 @@ export class ProviderService {
   //I added new func to get all pacients data.
 
   getAllPatientsData(value, field){
+    console.log('value')
+    console.log(value)
     const patientUrl = baseUrl + 'provider/allPacients';
     let params = new HttpParams().set("key", field).set("value", value);
     this.trace("getAllPatientsData:", patientUrl,params);

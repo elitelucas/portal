@@ -148,7 +148,7 @@ export class HealthProviderComponent implements OnInit{
     console.log('camera error', this.webCamError)
   }
   detail(param){
-    this.router.navigateByUrl('/dashboard/patient/'+param.id+'/'+param.fullName);
+    this.router.navigateByUrl('/dashboard/patient/'+param.id+'/'+param.dni+'/'+param.fullName);
   }
 
 
