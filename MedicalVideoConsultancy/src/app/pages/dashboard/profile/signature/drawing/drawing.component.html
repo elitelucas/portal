@@ -5,6 +5,10 @@
       (mousemove)="onMouseMove($event)">
       </canvas>
     </div>
+    
+  </div>
+  <div [class]="switch?'display':''">
+    <img [src]="img" />
   </div>
  
   <div *ngIf="userData && switch" class="mx-3" style="text-align: center;">
