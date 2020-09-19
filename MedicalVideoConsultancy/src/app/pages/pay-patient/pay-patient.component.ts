@@ -25,6 +25,7 @@ export class PayPatientComponent implements OnInit {
   identify_patient = 'OK';
   no_identify_patient = 'NOK';
   patientsEmail = null;
+  payProvider = null;
 
   constructor(private route: ActivatedRoute, public dialog: MatDialog, private providerService: ProviderService,
     private meetRoomService: MeetRoomService, private _ngZone: NgZone, private _router: Router) {
@@ -38,6 +39,9 @@ export class PayPatientComponent implements OnInit {
 
   ngOnInit(): void {
     console.log(localStorage.getItem('payProvider'));
+    this.payProvider = JSON.parse(localStorage.getItem('payProvider'));
+    console.log("this.payProvider");
+    console.log(this.payProvider);
     this.getFirstPatientsEmail();
     this.meetRoomService.startAttetionOfProvider().subscribe(providerStatus => {
       this.goChatCallAttetion();

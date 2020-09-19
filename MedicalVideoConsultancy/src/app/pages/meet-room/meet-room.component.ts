@@ -140,7 +140,7 @@ export class MeetRoomComponent implements OnInit {
     });
 
     this.meetRoomService.startAttetionPatientForPayListener().subscribe((payProvider) => {
-      localStorage.setItem('payProvider', payProvider);
+      localStorage.setItem('payProvider', JSON.stringify(payProvider));
       this.goPayAttetion();
     });
 
