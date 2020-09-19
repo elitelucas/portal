@@ -7,6 +7,7 @@ import {environment} from "../../../../../../environments/environment";
 import {catchError, map} from "rxjs/operators";
 import {HttpErrorResponse, HttpEventType} from "@angular/common/http";
 import {of} from "rxjs";
+import { UserService } from './../../../../../_services/user.service';
 
 
 @Component({
@@ -31,12 +32,17 @@ export class DrawingComponent implements OnInit {
   constructor(
     private data: DataService,
     private authService:AuthService,
-    private fileUploadService:FileUploadService){
+    private fileUploadService:FileUploadService,
+    private userService:UserService
+    ){
     this.currentUser = this.authService.getCurrentUser;
   }
 
   ngOnInit() {
-    this.data.currentMessage.subscribe(message => this.message = message)
+    this.data.currentMessage.subscribe(message => this.message = message);
+    this.userService.getSignature(this.currentUser.id).subscribe(res=>{
+      this.img=this.publicUrl+res;
+    })
   }
 
   ngAfterViewInit() {

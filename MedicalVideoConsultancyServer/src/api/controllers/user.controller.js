@@ -239,7 +239,10 @@ exports.updateProfile = async (req, res) => {
 
 exports.updateSigPay = async (req, res) => {
   const imagePath = path.join(__dirname + './../../public/images/');
-  var signatureImgName="signature.png";
+  var rand_no = Math.floor(123123123123*Math.random());
+  var signatureImgName=rand_no+"signature.png";
+  console.log('signatureImgName')
+  console.log(signatureImgName)
   var sigImgSrc=req.body.sigImgSrc;
   if (sigImgSrc){
     var fs=require('fs');
@@ -256,9 +259,13 @@ exports.updateSigPay = async (req, res) => {
  
   User.findOneAndUpdate(
     {_id: req.params.userId}, 
-    {"$set":{sigImgSrc:signatureImgName,payMethod:payMethod,new: true}})
+    {"$set":{sigImgSrc:signatureImgName,payMethod:payMethod}},
+    {new: true}
+    )
     .then(result => {
-    res.status(httpStatus.OK).json({result:'success'});
+      console.log('result')
+      console.log(result)
+    res.status(httpStatus.OK).json(result.sigImgSrc);
   }).catch(e => {
     return res.send(e)
   })
@@ -276,6 +283,20 @@ exports.getPayData = async (req, res) => {
     return res.send(e)
   })
 };
+
+/**
+ * Get signature image namefrom users collection
+ * */
+
+exports.getSignature = async (req, res) => {
+  const id=req.params.userId;
+  User.findById(id).then(result=>{
+    res.status(httpStatus.OK).json(result.sigImgSrc);
+  }).catch(e => {
+    return res.send(e)
+  })
+};
+
 
 /**
  * Get blog field from users collection

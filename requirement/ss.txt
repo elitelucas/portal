@@ -51,3 +51,14 @@ if you want the service not to die, you just need to perform "node src/index.js 
 PeerServer
 /var/www/peerServer
 It is a server for video calls that there are still improvement issues that I am making apart. In case you require it (nemiac.com:9000) it is activated with the command "node index.js"
+
+
+ps -aux | grep node ...
+with this command you can know the services running with nodeJs
+"ps -aux | grep node"
+
+Then as in the second column is the id of the process, I can know to kill the process. "kill -9 [ID_PROCESS]"
+
+And inside the same project folder I can initialize with "node src / index.js &"
+
+I use the putty.exe program to enter the linux server.

@@ -234,6 +234,26 @@ export class MeetRoomService {
     });
   }
 
+  public createRoom(data) {
+    this.trace("createRoom :", data);
+    this.socket.emit('createRoom', data);
+  }
+
+  public createProviderRoom(data) {
+    this.trace("createProviderRoom :", data);
+    this.socket.emit('createProviderRoom', data);
+  }
+  public receiveProvideId() {
+    this.trace("receiveProviderId :");
+    return Observable.create((observer) => {
+      this.socket.on('receiveProviderId', (providerId) => {
+        console.log('providerId')
+        console.log(providerId)
+        observer.next(providerId)
+      });
+    });
+  }
+
   trace(...arg) {
     var now = (window.performance.now() / 1000).toFixed(3);
     //console.log(now + ': ', arg);

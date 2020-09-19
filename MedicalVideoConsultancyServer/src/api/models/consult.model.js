@@ -57,7 +57,6 @@ const consultSchema = new Schema({
     type:Array,
     default:[]
   },
-  createDate: Date,
   patient: Object,
 },{
   timestamps:true

@@ -46,6 +46,13 @@ export class UserService {
     let paymentUrl=baseUrl+"/payment/"+id;
     return this.http.get<any>(paymentUrl);
   }
+
+
+  getSignature(id) {
+    let sigUrl=baseUrl+"/signature/"+id;
+    return this.http.get<any>(sigUrl);
+  }
+  
   //Get blog data from user collection of current provider
   getBlog(id) {
     let getBlogUrl=baseUrl+"/getBlog/"+id;

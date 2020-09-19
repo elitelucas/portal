@@ -49,7 +49,7 @@ export class NewConsultComponent implements OnInit {
     const formData = new FormData();
     formData.append('file', file.data);
     formData.append('_id', this.data.id);
-    formData.append('date', this.data.date);
+    formData.append('key', 'newConsult');
     file.inProgress = true;
     const fileType=file.data.type.split('/')[0];
     this.fileUploadService.uploadFile(formData).pipe(

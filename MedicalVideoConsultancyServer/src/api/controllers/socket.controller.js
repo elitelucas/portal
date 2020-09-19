@@ -108,11 +108,12 @@ const disconnectProvider = async (idProvider, notify) => {
 //-----------------------
 
 const startCallProvider = async (idProvider, idPatient , callback) => {
-  try {
+  try {  
     const userProvider = await User.findOne({
       _id: idProvider
     });
     userProvider.calling = true;
+  
     const patient = await Patient.findOne({
       _id: idPatient
     });
@@ -290,6 +291,7 @@ const notifyProvider = async (patient, callback) => {
 };
 
 io.on('connection', (socket) => {
+  console.log('sssss')
   logger.info('connection active :' + socket.id);
 
   socket.on('confirmConnect', async (userProvider) => {
@@ -382,7 +384,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('confirmReadyPatient', async (patient) => {
-    logger.info('confirmReadyPatient :' + socket.id + " - " + patient_.id);
+    logger.info('confirmReadyPatient :' + socket.id + " - " + patient._id);
     notifyProvider(patient, (provider) => {
       socket.join(provider.room)
       logger.info("confirmReadyPatient " + provider._id + " - " + provider.socketId);
@@ -400,6 +402,15 @@ io.on('connection', (socket) => {
       text: data.text
     });
   });
+
+  socket.on('createRoom',data=>{
+    socket.join(data);
+  })
+  socket.on('createProviderRoom',data=>{
+    socket.join(data.providerId);
+    socket.emit('receiveProviderId',data.providerId);
+    socket.to(data.dni).emit('receiveProviderId',data.providerId);
+  })
 
 });
 /* 

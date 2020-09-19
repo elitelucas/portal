@@ -56,7 +56,7 @@ export class ConsultListComponent implements OnInit {
     const PatientData: PatientData[] = [];
     data.forEach(function(item,idx){
       if(item) {
-        PatientData.push({index:idx+1, patientId:item.patientId, date: item.date});
+        PatientData.push({index:idx+1, patientId:item.patientId, date: item.createdAt});
       }
     });
 

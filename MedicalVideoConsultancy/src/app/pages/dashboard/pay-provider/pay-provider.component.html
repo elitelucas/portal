@@ -5,15 +5,15 @@
         </div>
         <div>
             <p>Amount to be paid by patient($):</p>
-            <input type="number">
+            <input #payAmount type="number">
         </div>
 
     </div>
     <div class="detail-pane  margin-div">
        <div class="qr-code">
            <h3>QR codes</h3>
-           <div *ngIf="payData.QRimg!=undefined">
-               <div class='row margin-div' *ngIf="payData.QRimg[0]">
+           <div>
+               <div class='row margin-div' *ngIf="QRimgKey[0]">
                    <div class="col-4">
                        {{payData.QRimg[0].description}}
                    </div>
@@ -21,7 +21,7 @@
                         <img class="qrImage" src="{{publicUrl + payData.QRimg[0].name}}">   
                    </div>
                </div>
-               <div class='row margin-div' *ngIf="payData.QRimg[1]">
+               <div class='row margin-div' *ngIf="QRimgKey[1]">
                     <div class="col-4">
                         {{payData.QRimg[1].description}}
                     </div>
@@ -31,13 +31,13 @@
                 </div> 
            </div>
        </div>
-       <div class="account margin-div">
+       <div class="account margin-div"  *ngIf="accountKey">
            <h3>Account Banks</h3>
            <div class="add-account" *ngFor="let item of payData.account;">
                 {{item}}
             </div>
        </div>
-       <div class="link-pay margin-div">
+       <div class="link-pay margin-div"  *ngIf="urlKey">
             <h3>Link Pay</h3>
             <div class="add-account" *ngFor="let item of payData.url;">
                 {{item}}
@@ -50,7 +50,7 @@
             <button class="btn btn-danger">Cancel</button>
         </div>
         <div class="col-4">
-            <button class="btn btn-primary">Send</button>
+            <button class="btn btn-primary" (click)="sendPay(payAmount.value)">Send</button>
         </div>
         <div class="col-4">
             <button class="btn btn-primary">Confirm Pay</button>

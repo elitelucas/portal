@@ -130,6 +130,13 @@ router
   router.route('/payment/:userId')
   .get(controller.getPayData);
 
+
+   /**
+   * api/v1/users/signature/:userId
+   * */
+  router.route('/signature/:userId')
+  .get(controller.getSignature);
+
   /**
    * api/v1/users/getBlog/:userId
    * */

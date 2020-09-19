@@ -77,6 +77,7 @@ export class MeetRoomComponent implements OnInit{
     if(this.roomName) {
       this.getFirstPatientsEmail();
     }
+    this.meetRoomService.createRoom(this.dniPatient);
     
   }
 
@@ -179,6 +180,12 @@ export class MeetRoomComponent implements OnInit{
     let urlAttetion = "attetion/"+this.roomName;
     this.trace(urlAttetion);
     this._router.navigateByUrl(urlAttetion);
+  }
+  receiveProviderId(){
+    this.meetRoomService.receiveProvideId().subscribe(providerId=>{
+      console.log('providerIdqqq')
+      console.log(providerId)
+    })
   }
 
 }

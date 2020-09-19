@@ -38,7 +38,7 @@ export const AppRoutes: Routes = [
     component: MeetRoomComponent
   },
   {
-    path: 'attetion/:roomName',
+    path: 'attetion/:roomName/:providerStatus',
     component: MeetCallComponent
   },
 ];

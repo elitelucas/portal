@@ -1,3 +1,4 @@
+import { Consult } from './../../../_model/user';
 import { Component, OnInit, ViewChild, ElementRef, NgZone, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MeetRoomService } from '../../../_services/meet-room.service';
@@ -22,6 +23,7 @@ export class HealthRoomComponent implements OnInit {
 
   patient: Patient;
   currentUser: User;
+  consultData:any;
   key={
     Prescription:true,
     Consults: false,
@@ -43,13 +45,27 @@ export class HealthRoomComponent implements OnInit {
       console.log(this.patient)
     });
     this.currentUser = Object.assign(new User(), JSON.parse(localStorage.getItem('provider_data')));
+    console.log('this.currentUser')
+    console.log(this.currentUser)
   }
 
   async ngOnInit() {
+    const providerInfo=JSON.parse(localStorage.getItem('provider_data'));
+    this.providerService
+    .createConsult({patientId:this.patient._id, providerId:providerInfo.id, dni:this.patient.dni})
+    .subscribe(res=>{
+      this.consultData=res;
+      console.log('this.consultData')
+      console.log(this.consultData)
+    })
     this.start();
     this.roomChatForm = this.formBuilder.group({
       text: ['', Validators.required]
     });
+    this.meetRoomService.confirmPatientCall().subscribe(data=>{
+      console.log('ertertertert')
+      console.log(data)
+    })
   }
 
   async ngAfterViewInit() {

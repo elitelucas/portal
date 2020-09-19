@@ -113,7 +113,7 @@ export class ProfileComponent implements OnInit {
   }
   saveAll(){
     this.userService.updateSigPay(this.sigImgSrc, this.payMethod,this.currentUser.id).subscribe(res=>{
-      if(res.result==='success')
+      if(res)
       Swal.fire('Updated successfully');
     })
   }

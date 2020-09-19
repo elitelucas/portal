@@ -213,7 +213,7 @@ exports.getOneConsult = async (req, res, next) => {
     const patientId=req.query.patientId;
     const date=req.query.date
     patient=await Patient.findById(patientId).exec();
-    consult = await Consult.findOne({patientId:patientId, providerId:providerId, date:new Date(date)}).exec();
+    consult = await Consult.findOne({patientId:patientId, providerId:providerId, createdAt:new Date(date)}).exec();
     consult.patient=patient;  
     res.status(httpStatus.OK).json(consult);
   } catch (e) {
@@ -231,7 +231,7 @@ exports.updateConsult = async (req, res, next) => {
     const symptom=[updateData.symptom0,updateData.symptom1,updateData.symptom2,updateData.symptom3];
 
     const updatedConsult = await Consult.findOneAndUpdate(
-      {patientId:patientId, providerId:providerId, date:new Date(date)}, 
+      {patientId:patientId, providerId:providerId, createdAt:new Date(date)}, 
       {"$set":{
         allergy:updateData.allergy,
         timeOfDisease:updateData.timeOfDisease,

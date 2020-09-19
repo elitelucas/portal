@@ -119,7 +119,7 @@ export class ProviderService {
     return this.http.get<Patient[]>(waitingPatientUrl);
   }
 
-  createConsult(consult: Consult) {
+  createConsult(consult) {
     let createConsultUrl = baseUrl + "provider/consult";
     this.trace("createConsultUrl:", createConsultUrl);
     return this.http.post(createConsultUrl, consult);
