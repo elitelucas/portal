@@ -107,6 +107,34 @@ const disconnectProvider = async (idProvider, notify) => {
 
 //-----------------------
 
+const startAttetionPatientForPay = async (idProvider, idPatient , callback) => {
+  try {
+    /*console.log("startAttetionPatientForPay")
+    console.log(idProvider)*/
+    const userProvider = await User.findOne({
+      _id: idProvider
+    });
+    /*console.log(userProvider)
+    console.log(idPatient)*/
+    userProvider.calling = false;
+    const patient = await Patient.findOne({
+      _id: idPatient
+    });
+   
+    patient.calling = false;
+    console.log("userProvider")
+    console.log(userProvider.socketId)
+    console.log("patient")
+    console.log(patient.socketId)
+    //await updateUserPatientState(idPatient, patient);
+    //await updateUserProviderState(idProvider, userProvider);
+    callback(patient.socketId, userProvider.socketId);
+  } catch (e) {
+    logger.error("startCallProvider e :" + e)
+  }
+};
+
+
 const startCallProvider = async (idProvider, idPatient , callback) => {
   try {
     const userProvider = await User.findOne({
@@ -124,6 +152,8 @@ const startCallProvider = async (idProvider, idPatient , callback) => {
     logger.error("startCallProvider e :" + e)
   }
 };
+
+
 
 const endCallProvider = async (idProvider, idPatient) => {
   try {
@@ -373,6 +403,36 @@ io.on('connection', (socket) => {
       });
   });
 
+  //------------
+
+  socket.on('startAttetionPatientForPay', async (provider, patient, amountPayAttetion) => {
+    logger.info('startAttetionPatientForPay :' + socket.id + " to " );
+    console.log(provider);
+    console.log(patient);
+    await startAttetionPatientForPay(provider.id, patient._id, (patientSocketId, providerSocketId) => {
+      socket.to(patientSocketId).emit("startAttetionPatientForPayListener", { 
+        providerId : provider.id, 
+        amount : amountPayAttetion
+      });
+    });
+  });
+
+
+  socket.on('confirmPayAttetion', async (provider, patient) => {
+    logger.info('confirmPayAttetion :' + socket.id  );
+    await startAttetionPatientForPay(provider._id, patient._id, (patientSocketId, providerSocketId) => {
+      
+      socket.to(providerSocketId).emit("confirmPayAttetionListener", { 
+        patientId : patient._id,
+        providerId : provider._id
+      });
+    });
+  });
+
+  
+
+  //------------------------
+
   socket.on('startAttetion', async (provider, patient) => {
     logger.info('startAttetion :' + socket.id + " - " + provider.id );
     await startCallProvider(provider.id, patient._id, (patientSocketId, providerSocketId) => {
@@ -391,13 +451,17 @@ io.on('connection', (socket) => {
   });
   
   socket.on("chat_provider", data => {
-    //console.log("chat_provider from: ", socket.id , data.from, data.text );
+    console.log("chat_provider from: ", socket.id , data.from, data.text );
     socket.emit("chat_provider", {
-      text: data.text
+      text: data.text,
+      from: data.from,
+      to: data.to
     });
-    //console.log("chat_provider to: ", socket.id , data.to, data.text );
+    console.log("chat_provider to: ", socket.id , data.to, data.text );
     socket.to(data.to).emit("chat_provider", {
-      text: data.text
+      text: data.text,
+      from: data.from,
+      to: data.to
     });
   });
 

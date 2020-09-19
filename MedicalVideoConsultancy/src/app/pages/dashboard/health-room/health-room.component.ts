@@ -22,8 +22,8 @@ export class HealthRoomComponent implements OnInit {
 
   patient: Patient;
   currentUser: User;
-  key={
-    Prescription:true,
+  key = {
+    Prescription: true,
     Consults: false,
     Files: false,
     Charts: false
@@ -63,9 +63,6 @@ export class HealthRoomComponent implements OnInit {
       this.meetRoomService.confirmConnect(this.currentUser);
       this.meetRoomService.updatePatientState().subscribe(async (pt: Patient) => {
         this.patient = pt;
-        console.log("this.patient provider----------------------")
-        console.log('this.patient222')
-        console.log(this.patient)
         this.meetRoomService.callPatient(this.patient);
       });
     });
@@ -76,11 +73,12 @@ export class HealthRoomComponent implements OnInit {
       this.meetRoomService.startAttetion(this.currentUser, this.patient);
       this.providerService.getPatient(this.patient.dni, 'dni').subscribe(async (pt: Patient) => {
         this.patient = pt;
+        //this.meetRoomService.activeProvider(this.currentUser);
       });
     });
-    this.meetRoomService.recivetext().subscribe((text) => {
+    this.meetRoomService.recivetext().subscribe((data) => {
       const p = this.renderer.createElement('p');
-      const d = this.renderer.createText(text);
+      const d = this.renderer.createText(data.text);
       this.renderer.appendChild(p, d);
       this.renderer.appendChild(this.chatText.nativeElement, p);
     });
@@ -92,12 +90,13 @@ export class HealthRoomComponent implements OnInit {
     const text = this.f.text.value;
     this.meetRoomService.sendtext(this.patient.socketId, "Provider: " + text);
   }
-  changeBackground(kk){
-    this.key.Prescription=false;
-    this.key.Consults=false;
-    this.key.Files=false;
-    this.key.Charts=false;
-    this.key[kk]=true;
+
+  changeBackground(kk) {
+    this.key.Prescription = false;
+    this.key.Consults = false;
+    this.key.Files = false;
+    this.key.Charts = false;
+    this.key[kk] = true;
   }
 
   /*trace(...arg) {

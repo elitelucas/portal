@@ -43,7 +43,7 @@ const routes:Routes = [{
     },
 
     {
-      path: 'pay-provider/:dni',
+      path: 'pay-provider/:patientId',
       component: PayProviderComponent
     },
     {

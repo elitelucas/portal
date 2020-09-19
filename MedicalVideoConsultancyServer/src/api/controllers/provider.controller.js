@@ -601,7 +601,7 @@ exports.createConsult = async (req, res, next) => {
 exports.getLastAttetions = async (req, res, next) => {
   try {
     const userId =  req.params.userId;  
-   // console.log("getLastAttetions providerId userId: ", userId)
+    console.log("getLastAttetions providerId userId: ", userId)
     const lastConsultAttetions = await Consult.find({providerId: userId}).sort({date: -1}).limit(10).map( async (list) =>{      
       await Promise.all(list.map(async (c) => {
         const patient = await Patient.find({_id: c.patientId});
@@ -610,6 +610,7 @@ exports.getLastAttetions = async (req, res, next) => {
       return list;
     });    
     if(lastConsultAttetions) {
+      console.log("lastConsultAttetions: ", lastConsultAttetions)
       res.status(httpStatus.OK).json(lastConsultAttetions);
     }
 

@@ -25,7 +25,8 @@ import { MeetRoomComponent } from './meet-room/meet-room.component';
 import { FormsModule , ReactiveFormsModule} from "@angular/forms";
 import { MeetRoomService } from "../_services/meet-room.service";
 import { VideoRoomComponent } from './video-room/video-room.component';
-import { MeetCallComponent } from './meet-room/meet-call/meet-call.component';
+import { MeetCallComponent } from './pay-patient/meet-call/meet-call.component';
+import { PayPatientComponent } from './pay-patient/pay-patient.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import { MeetCallComponent } from './meet-room/meet-call/meet-call.component';
     MeetRoomComponent,
     VideoRoomComponent,
     MeetCallComponent,
+    PayPatientComponent,
   ],
   imports: [
     BrowserModule,

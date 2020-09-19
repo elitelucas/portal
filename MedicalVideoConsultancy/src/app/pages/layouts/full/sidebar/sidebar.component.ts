@@ -95,8 +95,8 @@ export class AppSidebarComponent implements OnInit {
     if (this.provider_connect_active == localStorage.getItem('provider_connect')) {
       this.meetRoomService.confirmConnect(this.currentUser);
       this.desactive();
-      this.active();
     }
+    this.active();
   }
 
   active() {
@@ -113,7 +113,7 @@ export class AppSidebarComponent implements OnInit {
     this.meetRoomService.desactiveProvider(this.currentUser);
   }
 
-  startPreCall() {
+  nextAttetion() {
     // console.log("startPreCall")
     //console.log(this.waitingPatientsData)this.meetRoomService.init();
     if (this.waitingPatientsData && this.waitingPatientsData.length) {
@@ -121,7 +121,7 @@ export class AppSidebarComponent implements OnInit {
       //console.log(patient)
       localStorage.setItem('provider_data', JSON.stringify(this.currentUser));
       localStorage.setItem(patient._id, JSON.stringify(patient));
-      this.router.navigateByUrl('/dashboard/pay-provider/' + patient.dni);
+      this.router.navigateByUrl('/dashboard/pay-provider/' + patient._id);
     }
   }
 

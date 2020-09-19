@@ -171,6 +171,10 @@ userSchema.method({
   },
 
   async passwordMatches(password) {
+    console.log("passwordMatches")
+    console.log(password)
+    console.log(this.password)
+
     return bcrypt.compare(password, this.password);
   },
 });
@@ -191,6 +195,11 @@ userSchema.statics = {
   async findAndGenerateToken(options) {
     const { email, password, refreshObject } = options;
     if (!email) throw new APIError({ message: 'An email is required to generate a token' });
+    console.log("findAndGenerateToken")
+    console.log("email")
+    console.log(email)
+    console.log("password")
+    console.log(password)
 
     const user = await this.findOne({ email }).exec();
     const err = {
