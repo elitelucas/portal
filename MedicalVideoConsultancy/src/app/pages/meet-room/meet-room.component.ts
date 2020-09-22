@@ -182,11 +182,11 @@ export class MeetRoomComponent implements OnInit {
     this._router.navigate([]).then(result => { window.open(mailUrl, '_blank') })
   }
   openDialogue(option): void {
-    const smsContent = "Hello, this is " + this.providerData.role + "." + this.providerData.lastName + " - please join me for a secure video call: \n" + "https://pasatra.com/"
+    const smsContent = " - please join me for a secure video call: \n" + "https://pasatra.com/"
       + this.providerData.room + "\n" +
       "Use a computer or device with a good internet connection and webcam. If you run into issues connecting, restart your computer or check out the pasatra.com http://help.pasatra.com \n" +
       "Simple, free, and secure telemedicine powered by https://Pasatra.com \n";
-    const dialogRef = this.dialog.open(InviteBySms, {
+    const dialogRef = this.dialog.open(InviteBySms2, {
       width: '400px',
       data: { phoneNumber: '', room: this.roomUrl, smsContent: smsContent }
     });
@@ -277,13 +277,21 @@ export class MeetRoomComponent implements OnInit {
   }
 
 }
-export class InviteBySms {
+@Component({
+  selector: 'invite-by-sms2',
+  templateUrl: 'invite-by-sms2.html',
+})
+export class InviteBySms2 {
   isValidNumber: boolean = true;
   isInvited: boolean = false;
   constructor(
     public dialogRef: MatDialogRef<MeetRoomComponent>,
-    @Inject(MAT_DIALOG_DATA) public data) { }
+    @Inject(MAT_DIALOG_DATA) public data) {
+      console.log('data')
+      console.log(data)
+     }
   onCancelClick(): void {
+  
     this.isValidNumber = true;
     this.dialogRef.close({ event: 'cancel' });
   }

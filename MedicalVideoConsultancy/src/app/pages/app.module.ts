@@ -21,7 +21,7 @@ import { ToolbarComponent } from './layouts/default/toolbar/toolbar.component';
 import { MenubarComponent } from './layouts/default/menubar/menubar.component';
 import { FooterComponent } from './layouts/default/footer/footer.component';
 import { authInterceptorProviders } from "../_helpers/auth.interceptor";
-import { MeetRoomComponent } from './meet-room/meet-room.component';
+import { MeetRoomComponent,InviteBySms2 } from './meet-room/meet-room.component';
 import { FormsModule , ReactiveFormsModule} from "@angular/forms";
 import { MeetRoomService } from "../_services/meet-room.service";
 import { VideoRoomComponent } from './video-room/video-room.component';
@@ -43,6 +43,7 @@ import { PayPatientComponent } from './pay-patient/pay-patient.component';
     VideoRoomComponent,
     MeetCallComponent,
     PayPatientComponent,
+    InviteBySms2
   ],
   imports: [
     BrowserModule,
