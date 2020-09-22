@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
-const {PayU, Currency}  = require('@ingameltd/payu');
+//const {PayU, Currency}  = require('@ingameltd/payu');
 const APIError = require('../utils/APIError');
-const {smsConfig, paymentConfig} = require('../../config/vars');
+const {smsConfig, paymentConfig, culqiConfing} = require('../../config/vars');
 const client = require('twilio')(smsConfig.Sid, smsConfig.authToken);
 const path = require('path');
 const Room= require('../models/room.model');
@@ -12,6 +12,7 @@ const Consult = require('../models/consult.model');
 const Chart = require('../models/chart.model');
 const { date } = require('joi');
 var nodemailer = require('nodemailer');
+const Culqi = require('culqi-node');
 
 
 /**
@@ -473,18 +474,49 @@ exports.resetState = async (req, res, next) => {
  * */
 exports.checkout = async (req, res, next) => {
   try {
-    const id = req.body.checkoutData.id;
+    /*const id = req.body.checkoutData.id;
     const email = req.body.checkoutData.email;
-    const totalAmount = req.body.checkoutData.amountToPay;
-    const clientId = paymentConfig.clientId;
+    const totalAmount = req.body.checkoutData.amountToPay;*/
+
+   /* const clientId = paymentConfig.clientId;
     const clientSecret = paymentConfig.clientSecret;
     const secondKey = paymentConfig.secondKey;
     const notifyUrl = paymentConfig.notifyUrl;
     const continueUrl = paymentConfig.clientUrl + req.body.checkoutData.room;
     const merchantPosId = paymentConfig.merchantPosId;
-    const description = paymentConfig.description;
-    const currencyCode = Currency.PLN;
-    const payU = new PayU(clientId, clientSecret, merchantPosId, secondKey, {
+    const description = paymentConfig.description;*/
+    //const currencyCode = Currency.PLN;
+
+    const culqi = new Culqi({
+      privateKey: culqiConfing.private_key,
+      pciCompliant: true,
+      publicKey: culqiConfing.private_key,
+    });
+    console.log(culqi);
+
+
+    const token = await culqi.tokens.createToken({
+      card_number: '4111111111111111',
+      cvv: '123',
+      expiration_month: '09',
+      expiration_year: '2025',
+      email: 'richard@piedpiper.com',
+    });
+    console.log(token);
+    
+    console.log(token.id);
+
+
+    const charge = await culqi.charges.createCharge({
+      amount: '10000',
+      currency_code: 'PEN',
+      email: 'richard@piedpiper.com',
+      source_id: token.id,
+  });
+
+  console.log(charge);
+  console.log(charge.id);
+    /*const payU = new PayU(clientId, clientSecret, merchantPosId, secondKey, {
       sandbox: true,
     });
     const result = await payU.createOrder({
@@ -506,9 +538,13 @@ exports.checkout = async (req, res, next) => {
     if(result) {
         const patient = await Patient.findOneAndUpdate({_id: id}, {transactionMail: email}, {new: true});
         if(patient){ res.status(httpStatus.OK).json(result)}
-    }
+    }*/
+
+
+
+    res.status(httpStatus.OK).send()
   } catch (e) {
-    console.log("error from payu", e)
+    console.log("error ", e)
     return next(APIError(e))
   }
 };

@@ -38,5 +38,9 @@ module.exports = {
     secondKey: process.env.SECOND_KEY,
     clientId: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET
+  },
+  culqiConfing: {
+    public_key: process.env.CULQI_API_PUBLIC_KEY,
+    private_key: process.env.CULQI_API_PUBLIC_KEY
   }
 };

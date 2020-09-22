@@ -71,6 +71,7 @@
     "compression": "^1.6.2",
     "cors": "^2.8.3",
     "cross-env": "^6.0.3",
+    "culqi-node": "^2.0.4",
     "dotenv-safe": "^6.0.0",
     "email-templates": "^6.0.3",
     "express": "^4.15.2",
