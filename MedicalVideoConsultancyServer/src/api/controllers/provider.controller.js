@@ -199,7 +199,7 @@ exports.getConsult = async (req, res, next) => {
   try {
     const key=req.query.key;
     const value=req.query.value;
-    consult = await Consult.find({patientId:value}).exec();
+    consult = await Consult.find({patientId:value}).sort({createdAt:-1}).exec();
     res.status(httpStatus.OK).json(consult);
   } catch (e) {
     console.log("getConsult:",error);
@@ -277,27 +277,53 @@ exports.getConsultInChat = async (req, res, next) => {
 exports.fileUpload = async (req, res) => {
   const file = req.files.file;
   var folderName='provider';
-  if(req.body._id===undefined){
+  var fieldName='providerFiles';
+  if(req.body.key==='patient'){
     folderName='patient';
   }
+  var rand_no = Math.floor(123123123123*Math.random());
+  const fileName=rand_no+file.name;
   const imagePath = path.join(__dirname + './../../public/'+folderName+'/');
-  file.mv(imagePath + file.name, function (error) {
-    if (error) {
-      console.log("file upload error", error)
-    } else {
-      res.status(httpStatus.CREATED).json(file.name);
-    }
-  });
+  if(req.body.key==='newConsult'){
+    file.mv(imagePath + fileName, function (error) {
+      if (error) {
+        console.log("file upload error", error)
+      } else {
+        res.status(httpStatus.CREATED).json(fileName);
+      }
+    });
+  }else{
+    file.mv(imagePath + fileName, function (error) {
+      if (error) {
+        console.log("file upload error", error)
+      } else {
+        Consult.findOne({},{},{sort:{createdAt:-1}}).then(result=>{
+          if(req.body.key==='patient')
+          fieldName='patientFiles';          
+          result[fieldName].push(fileName);
+          result.save().then(result2=>{
+            console.log('result')
+            console.log(result)
+            res.status(httpStatus.CREATED).json(fileName);
+          })
+        })
+
+      }
+    });
+  }
+ 
 };
 
 exports.uploadCkImage = async (req, res) => {
   const file = req.files.attachment;
+  var rand_no = Math.floor(123123123123*Math.random());
+  const fileName=rand_no+file.name;
   const imagePath = path.join(__dirname + './../../public/images/');
-  file.mv(imagePath + file.name, function (error) {
+  file.mv(imagePath + fileName, function (error) {
     if (error) {
       console.log("file upload error", error)
     } else {
-      res.status(httpStatus.CREATED).json(file.name);
+      res.status(httpStatus.CREATED).json(fileName);
     }
   });
 };
@@ -601,7 +627,7 @@ exports.createConsult = async (req, res, next) => {
 exports.getLastAttetions = async (req, res, next) => {
   try {
     const userId =  req.params.userId;  
-   // console.log("getLastAttetions providerId userId: ", userId)
+    console.log("getLastAttetions providerId userId: ", userId)
     const lastConsultAttetions = await Consult.find({providerId: userId}).sort({date: -1}).limit(10).map( async (list) =>{      
       await Promise.all(list.map(async (c) => {
         const patient = await Patient.find({_id: c.patientId});
@@ -610,6 +636,7 @@ exports.getLastAttetions = async (req, res, next) => {
       return list;
     });    
     if(lastConsultAttetions) {
+      console.log("lastConsultAttetions: ", lastConsultAttetions)
       res.status(httpStatus.OK).json(lastConsultAttetions);
     }
 

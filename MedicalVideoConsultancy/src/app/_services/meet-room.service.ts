@@ -115,6 +115,99 @@ export class MeetRoomService {
     this.socket.emit('confirmConnectPatient', patient);
   }
 
+  //send the information that the provider entered in pay-provider 
+  //to patient that is in waiting room.
+
+  public providerEnteredInPayProvider(provider,patietDni) {
+    console.log("------------providerEndteredInPayProvider", provider);
+    console.log("------------patientDni", patietDni);
+    this.socket.emit('providerEnteredInPayProvider',provider, patietDni);
+  }
+
+  //send the information that the patient entered in pay-patient 
+  //to provider that is in pay-provider.
+
+  public patientEnteredInPayPatient(providerId,patietDni) {
+    console.log("------------patientEnteredInPayPatient", providerId);
+    console.log("------------patientDni", patietDni);
+    this.socket.emit('patientEnteredInPayPatient',providerId, patietDni);
+  }
+
+  //send payAmount from provider to patient
+  public sendPay(payAmount,patientSocketId) {
+    console.log("-----------payAmount", payAmount);
+    this.socket.emit('sendPay',payAmount, patientSocketId);
+  }
+
+   //send confirm pay infomation  from patient to provider
+   public confirmPay(providerId) {
+     console.log('providerId')
+     console.log(providerId)
+    this.socket.emit('confirmPay',providerId);
+  }
+
+    //send confirm provider infomation  from provider to patient
+    public confirmProvider(dni) {
+     this.socket.emit('confirmProvider',dni);
+   }
+
+   //send uploadFileName from provider to patient
+   
+   public sendUploadFile(uploadFileName,key,othersId) {
+    this.socket.emit('sendUploadFile',uploadFileName,key,othersId);
+  }
+
+  
+
+  public providerEntered() {
+    return Observable.create((observer) => {
+      this.socket.on('providerEnteredInPayProvider', (data) => {
+        observer.next(data)
+      });
+    })
+  }
+
+  public patientEntered() {
+    return Observable.create((observer) => {
+      this.socket.on('patientEnteredInPayPatient', (patientSocketId) => {
+        observer.next(patientSocketId)
+      });
+    })
+  }
+
+  public receivePay() {
+    return Observable.create((observer) => {
+      this.socket.on('sendPay', (payAmount) => {
+        observer.next(payAmount)
+      });
+    })
+  }
+
+  public receiveConfirmPay() {
+    return Observable.create((observer) => {
+      this.socket.on('confirmPay', (confirmPay) => {
+        observer.next(confirmPay)
+      });
+    })
+  }
+
+  public receiveConfirmProvider() {
+    return Observable.create((observer) => {
+      this.socket.on('confirmProvider', (confirmProvider) => {
+        observer.next(confirmProvider)
+      });
+    })
+  }
+
+  public receiveUploadFile(){
+    return Observable.create((observer) => {
+      this.socket.on('sendUploadFile', (uploadFileName) => {
+        observer.next(uploadFileName)
+      });
+    })
+  }
+
+
 
   public activeProvider(userProvider) {
     userProvider.peerId = this.myPeerId;
@@ -247,8 +340,6 @@ export class MeetRoomService {
     this.trace("receiveProviderId :");
     return Observable.create((observer) => {
       this.socket.on('receiveProviderId', (providerId) => {
-        console.log('providerId')
-        console.log(providerId)
         observer.next(providerId)
       });
     });

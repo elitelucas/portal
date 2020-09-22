@@ -38,12 +38,12 @@ const routes:Routes = [{
       component: EditRoomComponent
     },
     {
-      path: 'health-room/:patientId',
+      path: 'health-room/:patientId/:date',
       component: HealthRoomComponent
     },
 
     {
-      path: 'pay-provider/:dni',
+      path: 'pay-provider/:patientId',
       component: PayProviderComponent
     },
     {

@@ -10,7 +10,14 @@ ratione voluptatem sequi nesciunt. Neque porro quisquam est.
     <div class="post-title">
       <input #postTitle type="text" class="title-input" />
       <button class="btn btn-primary publish-button" 
-      (click)="publishPost(postTitle.value, postBody.editorInstance.getData())">
+      (click)="
+      publishPost(
+        postTitle.value, 
+        postBody.elementRef.nativeElement.children[1].lastChild.innerHTML
+        );
+        postTitle.value='';
+        postBody.editorInstance.setData('')
+        ">
         Publish
       </button>
       <p *ngIf="postTitle.value===''&& clickKey" style="color:red">required*</p>
@@ -35,7 +42,7 @@ ratione voluptatem sequi nesciunt. Neque porro quisquam est.
 
         <input #editTitle type="text" class="edit-title-input" [value]="item.postTitle" />
         <button class="btn btn-primary edit-button edit-margin" 
-        (click)="editOk(editTitle.value, editBody.editorInstance.getData(),i)">
+        (click)="editOk(editTitle.value, editBody.elementRef.nativeElement.children[1].lastChild.innerHTML,i)">
           Ok
         </button>
 
@@ -48,7 +55,7 @@ ratione voluptatem sequi nesciunt. Neque porro quisquam est.
       </div>
 
       <div class="post-body">
-        <ckeditor #editBody [editor]="Editor" [data]="item.postBody"></ckeditor>
+        <ckeditor #editBody [editor]="Editor" [data]="item.postBody" (ready)="onReady($event)"></ckeditor>
       </div>
     </div>
     

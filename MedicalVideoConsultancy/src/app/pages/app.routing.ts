@@ -2,7 +2,8 @@ import { Routes } from '@angular/router';
 import {AuthGuard} from "../_helpers/auth.guard";
 import {MeetRoomComponent} from "./meet-room/meet-room.component";
 import {VideoRoomComponent} from "./video-room/video-room.component";
-import { MeetCallComponent } from './meet-room/meet-call/meet-call.component';
+import { MeetCallComponent } from './pay-patient/meet-call/meet-call.component';
+import { PayPatientComponent } from './pay-patient/pay-patient.component';
 
 export const AppRoutes: Routes = [
   {
@@ -38,7 +39,11 @@ export const AppRoutes: Routes = [
     component: MeetRoomComponent
   },
   {
-    path: 'attetion/:roomName/:providerStatus',
+    path: 'payAttetion/:roomName',
+    component: PayPatientComponent
+  },
+  {
+    path: 'attetion/:roomName',
     component: MeetCallComponent
   },
 ];

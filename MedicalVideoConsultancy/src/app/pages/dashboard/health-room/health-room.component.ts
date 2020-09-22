@@ -24,6 +24,7 @@ export class HealthRoomComponent implements OnInit {
   patient: Patient;
   currentUser: User;
   consultData:any;
+  consultCreatedDate:string;
   key={
     Prescription:true,
     Consults: false,
@@ -41,8 +42,11 @@ export class HealthRoomComponent implements OnInit {
     private renderer: Renderer2) {
     this.route.paramMap.subscribe(async (params) => {
       this.patient = JSON.parse(localStorage.getItem(params.get("patientId")));
+      this.consultCreatedDate=params.get('date');
       console.log('this.patient')
       console.log(this.patient)
+      console.log('this.consultCreatedDate')
+      console.log(this.consultCreatedDate)
     });
     this.currentUser = Object.assign(new User(), JSON.parse(localStorage.getItem('provider_data')));
     console.log('this.currentUser')
@@ -51,13 +55,6 @@ export class HealthRoomComponent implements OnInit {
 
   async ngOnInit() {
     const providerInfo=JSON.parse(localStorage.getItem('provider_data'));
-    this.providerService
-    .createConsult({patientId:this.patient._id, providerId:providerInfo.id, dni:this.patient.dni})
-    .subscribe(res=>{
-      this.consultData=res;
-      console.log('this.consultData')
-      console.log(this.consultData)
-    })
     this.start();
     this.roomChatForm = this.formBuilder.group({
       text: ['', Validators.required]
@@ -80,7 +77,6 @@ export class HealthRoomComponent implements OnInit {
       this.meetRoomService.updatePatientState().subscribe(async (pt: Patient) => {
         this.patient = pt;
         console.log("this.patient provider----------------------")
-        console.log('this.patient222')
         console.log(this.patient)
         this.meetRoomService.callPatient(this.patient);
       });

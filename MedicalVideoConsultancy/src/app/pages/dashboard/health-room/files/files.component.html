@@ -2,9 +2,10 @@
     <p>File share to consults!</p>
     <div class="main-div">
         <div class="sub-div">
-            <div>
-                <p class="list">sdfsfsdf</p>
-                <p class="list">sdfsfsdf</p>
+            <div *ngIf="downloadFileList">
+              <p [class]="classKey[i]?'list p-bckground':'list'" 
+              (click)="changeClass(i)" 
+              *ngFor="let item of downloadFileList;let i=index">{{i+1}}. {{item}}</p>
             </div>
             <div class="button-div">
                 <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleDownload()">

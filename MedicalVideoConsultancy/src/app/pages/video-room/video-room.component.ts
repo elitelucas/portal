@@ -26,10 +26,11 @@ export class VideoRoomComponent implements OnInit {
   getRoomName() {
     this.route.paramMap.subscribe(params => {
       this.roomName = params.get('roomName');
-    })
+    });
   }
 
   roomListener() {
+
    /* this.meetRoomService.getUserDataObserver().subscribe(userData => {
       userData.patientsData.forEach(patient => {
         if(patient.calling === true)

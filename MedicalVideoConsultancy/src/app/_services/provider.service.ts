@@ -43,12 +43,12 @@ export class ProviderService {
     return this.http.get<any>(checkRoomUrl)
   }
 
-  //I added new func to get all pacients data.
+  //I added new func to get all patients data.
 
   getAllPatientsData(value, field){
     console.log('value')
     console.log(value)
-    const patientUrl = baseUrl + 'provider/allPacients';
+    const patientUrl = baseUrl + 'provider/allPatients';
     let params = new HttpParams().set("key", field).set("value", value);
     this.trace("getAllPatientsData:", patientUrl,params);
     return this.http.get<any>(patientUrl,{params});

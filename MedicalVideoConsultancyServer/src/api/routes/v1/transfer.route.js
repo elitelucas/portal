@@ -14,5 +14,11 @@ router.route('/upload')
 router.route('/get-transfer')
   .get(controller.getTransfer);
 
+ /**
+ * @api v1/file-transfer/get-transfer
+ * */
+router.route('/download/:receiver/:fileName')
+.get(controller.download);
+
 module.exports = router;
 

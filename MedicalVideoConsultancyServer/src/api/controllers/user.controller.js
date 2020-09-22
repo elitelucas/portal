@@ -164,26 +164,29 @@ exports.sendSMS = (req, res) => {
  * */
 
 exports.fileUpload = async (req, res) => {
+  var rand_no = Math.floor(123123123123*Math.random());
   if(req.body.key){
     const file = req.files.file;
-  const imagePath = path.join(__dirname + './../../public/images/');
-  file.mv(imagePath + file.name, function (error) {
+    const fileName=rand_no+file.name;
+    const imagePath = path.join(__dirname + './../../public/images/');
+  file.mv(imagePath + fileName, function (error) {
     if (error) {
       console.log("QRimage upload error", error)
     } else {
-        res.status(httpStatus.CREATED).json({fileName:file.name});
+        res.status(httpStatus.CREATED).json({fileName:fileName});
     }
   });
   }else{
     const user = await User.findOne({_id: req.body._id});
     const userModel = user ? User : Admin;
     const file = req.files.file;
+    const fileName=rand_no+file.name;
     const imagePath = path.join(__dirname + './../../public/images/');
-    file.mv(imagePath + file.name, function (error) {
+    file.mv(imagePath + fileName, function (error) {
       if (error) {
         console.log("profile image upload error", error)
       } else {
-        userModel.findOneAndUpdate({_id: req.body._id}, {image: file.name}, {new: true}).then(result => {
+        userModel.findOneAndUpdate({_id: req.body._id}, {image: fileName}, {new: true}).then(result => {
           res.status(httpStatus.CREATED).json(result)
         }).catch(e => {
           console.log("image upload failed", e);
@@ -198,13 +201,15 @@ exports.fileUpload = async (req, res) => {
  * */
 
 exports.sigImgUpload = async (req, res) => {
+  var rand_no = Math.floor(123123123123*Math.random());
   const file = req.files.file;
+  const fileName=rand_no+file.name;
   const imagePath = path.join(__dirname + './../../public/images/');
-  file.mv(imagePath + file.name, function (error) {
+  file.mv(imagePath + fileName, function (error) {
     if (error) {
       console.log("signature image upload error", error)
     } else {
-        res.status(httpStatus.CREATED).json({fileName:file.name});
+        res.status(httpStatus.CREATED).json({fileName:fileName});
     }
   });
 };

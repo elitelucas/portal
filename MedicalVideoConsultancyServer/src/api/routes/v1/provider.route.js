@@ -50,7 +50,7 @@ router.route('/roomName/:room')
 
 
 //I added 
-router.route('/allPacients')
+router.route('/allPatients')
   .get(controller.getAllPatients);
 
 router.route('/consult')

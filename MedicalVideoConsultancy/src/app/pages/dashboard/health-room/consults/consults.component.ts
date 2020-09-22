@@ -54,7 +54,7 @@ export class ConsultsComponent implements OnInit {
     data.forEach(function(item,idx){
       if(item) {
         console.log
-        PatientData.push({index:idx+1, patientId:item.patientId, date: item.date});
+        PatientData.push({index:idx+1, patientId:item.patientId, date: item.createdAt});
       }
     });
 
