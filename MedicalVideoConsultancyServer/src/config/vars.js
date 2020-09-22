@@ -41,6 +41,6 @@ module.exports = {
   },
   culqiConfing: {
     public_key: process.env.CULQI_API_PUBLIC_KEY,
-    private_key: process.env.CULQI_API_PUBLIC_KEY
+    private_key: process.env.CULQI_API_PRIVATE_KEY
   }
 };

@@ -17,6 +17,7 @@ class ExtendableError extends Error {
     this.isOperational = true; // This is required since bluebird 4 doesn't append it anymore.
     this.stack = stack;
     //logger.error("message : ",message , " errors:", errors , " stack:",stack)
+    //logger.error("message : ",message , " errors:", errors )
     // Error.captureStackTrace(this, this.constructor.name);
   }
 }

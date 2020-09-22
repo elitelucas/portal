@@ -123,6 +123,19 @@ router.route('/resetState')
 router.route('/checkout')
   .post(controller.checkout);
 
+  
+/**
+ * @api v1/provider/checkout
+ * */
+router.route('/charge')
+  .post(controller.charge);
+
+/**
+ * @api v1/provider/checkout
+ * */
+router.route('/subcription')
+  .post(controller.subcription);
+  
 /**
  * @api v1/provider/notify
  * */
