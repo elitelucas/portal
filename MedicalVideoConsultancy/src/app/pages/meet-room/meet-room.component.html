@@ -53,22 +53,48 @@
         </ng-container> -->
       </div>
     </mat-sidenav>
+    <div class="row">
+      <div class="user-invite col-xl-6 col-lg-6">
+        <mat-card class="p-3">
+          <mat-card-title class="p-3 font-18 text-black-50">You can invite any patient to your waiting room, share this link:</mat-card-title>
+          <div class=" d-block justify-content-between p-3">
+            <div class="mb-3 text-center">
+              <p  #inputRoom class="p-10 border-radius-5 " type="text">{{roomUrl}}</p>
+            </div>
+            <div class="text-center">
+              <!-- <button  class="text-white font-bold copy-invite-url" (click)="shareRoomAddress(inputRoom)">Share</button> -->
+  
+              <div class="mx-5 d-block ">
+                <button mat-stroked-button  class="w-p-180 p-3 text-black font-20" color="primary" [matMenuTriggerFor]="inviteMenu">Invite by <img class="w-25" src="https://img.icons8.com/nolan/48/expand-arrow.png"/></button>
+  
+                <mat-menu #inviteMenu="matMenu" class="w-p-180  mt-3" >
+                  <button  mat-menu-item class="w-45 mx-auto bg-info   text-white font-20 text-center" (click)="openDialogue('sms')">SMS <img class="w-25" src="https://img.icons8.com/dusk/64/000000/sms.png"/></button>
+                  <button  mat-menu-item class="w-45 mx-auto bg-success   text-dark font-20 mt-3 text-center"  [matMenuTriggerFor]="inviteByEmailMenu">Email <img class="w-25" src="https://img.icons8.com/nolan/64/email-open.png"/></button>
+                </mat-menu>
+                <mat-menu #inviteByEmailMenu="matMenu" class="w-p-180" >
+                  <button  mat-menu-item class="w-75 mx-auto bg-warning   text-white font-20 " (click)="sendInvite('gmail')">Gmail <img class="w-25" src="https://img.icons8.com/fluent/48/000000/gmail.png"/></button>
+                  <button  mat-menu-item class="w-75 mx-auto bg-purple   text-dark font-20 mt-3"  (click)="sendInvite('outlook')" >Outlook <img class="w-25" src="https://img.icons8.com/color/48/000000/ms-outlook.png"/></button>
+                  <button  mat-menu-item class="w-75 mx-auto bg-secondary   text-dark font-20 mt-3"  (click)="sendInvite('defaultMail')" >Default <img  class="w-25" src="https://img.icons8.com/fluent/50/000000/mail.png"/></button>
+                </mat-menu>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+      <div class="col-xl-6 col-lg-6">
+        <mat-card>
+          <div class="video-container">
+            <video autoplay muted class="local-video" #localVideo id="localVideo"></video>
+          </div>
+        </mat-card>
+      
+      </div>
+      
+    </div>
 
     <div class="container-fluid">
      
         <div class="d-flex flex-column">
-          <mat-card class="text-center">
-            <mat-card-title class="display-6 pt-5 d-flex justify-content-center">
-              <ng-container *ngIf="providerData">
-                <h3 class="font-weight-bold">Welcome to</h3>&nbsp;<div>Waiting Room of / {{providerData.role}}&nbsp;{{providerData.firstName}} !</div>
-              </ng-container>
-            </mat-card-title>
-            <mat-card-content>
-              <br/>
-              <h4>I will start the video call in a moment</h4>
-            </mat-card-content>
-          </mat-card>
-
           <ng-container *ngIf="literalArr">
             <mat-card *ngFor="let item of literalArr;">
               <mat-card-title class="p-3 text-center">{{item.postTitle}}</mat-card-title>
