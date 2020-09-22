@@ -1,1 +1,0 @@
-elementRef.nativeElement.children[1].lastChild.firstChild.innerHTML
