@@ -329,21 +329,32 @@ exports.uploadCkImage = async (req, res) => {
 };
 
 exports.mail = async (req, res) => {
-  console.log('**********dddddddddddddd********')
-  console.log('req.body')
-  console.log(req.body)
+  try {
+    console.log('**********dddddddddddddd********')
+    console.log('req.body')
+    console.log(req.body)
 
-    var transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
+      host: emailConfig.host,
+      port: emailConfig.port,
+      secure: false,
+      auth: {
+        user: emailConfig.username,
+        pass: emailConfig.password
+      }
+    });
+
+    /*var transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: 'dremova.yulya1@mail.ru',
         pass: 'sufdhk7k7bJABDFKer'
       }
-    });
+    });*/
 
     var mailOptions = {
       from: 'dremova.yulya1@mail.ru',
-      to: 'vovochkaperepelkin@yandex.ru',
+      to: 'danieldelgado20g@gmail.com',
       subject: 'Sending Email using Node.js',
       html: '<p>That was easy!</p>'
     };
@@ -355,7 +366,11 @@ exports.mail = async (req, res) => {
         console.log('Email sent: ' + info.response);
         res.status(httpStatus.CREATED).json('sent successfully');
       }
+      transporter.close();
     });
+  } catch (error) {
+    next(error);
+  }
 }
 //I added end
 
