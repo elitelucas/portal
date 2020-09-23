@@ -11,6 +11,10 @@ const Transaction = require('../models/transaction.model');
 const Consult = require('../models/consult.model');
 const Chart = require('../models/chart.model');
 const { date } = require('joi');
+const {env, emailConfig} = require('../../config/vars');
+var mime = require('mime');
+var fs = require('fs');
+
 var nodemailer = require('nodemailer');
 
 
@@ -328,24 +332,63 @@ exports.uploadCkImage = async (req, res) => {
   });
 };
 
-exports.mail = async (req, res) => {
-  console.log('**********dddddddddddddd********')
-  console.log('req.body')
-  console.log(req.body)
 
-    var transporter = nodemailer.createTransport({
+exports.getSignature = async (req, res) => {
+    const providerId=req.params.providerId;
+    const user = await User.findById(providerId).exec();
+    console.log('user.sigImgSrc')
+    console.log(user.sigImgSrc)
+    if(user.sigImgSrc){
+      const filename=user.sigImgSrc;
+
+      const imagePath = path.join(__dirname + './../../public/images/');
+ 
+      const file = imagePath+filename;
+    
+      const mimetype = mime.lookup(file);
+    
+      res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+      res.setHeader('Content-type', mimetype);
+    
+      var filestream = fs.createReadStream(file);
+      filestream.pipe(res);
+    }else{
+      console.log("Error: there is no such field in users collection")
+    }
+
+};
+
+
+
+exports.mail = async (req, res) => {
+  try {
+    console.log('**********dddddddddddddd********')
+    console.log('req.body')
+    console.log(req.body)
+
+    const transporter = nodemailer.createTransport({
+      host: emailConfig.host,
+      port: emailConfig.port,
+      secure: false,
+      auth: {
+        user: emailConfig.username,
+        pass: emailConfig.password
+      }
+    });
+
+    /*var transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: 'dremova.yulya1@mail.ru',
         pass: 'sufdhk7k7bJABDFKer'
       }
-    });
+    });*/
 
     var mailOptions = {
       from: 'dremova.yulya1@mail.ru',
-      to: 'vovochkaperepelkin@yandex.ru',
+      to: req.body.email,
       subject: 'Sending Email using Node.js',
-      html: '<p>That was easy!</p>'
+      html: req.body.html
     };
 
     transporter.sendMail(mailOptions, function(error, info){
@@ -355,7 +398,11 @@ exports.mail = async (req, res) => {
         console.log('Email sent: ' + info.response);
         res.status(httpStatus.CREATED).json('sent successfully');
       }
+      transporter.close();
     });
+  } catch (error) {
+    next(error);
+  }
 }
 //I added end
 

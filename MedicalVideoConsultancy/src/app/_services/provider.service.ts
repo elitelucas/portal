@@ -67,11 +67,11 @@ export class ProviderService {
     this.trace("getConsultInChat:", patientUrl,params);
     return this.http.get<any>(patientUrl,{params});
   }
-  sendMail(){
+  sendMail(html,email){
     console.log('sdfsdfsdf')
     const mailUrl = baseUrl + 'provider/mail';
     this.trace("getConsultInChat:", mailUrl);
-    return this.http.post(mailUrl,{aa:'aa'});
+    return this.http.post(mailUrl,{email:email,html:html});
   }
 
   getOneConsult(providerId, patientId, date){
@@ -98,6 +98,17 @@ export class ProviderService {
     this.trace("updateUrl:", updateUrl);
     return this.http.put(updateUrl, updateData)
   }
+
+  getSignature(providerId: string): Observable<Blob> {
+    console.log('providerId')
+    console.log(providerId)
+    const sigUrl = baseUrl + 'provider/getSignature/'+providerId;
+    return this.http.get(sigUrl,{
+      responseType: 'blob'
+    })
+  }
+
+
   //I added end
 
   getPatient(value, field) {
