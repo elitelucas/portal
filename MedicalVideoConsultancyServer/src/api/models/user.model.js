@@ -120,7 +120,22 @@ const userSchema = new mongoose.Schema({
   },
   blog:{
     type:Array
-  }
+  },
+  address: {
+    type: String
+  },
+  address_city: {
+    type: String
+  },
+  country_code: {
+    type: String
+  },
+  customerId: {
+    type: String
+  },
+  subcriptionId: {
+    type: String
+  },
 }, {
   timestamps: true,
 });
