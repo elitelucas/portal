@@ -109,7 +109,7 @@ export class PayProviderComponent implements OnInit {
     this.providerService.createConsult(consultData).subscribe(res=>{
       if(res){
         this.consultData=res;
-        this._route.navigateByUrl('/dashboard/health-room/'+this.data.patientId+'/'+this.consultData.createdAt);
+        this._route.navigateByUrl('/dashboard/health-room/'+this.data.patientId+'/'+this.consultData._id);
       }
     })
    

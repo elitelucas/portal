@@ -11,6 +11,10 @@ const Transaction = require('../models/transaction.model');
 const Consult = require('../models/consult.model');
 const Chart = require('../models/chart.model');
 const { date } = require('joi');
+const {env, emailConfig} = require('../../config/vars');
+var mime = require('mime');
+var fs = require('fs');
+
 var nodemailer = require('nodemailer');
 
 
@@ -209,11 +213,10 @@ exports.getConsult = async (req, res, next) => {
 
 exports.getOneConsult = async (req, res, next) => {
   try {
-    const providerId=req.query.providerId;
     const patientId=req.query.patientId;
-    const date=req.query.date
+    const consultId=req.query.consultId
     patient=await Patient.findById(patientId).exec();
-    consult = await Consult.findOne({patientId:patientId, providerId:providerId, createdAt:new Date(date)}).exec();
+    consult = await Consult.findById(consultId).exec();
     consult.patient=patient;  
     res.status(httpStatus.OK).json(consult);
   } catch (e) {
@@ -224,14 +227,14 @@ exports.getOneConsult = async (req, res, next) => {
 
 exports.updateConsult = async (req, res, next) => {
   try {
-    const providerId=req.body.providerId;
-    const patientId=req.body.patientId;
-    const date=req.body.date;
+    console.log('req.body')
+    console.log(req.body)
+    const consultId=req.body.consultId;
     const updateData=req.body.updateData;
     const symptom=[updateData.symptom0,updateData.symptom1,updateData.symptom2,updateData.symptom3];
 
-    const updatedConsult = await Consult.findOneAndUpdate(
-      {patientId:patientId, providerId:providerId, createdAt:new Date(date)}, 
+    const updatedConsult = await Consult.findByIdAndUpdate(
+      consultId, 
       {"$set":{
         allergy:updateData.allergy,
         timeOfDisease:updateData.timeOfDisease,
@@ -243,8 +246,8 @@ exports.updateConsult = async (req, res, next) => {
         assessment:updateData.assessment,
         plan:updateData.plan,
         providerFiles:updateData.providerFiles,
-        new: true
-      }});
+      }},
+      {new:true});
 
 
     const updatedPatient = await Patient.findOneAndUpdate(
@@ -253,9 +256,9 @@ exports.updateConsult = async (req, res, next) => {
         fullName:updateData.name,
         age:updateData.age,
         phoneNumber:updateData.phoneNumber,
-        new: true
-      }});
-    return res.status(httpStatus.OK).json('success');
+      }},
+      {new:true});
+    return res.status(httpStatus.OK).json(updatedConsult);
   } catch (e) {
     return next(APIError(e))
   }
@@ -276,14 +279,10 @@ exports.getConsultInChat = async (req, res, next) => {
 
 exports.fileUpload = async (req, res) => {
   const file = req.files.file;
-  var folderName='provider';
   var fieldName='providerFiles';
-  if(req.body.key==='patient'){
-    folderName='patient';
-  }
   var rand_no = Math.floor(123123123123*Math.random());
   const fileName=rand_no+file.name;
-  const imagePath = path.join(__dirname + './../../public/'+folderName+'/');
+  const imagePath = path.join(__dirname + './../../public/consult/');
   if(req.body.key==='newConsult'){
     file.mv(imagePath + fileName, function (error) {
       if (error) {
@@ -328,6 +327,34 @@ exports.uploadCkImage = async (req, res) => {
   });
 };
 
+
+exports.getSignature = async (req, res) => {
+    const providerId=req.params.providerId;
+    const user = await User.findById(providerId).exec();
+    console.log('user.sigImgSrc')
+    console.log(user.sigImgSrc)
+    if(user.sigImgSrc){
+      const filename=user.sigImgSrc;
+
+      const imagePath = path.join(__dirname + './../../public/images/');
+ 
+      const file = imagePath+filename;
+    
+      const mimetype = mime.lookup(file);
+    
+      res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+      res.setHeader('Content-type', mimetype);
+    
+      var filestream = fs.createReadStream(file);
+      filestream.pipe(res);
+    }else{
+      console.log("Error: there is no such field in users collection")
+    }
+
+};
+
+
+
 exports.mail = async (req, res) => {
   try {
     console.log('**********dddddddddddddd********')
@@ -354,9 +381,9 @@ exports.mail = async (req, res) => {
 
     var mailOptions = {
       from: 'dremova.yulya1@mail.ru',
-      to: 'danieldelgado20g@gmail.com',
+      to: req.body.email,
       subject: 'Sending Email using Node.js',
-      html: '<p>That was easy!</p>'
+      html: req.body.html
     };
 
     transporter.sendMail(mailOptions, function(error, info){

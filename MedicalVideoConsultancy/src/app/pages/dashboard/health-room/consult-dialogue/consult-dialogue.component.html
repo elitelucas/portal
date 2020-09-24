@@ -114,7 +114,6 @@
                     {{i+1}}.{{name}}
                 </div>
             </div>
-         
             
             <div>
                 <ng-container *ngFor="let file of files">
@@ -127,7 +126,7 @@
                       </button>
                 </div>
                 <div class="form-file-upload">
-                   
+               
                     <div class="upload-btn">
                       <input type="file" #fileUpload id="fileUpload" name="fileUpload" multiple="multiple" accept="*" style="display:none;" />
                       <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleUpload()">
@@ -143,6 +142,7 @@
 
     </div>
     <div class="main-div pull-right">
+        <button class="btn btn-danger mr-1" (click)="Cancel()">Cancel</button>
         <button class="btn btn-primary" 
         (click)="saveData({
             name:name.value,

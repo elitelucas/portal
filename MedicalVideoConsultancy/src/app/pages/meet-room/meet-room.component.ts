@@ -148,9 +148,6 @@ export class MeetRoomComponent implements OnInit {
   //   inputRoom.setSelectionRange(0, 0);
   // }
 
-  shareRoomAddress(inputRoom) {
-
-  }
 
   sendInvite(option) {
     switch (option) {

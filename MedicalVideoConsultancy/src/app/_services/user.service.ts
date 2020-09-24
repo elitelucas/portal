@@ -72,8 +72,8 @@ export class UserService {
   }
 
    //Delete blog data of user collection of current provider
-   deleteBlog(data) {
-    let deleteBlog=baseUrl+"/deleteBlog/"+data.idx+'/'+data.userId;
+   deleteBlog(postId) {
+    let deleteBlog=baseUrl+"/deleteBlog/"+postId;
     return this.http.delete<any>(deleteBlog);
   }
 }

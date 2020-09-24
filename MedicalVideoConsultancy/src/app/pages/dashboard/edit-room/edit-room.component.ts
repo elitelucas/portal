@@ -47,16 +47,14 @@ export class EditRoomComponent implements OnInit {
 
   ngOnInit(): void {
     this.data.currentMessage.subscribe(message=>{
-      console.log('message')
-      console.log(message)
+
       // this.firstVal='<img src="'+this.publicUrl+'image/first.png">';
     })
     
     this.currentUser = this.authService.getCurrentUser;
     this.userService.getBlog(this.currentUser.id)
     .subscribe(res=>{
-      console.log('res')
-      console.log(res)
+
       this.literalArr=res;
       this.tmpKk=[];
       this.literalArr.forEach(item=>{
@@ -83,20 +81,25 @@ export class EditRoomComponent implements OnInit {
   edit(idx){
     this.kk[idx]=false;
   }
-  editOk(title, body, idx){
+  editOk(title, body, postId,idx){
     if(body.length>10000000){
       Swal.fire('Blog size limit is 5Mbyte')
       return;
     }
-    this.userService.updateBlog({idx:idx,postTitle:title, postBody:body,userId:this.currentUser.id})
+    this.userService.updateBlog({postId,postTitle:title, postBody:body})
     .subscribe(res=>{
-      this.receiveData(res)
+      this.literalArr.splice(idx,1,res);
+      this.tmpKk=[];
+      this.literalArr.forEach(item=>{
+      this.tmpKk.push(true)
+    })
+    this.kk=this.tmpKk;
     })
   }
   editCancel(idx){
     this.kk[idx]=true;
   }
-  delete(idx){
+  delete(postId,idx){
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -107,9 +110,9 @@ export class EditRoomComponent implements OnInit {
       confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.userService.deleteBlog({idx:idx,userId:this.currentUser.id})
+        this.userService.deleteBlog(postId)
         .subscribe(res=>{
-          this.receiveData(res)
+          this.literalArr.splice(idx,1);
           Swal.fire(
             'Deleted!',
             'Your file has been deleted.',
@@ -120,8 +123,9 @@ export class EditRoomComponent implements OnInit {
     })
     
   }
+
   receiveData(res){
-    this.literalArr=res;
+    this.literalArr.push(res);
     this.tmpKk=[];
     this.literalArr.forEach(item=>{
       this.tmpKk.push(true)
@@ -131,10 +135,6 @@ export class EditRoomComponent implements OnInit {
   onReady(eventData) {
 
     eventData.plugins.get('FileRepository').createUploadAdapter = function (loader) {
-      console.log('btoa(loader.file)');
-      console.log(btoa(loader.file));
-      console.log('new UploadAdapter(loader)')
-      console.log(new UploadAdapter(loader))
       return new UploadAdapter(loader);
     };
   }

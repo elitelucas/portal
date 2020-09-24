@@ -117,9 +117,6 @@ const userSchema = new mongoose.Schema({
   payMethod:{
     type:Object
   },
-  blog:{
-    type:Array
-  }
 }, {
   timestamps: true,
 });

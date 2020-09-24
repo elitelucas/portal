@@ -158,7 +158,7 @@ router
        /**
    * api/v1/users/deleteBlog
    * */
-  router.route('/deleteBlog/:idx/:userId')
+  router.route('/deleteBlog/:postId')
   .delete(authorize(),controller.deleteBlog);
 
 module.exports = router;

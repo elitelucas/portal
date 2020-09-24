@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const path = require('path');
 const User = require('../models/user.model');
 const Admin = require('../models/admin.model');
+const Post = require('../models/post.model');
 const nodemailer = require("nodemailer");
 const {emailConfig, smsConfig} = require("../../config/vars");
 const client = require('twilio')(smsConfig.Sid, smsConfig.authToken);
@@ -309,8 +310,8 @@ exports.getSignature = async (req, res) => {
 
 exports.getBlog = async (req, res) => {
   const id=req.params.userId;
-  User.findById(id).then(result=>{
-    res.status(httpStatus.OK).json(result.blog);
+  Post.find({providerId:id}).sort({createdAt:-1}).then(result=>{
+    res.status(httpStatus.OK).json(result);
   }).catch(e => {
     return res.send(e)
   })
@@ -322,19 +323,18 @@ exports.getBlog = async (req, res) => {
 
 exports.postBlog = async (req, res) => {
 
-  const id=req.body.userId;
+  const providerId=req.body.userId;
   const postTitle=req.body.postTitle;
   const postBody=req.body.postBody;
 
-  User.findOneAndUpdate(
-    { _id: id }, 
-    { $push: { blog: {postTitle,postBody}}},
-    {new:true})
-    .then(result=>{
-      res.status(httpStatus.OK).json(result.blog);
-    }).catch(e => {
-      return res.send(e)
-    })
+  // a document instance
+  var post = new Post({providerId,postTitle,postBody});
+
+  // save model to database
+  post.save(function (err, result) {
+    if (err) return console.error(err);
+    res.status(httpStatus.OK).json(result);
+  });
 };
 
 /**
@@ -342,22 +342,19 @@ exports.postBlog = async (req, res) => {
  * */
 
 exports.updateBlog = async (req, res, next) => {
-  const idx=req.body.idx;
-  const id=req.body.userId;
+  const postId=req.body.postId;
   const postTitle=req.body.postTitle;
   const postBody=req.body.postBody;
-  User.findOne({_id: id})
+  Post.findByIdAndUpdate(
+    postId,
+    {"$set":{postTitle,postBody}},
+    {new:true}
+    )
     .then(result =>{
-      result.blog.splice(idx,1,{postTitle,postBody});
-      result.save(function(error) {
-        if (error) {
-            console.log(error);
-            return res.status(500).send(null);
-        } else {
-          return res.status(httpStatus.OK).json(result.blog);
-        }
-    });
-  })  
+      console.log('result')
+      console.log(result)
+      return res.status(httpStatus.OK).json(result);
+    })
     .catch(e =>{
       return res.send(e)
     });
@@ -368,19 +365,10 @@ exports.updateBlog = async (req, res, next) => {
  * */
 
 exports.deleteBlog = async (req, res, next) => {
-  const idx=req.params.idx;
-  const id=req.params.userId;
-  User.findById(id)
+  const postId=req.params.postId;
+  Post.findByIdAndDelete(postId)
     .then(result =>{
-      result.blog.splice(idx,1);
-      result.save(function(error) {
-        if (error) {
-            console.log(error);
-            return res.status(500).send(null);
-        } else {
-          return res.status(httpStatus.OK).json(result.blog);
-        }
-    });
+      return res.status(httpStatus.OK).json(result);
   })  
     .catch(e =>{
       return res.send(e)

@@ -29,6 +29,7 @@ export class MeetCallComponent implements OnInit {
   patientsEmail: any;
   downloadFileList=[];
   classKey=[];
+  upClassKey=[];
   downloadFile:string;
 
   public patient: Patient;
@@ -81,6 +82,13 @@ export class MeetCallComponent implements OnInit {
       this.downloadFileList.push(uploadFileName);
       console.log('uploadFileName')
       console.log(uploadFileName)
+    })
+    this.meetRoomService.receiveEndCall()
+    .subscribe(text=>{
+      if(text==='endCall'){
+        this.meetRoomService.endCall(this.providerSocketId,'acceptEnd');
+        this._router.navigateByUrl("/home")
+      }
     })
   }
 
@@ -162,17 +170,30 @@ export class MeetCallComponent implements OnInit {
     fileUpload.click();
   }
 
-  changeClass(idx){
-    this.classKey=[];
-    this.downloadFileList.forEach((item)=>{
-      this.classKey.push(false);
-    })
-    this.classKey[idx]=true;
-    this.downloadFile=this.downloadFileList[idx];
+  changeClass(idx,key){
+    if(key==='down'){
+      this.initClass();
+      this.classKey[idx]=true;
+      this.downloadFile=this.downloadFileList[idx];
+      }else{
+        this.initClass();
+        this.upClassKey[idx]=true;
+        this.downloadFile=this.fileName[idx];
+      }
+    }
+    initClass(){
+      this.classKey=[];
+      this.upClassKey=[];
+      this.downloadFileList.forEach((item)=>{
+        this.classKey.push(false);
+      })
+      this.fileName.forEach((item)=>{
+        this.upClassKey.push(false);
+      })
     }
   handleDownload(){
     if(this.downloadFile){
-      this.patientService.download('file-transfer/download/provider/'+this.downloadFile)
+      this.patientService.download('file-transfer/download/consult/'+this.downloadFile)
       .subscribe(blob =>{
         saveAs(blob, this.downloadFile)} )
     }

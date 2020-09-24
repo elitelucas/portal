@@ -2,7 +2,7 @@ import { Consult } from './../../../_model/user';
 import { Component, OnInit, ViewChild, ElementRef, NgZone, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MeetRoomService } from '../../../_services/meet-room.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute,Router } from '@angular/router';
 import { ProviderService } from '../../../_services/provider.service';
 import { User, Patient } from '../../../_model/user';
 import { timer } from 'rxjs';
@@ -23,8 +23,7 @@ export class HealthRoomComponent implements OnInit {
 
   patient: Patient;
   currentUser: User;
-  consultData:any;
-  consultCreatedDate:string;
+  consultId:any;
   key={
     Prescription:true,
     Consults: false,
@@ -39,14 +38,12 @@ export class HealthRoomComponent implements OnInit {
     public providerService: ProviderService,
     private ngZone: NgZone,
     private formBuilder: FormBuilder,
-    private renderer: Renderer2) {
+    private renderer: Renderer2,
+    private _router:Router
+    ) {
     this.route.paramMap.subscribe(async (params) => {
       this.patient = JSON.parse(localStorage.getItem(params.get("patientId")));
-      this.consultCreatedDate=params.get('date');
-      console.log('this.patient')
-      console.log(this.patient)
-      console.log('this.consultCreatedDate')
-      console.log(this.consultCreatedDate)
+      this.consultId=params.get('consultId');
     });
     this.currentUser = Object.assign(new User(), JSON.parse(localStorage.getItem('provider_data')));
     console.log('this.currentUser')
@@ -81,6 +78,12 @@ export class HealthRoomComponent implements OnInit {
         this.meetRoomService.callPatient(this.patient);
       });
     });
+    this.meetRoomService.receiveEndCall()
+    .subscribe(text=>{
+      if(text==='acceptEnd'){
+        this._router.navigateByUrl("/dashboard/health-provider")
+      }
+    })
   }
 
   async start() {
@@ -110,6 +113,9 @@ export class HealthRoomComponent implements OnInit {
     this.key.Files=false;
     this.key.Charts=false;
     this.key[kk]=true;
+  }
+  public endCall(){
+    this.meetRoomService.endCall(this.patient.socketId,'endCall');
   }
 
   /*trace(...arg) {

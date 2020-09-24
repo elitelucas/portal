@@ -75,6 +75,9 @@ router.route('/updateConsult')
 router.route('/ckImage')
   .post(controller.uploadCkImage)
 
+router.route('/getSignature/:providerId')
+  .get(controller.getSignature)
+
 //I added end
 router.route('/patientByField')
   .get(controller.getPatient);

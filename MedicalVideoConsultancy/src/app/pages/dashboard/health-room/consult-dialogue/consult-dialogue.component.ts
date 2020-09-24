@@ -1,64 +1,69 @@
-import { Patient, User, Consult } from './../../../../_model/user';
-import { ActivatedRoute,Router } from '@angular/router';
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import {Component, ElementRef, OnInit, ViewChild,Inject} from '@angular/core';
 import {FileUploadService} from "../../../../_services/file-upload.service";
 import {HttpErrorResponse, HttpEventType} from "@angular/common/http";
 import {catchError, map} from "rxjs/operators";
 import {of} from "rxjs";
-import { ProviderService } from './../../../../_services/provider.service';
-import { MeetRoomService } from './../../../../_services/meet-room.service';
-import { saveAs } from 'file-saver';
+import {AuthService} from "../../../../_services/auth.service";
+import {ProviderService} from "../../../../_services/provider.service";
+import {Consult} from "../../../../_model/user";
+import Swal from 'sweetalert2';
+import { ConsultsComponent } from './../consults/consults.component';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material";
 import { PatientService } from './../../../../_services/patient.service';
+import { saveAs } from 'file-saver';
+
+
 
 @Component({
-  selector: 'app-files',
-  templateUrl: './files.component.html',
-  styleUrls: ['./files.component.css']
+  selector: 'app-consult-dialogue',
+  templateUrl: './consult-dialogue.component.html',
+  styleUrls: ['./consult-dialogue.component.css']
 })
-export class FilesComponent implements OnInit {
+export class ConsultDialogueComponent implements OnInit {
+  currentUser: any;
+  data:any;
+  iteralData:Consult;
+  dataDisplay:boolean=false;
   fileName=[];
-  patient:Patient;
-  consultId:string;
-  downloadFileList=[];
   classKey=[];
   upClassKey=[];
   downloadFile:String;
-  currentUser:User;
-  consultData:Consult;
-
   @ViewChild("fileUpload", {static: false}) fileUpload: ElementRef; files = [] ;
-  constructor(
-    private fileUploadService: FileUploadService,
-    private route:ActivatedRoute,
-    private providerService:ProviderService,
-    private meetRoomService:MeetRoomService,
-    private patientService:PatientService
-    ) {
-    this.route.paramMap.subscribe(async (params) => {
-      this.patient = JSON.parse(localStorage.getItem(params.get("patientId")));
-      this.consultId=params.get('consultId');
-      this.providerService.getOneConsult(this.patient._id,this.consultId)
-      .subscribe(res=>{
-        this.consultData=res;
-        this.downloadFileList=this.consultData.patientFiles;
-        this.fileName=this.consultData.providerFiles;
-      })
-    });
-    this.currentUser = Object.assign(new User(), JSON.parse(localStorage.getItem('provider_data')));
 
-   }
+  constructor(
+    private activatedroute: ActivatedRoute, 
+    private fileUploadService: FileUploadService,
+    private authService:AuthService,
+    private providerService:ProviderService,
+    private patientService:PatientService,
+    public dialogRef: MatDialogRef<ConsultsComponent>,
+    @Inject(MAT_DIALOG_DATA) public receiveData
+  ) {
+    console.log('receiveData')
+    console.log(receiveData)
+    this.currentUser = this.authService.getCurrentUser;
+    this.activatedroute.params.subscribe(data => {
+      this.data=receiveData;
+      console.log('this.data')
+      console.log(this.data)
+    })
+  }
 
   ngOnInit(): void {
-    console.log('sdfsdf')
-    this.meetRoomService.confirmConnect(this.currentUser);
-   
+    this.providerService.getOneConsult(this.data.id, this.data.consultId)
+    .subscribe(res=>{
+      this.iteralData=res;
+      this.fileName=this.iteralData.providerFiles;
+      this.dataDisplay=true;
+    })
   }
+  
   uploadFile(file) {
-    const providerId=JSON.parse(localStorage.getItem('provider_data')).id;
     const formData = new FormData();
     formData.append('file', file.data);
-    formData.append('_id', providerId);
-    formData.append('key', 'provider');
+    formData.append('_id', this.data.id);
+    formData.append('key', 'newConsult');
     file.inProgress = true;
     const fileType=file.data.type.split('/')[0];
     this.fileUploadService.uploadFile(formData).pipe(
@@ -82,10 +87,10 @@ export class FilesComponent implements OnInit {
           this.files = [];
         }, 1000);
         this.fileName.push(event.body)
-        this.meetRoomService.sendUploadFile(event.body,'provider',this.patient._id);
       }
     });
   }
+
   private uploadFiles() {
     this.fileUpload.nativeElement.value = '';
     this.files.forEach(file => {
@@ -104,12 +109,11 @@ export class FilesComponent implements OnInit {
     };
     fileUpload.click();
   }
-  
   changeClass(idx,key){
     if(key==='down'){
       this.initClass();
       this.classKey[idx]=true;
-      this.downloadFile=this.downloadFileList[idx];
+      this.downloadFile=this.iteralData.patientFiles[idx];
       }else{
         this.initClass();
         this.upClassKey[idx]=true;
@@ -119,7 +123,7 @@ export class FilesComponent implements OnInit {
     initClass(){
       this.classKey=[];
       this.upClassKey=[];
-      this.downloadFileList.forEach((item)=>{
+      this.iteralData.patientFiles.forEach((item)=>{
         this.classKey.push(false);
       })
       this.fileName.forEach((item)=>{
@@ -136,11 +140,37 @@ export class FilesComponent implements OnInit {
         saveAs(blob, this.downloadFile)} )
     }  
   }
-  async ngAfterViewInit(){
-    this.meetRoomService.receiveUploadFile().subscribe(uploadFileName=>{
-      this.downloadFileList.push(uploadFileName);
+
+  saveData(updateConsult){
+    updateConsult.providerFiles=this.fileName;
+    const updateData={
+      patientId:this.data.id,
+      consultId:this.data.consultId,
+      updateData:updateConsult
+    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, update it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.providerService.updateConsult(updateData)
+        .subscribe(res=>{
+          if(res){
+            Swal.fire('Updated successfully');
+            this.dialogRef.close();
+          }
+        })
+      }
     })
   }
-
+  Cancel(){
+    this.dialogRef.close();
+  }
 
 }
+

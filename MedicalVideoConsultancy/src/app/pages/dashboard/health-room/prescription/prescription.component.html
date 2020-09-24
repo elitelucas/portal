@@ -21,8 +21,17 @@
         </div>
     </div>
     <div class="bottom-mgn">
-        <input type="text" class="input-stl" placeholder="Patients email by defaults or it can be edited" />
-        <button class="btn btn-primary" (click)="sendPrescription()">Send Prescription</button>
+        <form [formGroup]="prescriptionForm" (ngSubmit)="sendPrescription()">
+            <input type="email" formControlName="email" class="input-stl" 
+            placeholder="Patients email by defaults or it can be edited" />
+            <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+                <div *ngIf="f.email.errors.required">Email address is required</div>
+                <div *ngIf="f.email.errors.email">Email address is invalid</div>
+                <div *ngIf="f.email.errors.maxlength">Email address must be less than 100 characters</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Prescription</button>
+
+        </form>
     </div>
     <div>
         <img [src]="message">

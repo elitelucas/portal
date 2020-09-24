@@ -32,7 +32,7 @@ ratione voluptatem sequi nesciunt. Neque porro quisquam est.
       <div class="head-bar">
         <h3 class="each-post-title pull-left">{{item.postTitle}}</h3>
         <button class="btn btn-primary edit-button edit-margin" (click)="edit(i)">Edit</button>
-        <button class="btn btn-danger edit-button" (click)="delete(i)">Delete</button>
+        <button class="btn btn-danger edit-button" (click)="delete(item._id,i)">Delete</button>
       </div>
       <div class="each-post-body" [innerHTML]="item.postBody">
       </div>
@@ -42,7 +42,7 @@ ratione voluptatem sequi nesciunt. Neque porro quisquam est.
 
         <input #editTitle type="text" class="edit-title-input" [value]="item.postTitle" />
         <button class="btn btn-primary edit-button edit-margin" 
-        (click)="editOk(editTitle.value, editBody.elementRef.nativeElement.children[1].lastChild.innerHTML,i)">
+        (click)="editOk(editTitle.value, editBody.elementRef.nativeElement.children[1].lastChild.innerHTML,item._id,i)">
           Ok
         </button>
 

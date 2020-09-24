@@ -3,11 +3,13 @@ import {Component, OnInit, ViewChild, ViewEncapsulation, Input} from '@angular/c
 import {MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort} from "@angular/material";
 import { ProviderService } from './../../../../_services/provider.service';
 import {Router} from "@angular/router";
+import { ConsultDialogueComponent } from './../consult-dialogue/consult-dialogue.component';
 
 export interface PatientData {
   index:number;
   patientId:string;
   date: Date;
+  consultId:string;
 }
 
 @Component({
@@ -54,7 +56,7 @@ export class ConsultsComponent implements OnInit {
     data.forEach(function(item,idx){
       if(item) {
         console.log
-        PatientData.push({index:idx+1, patientId:item.patientId, date: item.createdAt});
+        PatientData.push({index:idx+1, patientId:item.patientId, date: item.createdAt,consultId:item._id});
       }
     });
 
@@ -74,13 +76,23 @@ export class ConsultsComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
   detail(data){
-    this.router.navigateByUrl('/dashboard/newConsult/'+data.index+'/'+data.id+'/'+data.date);
+    const dialogRef = this.dialog.open(ConsultDialogueComponent, {
+      width: '75%',
+      height:'70%',
+      data: data
+    });
+
+    // dialogRef.afterClosed().subscribe(result => {
+    //   this.smsData = result;
+    //   this.sendInvite(option);
+    // })
+    // this.router.navigateByUrl('/dashboard/newConsult/'+data.index+'/'+data.id+'/'+data.date);
   }
   search(startDate,endDate){
     this.dataSource.data = this.tmpData;
     const fromDate = startDate;
     const toDate = endDate;
-    this.dataSource.data = this.dataSource.data.filter(e=>e.date > fromDate && e.date < toDate ) ;
+    this.dataSource.data = this.dataSource.data.filter(e=>e.createdAt > fromDate && e.createdAt < toDate ) ;
     this.initDataSource(this.dataSource.data)
   }
 }

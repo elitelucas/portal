@@ -542,7 +542,14 @@ io.on('connection', (socket) => {
       to: data.to
     });
   });
-
+  socket.on("endCall", data => {
+    console.log("endCall to: ", socket.id , data.to, data.text );
+    socket.to(data.to).emit("endCall", {
+      text: data.text,
+      from: data.from,
+      to: data.to
+    });
+  });
   socket.on('createRoom',data=>{
     socket.join(data);
   })

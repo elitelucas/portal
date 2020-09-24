@@ -270,6 +270,24 @@ export class MeetRoomService {
     });
   }
 
+  public endCall(to, text) {
+    this.socket.emit("endCall", {
+      text: text,
+      from: this.socket.id,
+      to: to
+    });
+  }
+
+
+  public receiveEndCall() {
+    return Observable.create((observer) => {
+      this.socket.on("endCall", async (data) => {
+        observer.next(data.text);
+      });
+    });
+  }
+
+
   public startAttetion(provider, patient) {
     this.trace("startAttetion :", provider, patient);
     this.socket.emit('startAttetion', provider, patient);
