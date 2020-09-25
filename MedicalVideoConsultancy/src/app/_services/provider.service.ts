@@ -54,12 +54,10 @@ export class ProviderService {
     return this.http.get<any>(patientUrl,{params});
   }
 
-  getConsult(value, field){
-    const patientUrl = baseUrl + 'provider/consult';
-    let params = new HttpParams().set("key", field)
-    .set("value", value).set("value", value).set("value", value);
-    this.trace("getConsult:", patientUrl,params);
-    return this.http.get<any>(patientUrl,{params});
+  getConsult(id,startDate,endDate){
+    const patientUrl = baseUrl + 'provider/consult/'+id+'/'+startDate+'/'+endDate;
+    this.trace("getConsult:", patientUrl);
+    return this.http.get<any>(patientUrl);
   }
 
   getConsultInChat(patientId, providerId){

@@ -53,7 +53,7 @@ router.route('/roomName/:room')
 router.route('/allPatients')
   .get(controller.getAllPatients);
 
-router.route('/consult')
+router.route('/consult/:patientId/:startDate/:endDate')
   .get(controller.getConsult);
 
 router.route('/oneConsult')

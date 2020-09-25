@@ -201,9 +201,11 @@ exports.getAllPatients = async (req, res, next) => {
 
 exports.getConsult = async (req, res, next) => {
   try {
-    const key=req.query.key;
-    const value=req.query.value;
-    consult = await Consult.find({patientId:value}).sort({createdAt:-1}).exec();
+    const patientId=req.params.patientId;
+    const startDate=req.params.startDate;
+    const endDate=req.params.endDate;
+    consult = await Consult.find({patientId,createdAt: {"$gte": new Date(startDate), "$lt": new Date(endDate)}})
+    .sort({createdAt:-1}).exec();
     res.status(httpStatus.OK).json(consult);
   } catch (e) {
     console.log("getConsult:",error);

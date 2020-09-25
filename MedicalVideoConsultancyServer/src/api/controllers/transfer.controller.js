@@ -49,12 +49,17 @@ exports.download = async (req, res, next) => {
     const filePath = imagePath+req.params.receiver+'\\';
     const filename=req.params.fileName;
     const file = filePath+filename;
+    if(fs.existsSync(file)){
+      const mimetype = mime.lookup(file);
   
-    const mimetype = mime.lookup(file);
+      res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+      res.setHeader('Content-type', mimetype);
+    
+      var filestream = fs.createReadStream(file);
+      filestream.pipe(res);
+    }else{
+      console.log('There is no such files');
+    }
   
-    res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-    res.setHeader('Content-type', mimetype);
-  
-    var filestream = fs.createReadStream(file);
-    filestream.pipe(res);
+    
 };

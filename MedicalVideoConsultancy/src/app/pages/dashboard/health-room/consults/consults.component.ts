@@ -4,6 +4,7 @@ import {MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort} from "@a
 import { ProviderService } from './../../../../_services/provider.service';
 import {Router} from "@angular/router";
 import { ConsultDialogueComponent } from './../consult-dialogue/consult-dialogue.component';
+import  Swal  from 'sweetalert2';
 
 export interface PatientData {
   index:number;
@@ -35,21 +36,8 @@ export class ConsultsComponent implements OnInit {
   
   }
   ngOnInit(): void {
-    this.initData();
   }
 
-  initData() {
-    this.ProviderService.getConsult(this.patient._id,'id').subscribe(res=> {
-      if(res) {
-        console.log("consult data s>>>>>>>>>>>>>", res)
-        this.tmpData=res;
-        this.initDataSource(res)
-        this.noDataToDisplay = false;
-      } else{
-        this.noDataToDisplay = true;
-      }
-    })
-  }
 
   initDataSource(data) {
     const PatientData: PatientData[] = [];
@@ -88,12 +76,22 @@ export class ConsultsComponent implements OnInit {
     // })
     // this.router.navigateByUrl('/dashboard/newConsult/'+data.index+'/'+data.id+'/'+data.date);
   }
-  search(startDate,endDate){
-    this.dataSource.data = this.tmpData;
-    const fromDate = startDate;
-    const toDate = endDate;
-    this.dataSource.data = this.dataSource.data.filter(e=>e.createdAt > fromDate && e.createdAt < toDate ) ;
-    this.initDataSource(this.dataSource.data)
+   search(startDate,endDate){
+    if(startDate==='' || endDate==='' || endDate>startDate==false){
+      Swal.fire('Input the date correctly.')
+      return;
+    }
+    this.ProviderService.getConsult(this.patient._id,startDate,endDate)
+    .subscribe(res=> {
+      if(res) {
+        console.log("consult data s>>>>>>>>>>>>>", res)
+        this.tmpData=res;
+        this.initDataSource(res)
+        this.noDataToDisplay = false;
+      } else{
+        this.noDataToDisplay = true;
+      }
+    })
   }
 }
 
