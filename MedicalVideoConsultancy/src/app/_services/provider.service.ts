@@ -102,9 +102,7 @@ export class ProviderService {
     console.log('providerId')
     console.log(providerId)
     const sigUrl = baseUrl + 'provider/getSignature/'+providerId;
-    return this.http.get(sigUrl,{
-      responseType: 'blob'
-    })
+    return this.http.get<any>(sigUrl)
   }
 
 

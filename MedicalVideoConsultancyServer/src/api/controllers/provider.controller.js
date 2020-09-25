@@ -335,27 +335,32 @@ exports.getSignature = async (req, res) => {
     const user = await User.findById(providerId).exec();
     console.log('user.sigImgSrc')
     console.log(user.sigImgSrc)
-    if(user.sigImgSrc){
-      const filename=user.sigImgSrc;
-
-      const imagePath = path.join(__dirname + './../../public/images/');
- 
-      const file = imagePath+filename;
-      if(fs.existsSync(file)){
-        const mimetype = mime.lookup(file);
-    
-        res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-        res.setHeader('Content-type', mimetype);
-      
-        var filestream = fs.createReadStream(file);
-        filestream.pipe(res);
-      }else
-      console.log('There is no such file.')
-    
-      
-    }else{
-      console.log("Error: there is no such field in users collection")
+    if(user.sigImgSrc)
+    res.status(httpStatus.CREATED).json(user.sigImgSrc);
+    else{
+      console.log('no such file.')
     }
+
+    // if(user.sigImgSrc){
+    //   const filename=user.sigImgSrc;
+
+    //   const imagePath = path.join(__dirname + './../../public/images/');
+ 
+    //   const file = imagePath+filename;
+    
+    //   if(fs.existsSync(file)){
+    //     const mimetype = mime.lookup(file);
+    
+    //     res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+    //     res.setHeader('Content-type', mimetype);
+      
+    //     var filestream = fs.createReadStream(file);
+    //     filestream.pipe(res);
+    //   }else
+    //   console.log('There is no such file.')
+    // }else{
+    //   console.log("Error: there is no such field in users collection")
+    // }
 
 };
 
@@ -399,7 +404,6 @@ exports.mail = async (req, res) => {
         console.log('Email sent: ' + info.response);
         res.status(httpStatus.CREATED).json('sent successfully');
       }
-      transporter.close();
     });
   } catch (error) {
     next(error);

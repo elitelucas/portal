@@ -3,7 +3,8 @@ import { DataService } from "../../../../_services/data.service";
 import { ProviderService } from "../../../../_services/provider.service";
 import { User, Patient } from '../../../../_model/user';
 import { ActivatedRoute } from '@angular/router';
-import { FormGroup,FormBuilder,Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {environment} from "../../../../../environments/environment";
 import Swal from 'sweetalert2';
 
 
@@ -13,6 +14,8 @@ import Swal from 'sweetalert2';
   styleUrls: ['./prescription.component.css']
 })
 export class PrescriptionComponent implements OnInit {
+  publicUrl = environment.baseUrl + 'public/image/';
+
   prescriptions=[];
   message:any;
   patient: Patient;
@@ -65,20 +68,20 @@ export class PrescriptionComponent implements OnInit {
     }
 
     this.providerService.getSignature(this.currentUser.id)
-      .subscribe(blob => {
-        const blobToBase64 = blob => {
-          const reader = new FileReader();
-          reader.readAsDataURL(blob);
-          return new Promise(resolve => {
-            reader.onloadend = () => {
-              resolve(reader.result);
-            };
-          });
-        };
+      .subscribe(res => {
+        // const blobToBase64 = blob => {
+        //   const reader = new FileReader();
+        //   reader.readAsDataURL(blob);
+        //   return new Promise(resolve => {
+        //     reader.onloadend = () => {
+        //       resolve(reader.result);
+        //     };
+        //   });
+        // };
 
-        blobToBase64(blob).then(base64data => {
-          if (base64data) {
-            this.base64data = base64data;
+        // blobToBase64(blob).then(base64data => {
+          if (res) {
+            this.base64data =this.publicUrl+ res;
 
             var prescriptionHtmlStr = '';
             var today = new Date();
@@ -122,7 +125,7 @@ export class PrescriptionComponent implements OnInit {
           } else {
             Swal.fire('There is no doctor signature. Please upload the signature.')
           }
-        });
+        // });
     });
     
   }
