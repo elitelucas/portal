@@ -341,14 +341,18 @@ exports.getSignature = async (req, res) => {
       const imagePath = path.join(__dirname + './../../public/images/');
  
       const file = imagePath+filename;
+      if(fs.existsSync(file)){
+        const mimetype = mime.lookup(file);
     
-      const mimetype = mime.lookup(file);
+        res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+        res.setHeader('Content-type', mimetype);
+      
+        var filestream = fs.createReadStream(file);
+        filestream.pipe(res);
+      }else
+      console.log('There is no such file.')
     
-      res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-      res.setHeader('Content-type', mimetype);
-    
-      var filestream = fs.createReadStream(file);
-      filestream.pipe(res);
+      
     }else{
       console.log("Error: there is no such field in users collection")
     }
