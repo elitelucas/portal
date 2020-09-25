@@ -4,11 +4,13 @@
       <canvas #sigPad (mousedown)="onMouseDown($event)"
       (mousemove)="onMouseMove($event)">
       </canvas>
+      <canvas #blank style="display: none;">
+      </canvas>
     </div>
     
   </div>
   <div [class]="switch?'display':''">
-    <img [src]="img" />
+    <img *ngIf="sigImgKey" [src]="img" />
   </div>
  
   <div *ngIf="userData && switch" class="mx-3" style="text-align: center;">

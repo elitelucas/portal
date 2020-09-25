@@ -79,6 +79,7 @@ export class ConsultListComponent implements OnInit {
     this.router.navigateByUrl('/dashboard/newConsult/'+data.index+'/'+data.id+'/'+data.consultId);
   }
   search(startDate,endDate){
+    // this.ProviderService.getConsultBy
     this.dataSource.data = this.tmpData;
     const fromDate = startDate;
     const toDate = endDate;

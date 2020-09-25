@@ -61,17 +61,25 @@ export class PayProviderComponent implements OnInit {
         }
       }
       if(this.payData){
-        if(this.payData.QRimg[0]){
-          this.QRimgKey[0]=true;
-        }
-        if(this.payData.QRimg[1]){
-          this.QRimgKey[1]=true;
+        if(this.payData.QRimg){
+          if(this.payData.QRimg[0]){
+            this.QRimgKey[0]=true;
+          }
+          if(this.payData.QRimg[1]){
+            this.QRimgKey[1]=true;
+          }
+        }else{
+          this.payData.QRimg=[];
         }
         if(this.payData.account){
           this.accountKey=true;
+        }else{
+          this.payData.account=[];
         }
         if(this.payData.url){
           this.urlKey=true;
+        }else{
+          this.payData.url=[]
         }
       }
     })

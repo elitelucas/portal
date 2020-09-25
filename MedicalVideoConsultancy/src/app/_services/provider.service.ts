@@ -56,7 +56,8 @@ export class ProviderService {
 
   getConsult(value, field){
     const patientUrl = baseUrl + 'provider/consult';
-    let params = new HttpParams().set("key", field).set("value", value);
+    let params = new HttpParams().set("key", field)
+    .set("value", value).set("value", value).set("value", value);
     this.trace("getConsult:", patientUrl,params);
     return this.http.get<any>(patientUrl,{params});
   }

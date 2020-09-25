@@ -118,11 +118,18 @@ router
   router.route('/update-profile/:userId')
     .put(authorize(), controller.updateProfile);
 
-  /**
-   * api/v1/users/update-sigPay/:userId
+
+    /**
+   * api/v1/users/updateSignature/:userId
    * */
-  router.route('/update-sigPay/:userId')
-  .put(controller.updateSigPay);
+  router.route('/updateSignature/:userId')
+  .put(controller.updateSignature);
+
+    /**
+   * api/v1/users/updatePayment/:userId
+   * */
+  router.route('/updatePayment/:userId')
+  .put(controller.updatePayment);
 
   /**
    * api/v1/users/payment/:userId

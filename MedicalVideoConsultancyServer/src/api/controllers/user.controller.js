@@ -3,6 +3,7 @@ const path = require('path');
 const User = require('../models/user.model');
 const Admin = require('../models/admin.model');
 const Post = require('../models/post.model');
+const Payment = require('../models/payment.model');
 const nodemailer = require("nodemailer");
 const {emailConfig, smsConfig} = require("../../config/vars");
 const client = require('twilio')(smsConfig.Sid, smsConfig.authToken);
@@ -243,48 +244,59 @@ exports.updateProfile = async (req, res) => {
  * Update signature and payment method in user profile page
  * */
 
-exports.updateSigPay = async (req, res) => {
-  const imagePath = path.join(__dirname + './../../public/images/');
-  var rand_no = Math.floor(123123123123*Math.random());
-  var signatureImgName=rand_no+"signature.png";
-  console.log('signatureImgName')
-  console.log(signatureImgName)
-  var sigImgSrc=req.body.sigImgSrc;
-  if (sigImgSrc){
-    var fs=require('fs');
-    if(sigImgSrc.indexOf(';base64,')!==-1){
-      let base64Image = sigImgSrc.split(';base64,').pop();
-      fs.writeFile(imagePath+signatureImgName, base64Image, {encoding: 'base64'}, function(err) {
-          console.log('File created');
-      });
-    }else{
-      signatureImgName=sigImgSrc;
-    }   
-  }
-  const payMethod=req.body.payMethod;
- 
-  User.findOneAndUpdate(
-    {_id: req.params.userId}, 
-    {"$set":{sigImgSrc:signatureImgName,payMethod:payMethod}},
-    {new: true}
-    )
-    .then(result => {
-      console.log('result')
-      console.log(result)
-    res.status(httpStatus.OK).json(result.sigImgSrc);
-  }).catch(e => {
-    return res.send(e)
-  })
+exports.updateSignature = async (req, res,next) => {
+  try{
+    const imagePath = path.join(__dirname + './../../public/images/');
+    var rand_no = Math.floor(123123123123*Math.random());
+    var signatureImgName=rand_no+"signature.png";
+    console.log('signatureImgName')
+    console.log(signatureImgName)
+    var sigImgSrc=req.body.signature;
+    if (sigImgSrc){
+      var fs=require('fs');
+      if(sigImgSrc.indexOf(';base64,')!==-1){
+        let base64Image = sigImgSrc.split(';base64,').pop();
+        fs.writeFile(imagePath+signatureImgName, base64Image, {encoding: 'base64'}, function(err) {
+            console.log('File created');
+        });
+      }else{
+        signatureImgName=sigImgSrc;
+      }   
+    }  
+    User.findByIdAndUpdate(
+      req.params.userId,{sigImgSrc:signatureImgName},
+      {upsert: true, setDefaultsOnInsert: true})
+      .then(result=>{
+        res.status(httpStatus.OK).json(result);    
+      }) 
+  }catch (error) {
+    next(error);
+  } 
 };
+
+exports.updatePayment = async(req,res,next)=>{
+  try{
+    const payMethod=req.body.payment;
+    Payment.findByIdAndUpdate(
+      req.params.userId, 
+      {'$set':{QRimg:payMethod.QRimg,account:payMethod.account,url:payMethod.url}},
+      {upsert: true, setDefaultsOnInsert: true,new:true})
+      .then(result=>{
+        res.status(httpStatus.OK).json(result);    
+      })
+  }catch (error) {
+    next(error);
+  }  
+}
 
 /**
  * Get payment method field from users collection
  * */
 
 exports.getPayData = async (req, res) => {
-  const id=req.params.userId;
-  User.findById(id).then(result=>{
-    res.status(httpStatus.OK).json(result.payMethod);
+  const providerId=req.params.userId;
+  Payment.findById(providerId).then(result=>{
+    res.status(httpStatus.OK).json(result);
   }).catch(e => {
     return res.send(e)
   })
