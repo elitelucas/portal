@@ -57,7 +57,7 @@ const consultSchema = new Schema({
     type:Array,
     default:[]
   },
-  createDate: Date,
+  payment:Object,
   patient: Object,
 },{
   timestamps:true

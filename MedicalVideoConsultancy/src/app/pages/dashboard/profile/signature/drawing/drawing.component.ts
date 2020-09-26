@@ -8,6 +8,7 @@ import {catchError, map} from "rxjs/operators";
 import {HttpErrorResponse, HttpEventType} from "@angular/common/http";
 import {of} from "rxjs";
 import { UserService } from './../../../../../_services/user.service';
+import  Swal  from 'sweetalert2';
 
 
 @Component({
@@ -19,13 +20,16 @@ export class DrawingComponent implements OnInit {
   currentUser: any;
   @Input() name: string;
   @ViewChild('sigPad') sigPad;
+  @ViewChild('blank') blank;
   @ViewChild("fileUpload", {static: false}) fileUpload: ElementRef; files = [] ;
   publicUrl = environment.baseUrl + "public/image/";
 
   sigPadElement;
+  blankElement;
   context;
   isDrawing = false;
   img;
+  sigImgKey=false;
   message:string;
   userData: any;
   switch:boolean=false;
@@ -39,14 +43,18 @@ export class DrawingComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.data.currentMessage.subscribe(message => this.message = message);
     this.userService.getSignature(this.currentUser.id).subscribe(res=>{
-      this.img=this.publicUrl+res;
+      if(res){
+        this.sigImgKey=true;
+        this.img=this.publicUrl+res;
+      }
     })
   }
 
   ngAfterViewInit() {
     this.sigPadElement = this.sigPad.nativeElement;
+    this.blankElement=this.blank.nativeElement;
+
     this.context = this.sigPadElement.getContext('2d');
  
     this.context.strokeStyle = '#3742fa';
@@ -55,6 +63,7 @@ export class DrawingComponent implements OnInit {
    
     var parent = document.getElementById("parent");
     this.sigPadElement.width = parent.clientWidth;
+    this.blankElement.width = parent.clientWidth;
   }
 
 
@@ -78,6 +87,7 @@ export class DrawingComponent implements OnInit {
   }
   onResize(event){
       this.sigPadElement.width = event.target.innerWidth*0.7;
+      this.blankElement.width = event.target.innerWidth*0.7;
   }
 
   private relativeCoords(event) {
@@ -95,9 +105,25 @@ export class DrawingComponent implements OnInit {
     
   }
 
-  save() {
-    this.img = this.sigPadElement.toDataURL("image/png");
-    this.data.changeMessage(this.img);
+  save() {  
+    if(this.switch){
+      this.userService.updateSignature(this.userData.fileName,this.currentUser.id).subscribe(res=>{
+        if(res)
+        Swal.fire('Updated successfully');
+      })
+    }else{
+      if(this.sigPadElement.toDataURL() === this.blankElement.toDataURL()){
+        Swal.fire('There is no new signature.Please draw signature.');
+        return;
+      } 
+      this.sigImgKey=true;
+      this.img = this.sigPadElement.toDataURL("image/png");
+      this.userService.updateSignature(this.img,this.currentUser.id).subscribe(res=>{
+        if(res)
+        Swal.fire('Updated successfully');
+      })
+    }
+    // this.data.changeMessage(this.img);
   }
   
   uploadFile(file) {
@@ -127,7 +153,7 @@ export class DrawingComponent implements OnInit {
         }, 1000);
         this.userData = event.body;
         this.switch=true;
-        this.data.changeMessage(this.userData.fileName);
+        // this.data.changeMessage(this.userData.fileName);
       }
     });
   }

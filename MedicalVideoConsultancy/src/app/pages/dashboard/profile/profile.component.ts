@@ -34,12 +34,12 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.initProfile()
-    this.data.currentMessage.subscribe(message => {
-      if(typeof(message)==='string')
-      this.sigImgSrc = message;
-      if(typeof(message)==='object')
-      this.payMethod = message;    
-    });
+    // this.data.currentMessage.subscribe(message => {
+    //   if(typeof(message)==='string')
+    //   this.sigImgSrc = message;
+    //   if(typeof(message)==='object')
+    //   this.payMethod = message;    
+    // });
   }
 
   initProfile() {
@@ -111,11 +111,11 @@ export class ProfileComponent implements OnInit {
       }
     })
   }
-  saveAll(){
-    this.userService.updateSigPay(this.sigImgSrc, this.payMethod,this.currentUser.id).subscribe(res=>{
-      if(res)
-      Swal.fire('Updated successfully');
-    })
-  }
+  // saveAll(){
+  //   this.userService.updateSigPay(this.sigImgSrc, this.payMethod,this.currentUser.id).subscribe(res=>{
+  //     if(res)
+  //     Swal.fire('Updated successfully');
+  //   })
+  // }
 
 }

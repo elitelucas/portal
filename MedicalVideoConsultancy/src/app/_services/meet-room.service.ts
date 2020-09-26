@@ -4,7 +4,7 @@ import { environment } from "../../environments/environment";
 import { Observable } from "rxjs";
 import { Patient } from '../_model/user';
 
-declare var Peer: any;
+declare var Peer:any;
 
 
 @Injectable({
@@ -19,11 +19,10 @@ export class MeetRoomService {
   private remoteVideo = null;
   private remoteStream = null;
 
-  public myPeer = null;
-  public myPeerId = null;
+  public  myPeer = null;
+  public  myPeerId = null;
 
   constructor() {
-    console.log("socket::::::>", this.socket)
   }
 
   public async init() {
@@ -36,13 +35,13 @@ export class MeetRoomService {
 
   public connect() {
     return Observable.create((observer) => {
-      this.myPeer = new Peer(undefined, {
+        this.myPeer = new Peer(undefined, {
         host: 'nemiac.com',
-        port: '9000',
-        debug: 3,
+        port: '9000',      
+        debug: 3,  
         path: '/peerjs',
         config: {
-          'iceServers': [
+            'iceServers': [
                 /*{
                     url: 'stun:stun.nemiac.com:5349',
                     credential: '12345', 
@@ -53,16 +52,16 @@ export class MeetRoomService {
                     credential: 'guest', 
                     username: 'somepassword'
                 }*//**/,
-            { url: 'stun:stun1.l.google.com:19302' },
-            { url: 'stun:stun2.l.google.com:19302' },
-            { url: 'stun:stun3.l.google.com:19302' },
-            { url: 'stun:stun4.l.google.com:19302' },
-            {
-              url: 'turn:numb.viagenie.ca',
-              credential: 'muazkh',
-              username: 'webrtc@live.com'
-            }
-          ]
+                {url: 'stun:stun1.l.google.com:19302'},
+                {url: 'stun:stun2.l.google.com:19302'},
+                {url: 'stun:stun3.l.google.com:19302'},
+                {url: 'stun:stun4.l.google.com:19302'},
+                {
+                  url: 'turn:numb.viagenie.ca',
+                  credential: 'muazkh',
+                  username: 'webrtc@live.com'
+                }
+            ]
         }
       });
 
@@ -79,7 +78,7 @@ export class MeetRoomService {
       this.myPeer.on('error', (err) => {
         console.log(err);
       });
-
+      
     })
   }
 
@@ -110,11 +109,104 @@ export class MeetRoomService {
     this.socket.emit('confirmConnect', userProvider);
   }
 
-  public confirmConnectPatient(patient: Patient) {
+  public confirmConnectPatient(patient : Patient) {
     patient.peerId = this.myPeerId;
     console.log("------------confirmConnectPatient:", patient);
     this.socket.emit('confirmConnectPatient', patient);
   }
+
+  //send the information that the provider entered in pay-provider 
+  //to patient that is in waiting room.
+
+  public providerEnteredInPayProvider(provider,patietDni) {
+    console.log("------------providerEndteredInPayProvider", provider);
+    console.log("------------patientDni", patietDni);
+    this.socket.emit('providerEnteredInPayProvider',provider, patietDni);
+  }
+
+  //send the information that the patient entered in pay-patient 
+  //to provider that is in pay-provider.
+
+  public patientEnteredInPayPatient(providerId,patietDni) {
+    console.log("------------patientEnteredInPayPatient", providerId);
+    console.log("------------patientDni", patietDni);
+    this.socket.emit('patientEnteredInPayPatient',providerId, patietDni);
+  }
+
+  //send payAmount from provider to patient
+  public sendPay(payAmount,patientSocketId) {
+    console.log("-----------payAmount", payAmount);
+    this.socket.emit('sendPay',payAmount, patientSocketId);
+  }
+
+   //send confirm pay infomation  from patient to provider
+   public confirmPay(providerId) {
+     console.log('providerId')
+     console.log(providerId)
+    this.socket.emit('confirmPay',providerId);
+  }
+
+    //send confirm provider infomation  from provider to patient
+    public confirmProvider(dni) {
+     this.socket.emit('confirmProvider',dni);
+   }
+
+   //send uploadFileName from provider to patient
+   
+   public sendUploadFile(uploadFileName,key,othersId) {
+    this.socket.emit('sendUploadFile',uploadFileName,key,othersId);
+  }
+
+  
+
+  public providerEntered() {
+    return Observable.create((observer) => {
+      this.socket.on('providerEnteredInPayProvider', (data) => {
+        observer.next(data)
+      });
+    })
+  }
+
+  public patientEntered() {
+    return Observable.create((observer) => {
+      this.socket.on('patientEnteredInPayPatient', (patientSocketId) => {
+        observer.next(patientSocketId)
+      });
+    })
+  }
+
+  public receivePay() {
+    return Observable.create((observer) => {
+      this.socket.on('sendPay', (payAmount) => {
+        observer.next(payAmount)
+      });
+    })
+  }
+
+  public receiveConfirmPay() {
+    return Observable.create((observer) => {
+      this.socket.on('confirmPay', (confirmPay) => {
+        observer.next(confirmPay)
+      });
+    })
+  }
+
+  public receiveConfirmProvider() {
+    return Observable.create((observer) => {
+      this.socket.on('confirmProvider', (confirmProvider) => {
+        observer.next(confirmProvider)
+      });
+    })
+  }
+
+  public receiveUploadFile(){
+    return Observable.create((observer) => {
+      this.socket.on('sendUploadFile', (uploadFileName) => {
+        observer.next(uploadFileName)
+      });
+    })
+  }
+
 
 
   public activeProvider(userProvider) {
@@ -173,10 +265,28 @@ export class MeetRoomService {
   public recivetext() {
     return Observable.create((observer) => {
       this.socket.on("chat_provider", async (data) => {
-        observer.next(data);
+        observer.next(data.text);
       });
     });
   }
+
+  public endCall(to, text) {
+    this.socket.emit("endCall", {
+      text: text,
+      from: this.socket.id,
+      to: to
+    });
+  }
+
+
+  public receiveEndCall() {
+    return Observable.create((observer) => {
+      this.socket.on("endCall", async (data) => {
+        observer.next(data.text);
+      });
+    });
+  }
+
 
   public startAttetion(provider, patient) {
     this.trace("startAttetion :", provider, patient);
@@ -198,7 +308,7 @@ export class MeetRoomService {
     var call = this.myPeer.call(patient.peerId, this.localStream);
     console.log("stream 2")
     call.on('stream', (remoteStream) => {
-      console.log("stream 3 ", remoteStream)
+      console.log("stream 3 " , remoteStream)
       this.remoteVideo.nativeElement.srcObject = remoteStream;
     });
   }
@@ -212,7 +322,7 @@ export class MeetRoomService {
         call.answer(this.localStream);
         console.log("answer localStream")
         call.on('stream', (remoteStream) => {
-          console.log("stream : ", remoteStream)
+          console.log("stream : " , remoteStream)
           this.remoteVideo.nativeElement.srcObject = remoteStream;
         });
         console.log("stream 22")
@@ -226,11 +336,6 @@ export class MeetRoomService {
     this.socket.emit('confirmReadyPatient', patient);
   }
 
-  public confirmPayAttetion(provider, patient) {
-    this.trace("confirmPayAttetion :", provider, patient);
-    this.socket.emit('confirmPayAttetion', provider, patient);
-  }
-
   public confirmPatientCall() {
     this.trace("confirmReadyPatient :");
     return Observable.create((observer) => {
@@ -240,32 +345,27 @@ export class MeetRoomService {
     });
   }
 
-  public startAttetionPatientForPay(currentUser, patient, amountPayAttetion) {
-    this.trace("startAttetionPatientForPay :", patient, amountPayAttetion);
-    this.socket.emit('startAttetionPatientForPay', currentUser, patient, amountPayAttetion);
+  public createRoom(data) {
+    this.trace("createRoom :", data);
+    this.socket.emit('createRoom', data);
   }
 
-  public startAttetionPatientForPayListener() {
-    this.trace("startAttetionPatientForPayListener :");
-    return Observable.create((observer) => {
-      this.socket.on('startAttetionPatientForPayListener', (payProvider) => {
-        observer.next(payProvider)
-      });
-    });
+  public createProviderRoom(data) {
+    this.trace("createProviderRoom :", data);
+    this.socket.emit('createProviderRoom', data);
   }
-
-  public confirmPayAttetionListener() {
-    this.trace("confirmPayAttetionListener :");
+  public receiveProvideId() {
+    this.trace("receiveProviderId :");
     return Observable.create((observer) => {
-      this.socket.on('confirmPayAttetionListener', (payProvider) => {
-        observer.next(payProvider)
+      this.socket.on('receiveProviderId', (providerId) => {
+        observer.next(providerId)
       });
     });
   }
 
   trace(...arg) {
     var now = (window.performance.now() / 1000).toFixed(3);
-    console.log(now + ': ', arg);
+    //console.log(now + ': ', arg);
   }
 
 }

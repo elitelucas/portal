@@ -2,6 +2,8 @@ import {Component, OnInit, ViewChild, ViewEncapsulation, Input} from '@angular/c
 import {MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort} from "@angular/material";
 import { ProviderService } from './../../../../_services/provider.service';
 import {Router} from "@angular/router";
+import  Swal  from 'sweetalert2';
+
 
 export interface IdName {
   id:string;
@@ -13,6 +15,7 @@ export interface PatientData {
   index:number;
   patientId:string;
   date: Date;
+  consultId:string
 }
 
 
@@ -40,23 +43,14 @@ export class ConsultListComponent implements OnInit {
   }
 
   initData() {
-    this.ProviderService.getConsult(this.idName.id,'id').subscribe(res=> {
-      if(res) {
-        console.log("consult data s>>>>>>>>>>>>>", res)
-        this.tmpData=res;
-        this.initDataSource(res)
-        this.noDataToDisplay = false;
-      } else{
-        this.noDataToDisplay = true;
-      }
-    })
+    
   }
 
   initDataSource(data) {
     const PatientData: PatientData[] = [];
     data.forEach(function(item,idx){
       if(item) {
-        PatientData.push({index:idx+1, patientId:item.patientId, date: item.date});
+        PatientData.push({index:idx+1, patientId:item.patientId, date: item.createdAt,consultId:item._id});
       }
     });
 
@@ -75,14 +69,24 @@ export class ConsultListComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
   detail(data){
-    this.router.navigateByUrl('/dashboard/newConsult/'+data.index+'/'+data.id+'/'+data.date);
+    this.router.navigateByUrl('/dashboard/newConsult/'+data.index+'/'+data.id+'/'+data.consultId);
   }
   search(startDate,endDate){
-    this.dataSource.data = this.tmpData;
-    const fromDate = startDate;
-    const toDate = endDate;
-    this.dataSource.data = this.dataSource.data.filter(e=>e.date > fromDate && e.date < toDate ) ;
-    this.initDataSource(this.dataSource.data)
+    if(startDate==='' || endDate==='' || endDate>startDate==false){
+      Swal.fire('Input the date correctly.')
+      return;
+    }
+    this.ProviderService.getConsult(this.idName.id,startDate,endDate)
+    .subscribe(res=> {
+      if(res) {
+        console.log("consult data s>>>>>>>>>>>>>", res)
+        this.tmpData=res;
+        this.initDataSource(res)
+        this.noDataToDisplay = false;
+      } else{
+        this.noDataToDisplay = true;
+      }
+    })
   }
 }
 

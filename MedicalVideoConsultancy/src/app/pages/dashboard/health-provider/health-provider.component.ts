@@ -164,7 +164,10 @@ export class InviteBySms {
   isInvited: boolean = false;
   constructor(
     public dialogRef: MatDialogRef<HealthProviderComponent>,
-    @Inject(MAT_DIALOG_DATA) public data) { }
+    @Inject(MAT_DIALOG_DATA) public data) {
+      console.log('data')
+      console.log(data)
+     }
   onCancelClick(): void {
     this.isValidNumber = true;
     this.dialogRef.close({ event: 'cancel' });

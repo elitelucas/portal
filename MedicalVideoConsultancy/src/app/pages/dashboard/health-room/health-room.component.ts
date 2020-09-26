@@ -1,7 +1,8 @@
+import { Consult } from './../../../_model/user';
 import { Component, OnInit, ViewChild, ElementRef, NgZone, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MeetRoomService } from '../../../_services/meet-room.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute,Router } from '@angular/router';
 import { ProviderService } from '../../../_services/provider.service';
 import { User, Patient } from '../../../_model/user';
 import { timer } from 'rxjs';
@@ -22,8 +23,9 @@ export class HealthRoomComponent implements OnInit {
 
   patient: Patient;
   currentUser: User;
-  key = {
-    Prescription: true,
+  consultId:any;
+  key={
+    Prescription:true,
     Consults: false,
     Files: false,
     Charts: false
@@ -36,20 +38,28 @@ export class HealthRoomComponent implements OnInit {
     public providerService: ProviderService,
     private ngZone: NgZone,
     private formBuilder: FormBuilder,
-    private renderer: Renderer2) {
+    private renderer: Renderer2,
+    private _router:Router
+    ) {
     this.route.paramMap.subscribe(async (params) => {
       this.patient = JSON.parse(localStorage.getItem(params.get("patientId")));
-      console.log('this.patient')
-      console.log(this.patient)
+      this.consultId=params.get('consultId');
     });
     this.currentUser = Object.assign(new User(), JSON.parse(localStorage.getItem('provider_data')));
+    console.log('this.currentUser')
+    console.log(this.currentUser)
   }
 
   async ngOnInit() {
+    const providerInfo=JSON.parse(localStorage.getItem('provider_data'));
     this.start();
     this.roomChatForm = this.formBuilder.group({
       text: ['', Validators.required]
     });
+    this.meetRoomService.confirmPatientCall().subscribe(data=>{
+      console.log('ertertertert')
+      console.log(data)
+    })
   }
 
   async ngAfterViewInit() {
@@ -63,9 +73,17 @@ export class HealthRoomComponent implements OnInit {
       this.meetRoomService.confirmConnect(this.currentUser);
       this.meetRoomService.updatePatientState().subscribe(async (pt: Patient) => {
         this.patient = pt;
+        console.log("this.patient provider----------------------")
+        console.log(this.patient)
         this.meetRoomService.callPatient(this.patient);
       });
     });
+    this.meetRoomService.receiveEndCall()
+    .subscribe(text=>{
+      if(text==='acceptEnd'){
+        this._router.navigateByUrl("/dashboard/health-provider")
+      }
+    })
   }
 
   async start() {
@@ -73,12 +91,11 @@ export class HealthRoomComponent implements OnInit {
       this.meetRoomService.startAttetion(this.currentUser, this.patient);
       this.providerService.getPatient(this.patient.dni, 'dni').subscribe(async (pt: Patient) => {
         this.patient = pt;
-        //this.meetRoomService.activeProvider(this.currentUser);
       });
     });
-    this.meetRoomService.recivetext().subscribe((data) => {
+    this.meetRoomService.recivetext().subscribe((text) => {
       const p = this.renderer.createElement('p');
-      const d = this.renderer.createText(data.text);
+      const d = this.renderer.createText(text);
       this.renderer.appendChild(p, d);
       this.renderer.appendChild(this.chatText.nativeElement, p);
     });
@@ -90,13 +107,15 @@ export class HealthRoomComponent implements OnInit {
     const text = this.f.text.value;
     this.meetRoomService.sendtext(this.patient.socketId, "Provider: " + text);
   }
-
-  changeBackground(kk) {
-    this.key.Prescription = false;
-    this.key.Consults = false;
-    this.key.Files = false;
-    this.key.Charts = false;
-    this.key[kk] = true;
+  changeBackground(kk){
+    this.key.Prescription=false;
+    this.key.Consults=false;
+    this.key.Files=false;
+    this.key.Charts=false;
+    this.key[kk]=true;
+  }
+  public endCall(){
+    this.meetRoomService.endCall(this.patient.socketId,'endCall');
   }
 
   /*trace(...arg) {

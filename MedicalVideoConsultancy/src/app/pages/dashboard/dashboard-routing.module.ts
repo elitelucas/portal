@@ -38,7 +38,7 @@ const routes:Routes = [{
       component: EditRoomComponent
     },
     {
-      path: 'health-room/:patientId',
+      path: 'health-room/:patientId/:consultId',
       component: HealthRoomComponent
     },
 
@@ -60,7 +60,7 @@ const routes:Routes = [{
       component: PatientComponent
     },
     {
-      path: 'newConsult/:index/:id/:date',
+      path: 'newConsult/:index/:id/:consultId',
       component: NewConsultComponent
     },
     {

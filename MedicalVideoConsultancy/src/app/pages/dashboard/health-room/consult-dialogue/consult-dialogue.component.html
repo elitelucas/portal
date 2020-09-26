@@ -1,0 +1,169 @@
+<div class="main-margin" *ngIf="dataDisplay">
+    <div class="head-bar">
+        <div class="row">
+            <div class="col-xl-3 col-md-6 col-sm-6">
+                Name:<input #name type='text' [value]="iteralData.patient.fullName">
+            </div>
+            <div class="col-xl-3 col-md-6 col-sm-6">
+                Age:<input #age type='number' [value]="iteralData.patient.age">
+            </div>
+            <div class="col-xl-3 col-md-6 col-sm-6">
+                Phone number:<input #phoneNumber type="number" [value]="iteralData.patient.phoneNumber">
+            </div>
+            <div class="col-xl-3 col-md-6 col-sm-6">
+                Allergies:<input #allergy type="text" [value]="iteralData.allergy">
+            </div>
+        </div>
+    </div>
+    <div class="date-bar">
+        <div class="row">
+            <div class="col-xl-8 col-md-6 col-sm-6">Consult #{{data.index}}</div>
+            <div class="col-xl-4 col-md-6 col-sm-6">Date:{{data.date}}</div>
+        </div>
+    </div>
+    <div class="main-div">
+        <div class="title">
+            Chief Complain: {{iteralData.complain}}
+        </div>
+        <div class="content sub-margin">
+            <div class="row">
+                <div class="col-xl-6 col-md-6 col-sm-6">
+                    Time of disease:
+                    <input #timeOfDisease type="text" placeholder="FREE TEXT" [value]="iteralData.timeOfDisease" />
+                </div>
+                <div class="col-xl-6 col-md-6 col-sm-6">
+                    Way of start:
+                    <input #wayOfStart type="text" placeholder="FREE TEXT" [value]="iteralData.wayOfStart" />
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div>Signs of symptons</div>
+            <div class="main-pad">
+                <div class="input-style min-pad">
+                    1.<input #symptom0 type=text [value]="iteralData.symptom[0]===undefined?'':iteralData.symptom[0]">
+                </div>
+                <div>
+                    2.<input #symptom1 type=text [value]="iteralData.symptom[1]===undefined?'':iteralData.symptom[1]">
+                </div>
+            </div>
+            <div class="main-pad">
+                <div class="input-style">
+                    3.<input #symptom2 type=text [value]="iteralData.symptom[2]===undefined?'':iteralData.symptom[2]">
+                </div>
+                <div>
+                    4.<input #symptom3 type=text [value]="iteralData.symptom[3]===undefined?'':iteralData.symptom[3]">
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div>History</div>
+            <div>
+                <textarea #history class="text-width" placeholder="FREE TEXT">{{iteralData.history}}</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="main-div">
+        <div class="title">SUBJECTIVE</div>
+        <div class="content">
+            <div>
+                <textarea #subjective class="text-width" placeholder="FREE TEXT">{{iteralData.subjective}}</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="main-div">
+        <div class="title">OBJECTIVE</div>
+        <div class="content">
+            <div>
+                <textarea #objective class="text-width" placeholder="FREE TEXT">{{iteralData.objective}}</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="main-div">
+        <div class="title">ASSESTMENT</div>
+        <div class="content">
+            <div>
+                <textarea #assessment class="text-width" placeholder="FREE TEXT">{{iteralData.assessment}}</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="main-div">
+        <div class="title">PLAN</div>
+        <div class="content">
+            <div>
+                <textarea #plan class="text-width" placeholder="FREE TEXT">{{iteralData.plan}}</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="main-div">
+        <div class="title">FILES</div>
+        <div class="content">
+            <div>
+                <p><b>Uploaded By Patient</b></p>
+                <div *ngFor="let name of iteralData.patientFiles;let i=index"
+                [class]="classKey[i]?'list p-bckground':'list'" 
+                (click)="changeClass(i,'down')">
+                    {{i+1}}.{{name}}
+                </div>
+            </div>
+            <div>
+                <p><b>Uploaded By Provider</b></p>
+                <div *ngFor="let name of fileName;let i=index"
+                [class]="upClassKey[i]?'list p-bckground':'list'" 
+                (click)="changeClass(i,'up')">
+                    {{i+1}}.{{name}}
+                </div>
+            </div>
+            
+            <div>
+                <ng-container *ngFor="let file of files">
+                    <mat-progress-bar [value]="file.progress"></mat-progress-bar>
+                  </ng-container>
+                <div class="button-div">
+                    <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleDownload()">
+                        <mat-icon>file_download</mat-icon>
+                        Download
+                      </button>
+                </div>
+                <div class="form-file-upload">
+               
+                    <div class="upload-btn">
+                      <input type="file" #fileUpload id="fileUpload" name="fileUpload" multiple="multiple" accept="*" style="display:none;" />
+                      <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleUpload()">
+                        <mat-icon>file_upload</mat-icon>
+                        Upload
+                      </button>
+                    </div>
+                  </div>
+            </div>
+        </div>
+
+       
+
+    </div>
+    <div class="main-div pull-right">
+        <button class="btn btn-danger mr-1" (click)="Cancel()">Cancel</button>
+        <button class="btn btn-primary" 
+        (click)="saveData({
+            name:name.value,
+            age:age.value,
+            phoneNumber:phoneNumber.value,
+            allergy:allergy.value,
+            timeOfDisease:timeOfDisease.value,
+            wayOfStart:wayOfStart.value,
+            symptom0:symptom0.value,
+            symptom1:symptom1.value,
+            symptom2:symptom2.value,
+            symptom3:symptom3.value,
+            history:history.value,
+            subjective:subjective.value,
+            objective:objective.value,
+            assessment:assessment.value,
+            plan:plan.value
+        })">
+            Submit
+        </button>
+    </div>
+
+</div>
+

@@ -66,7 +66,6 @@ export class Consult {
   plan: String;
   providerFiles: Array<string>;
   patientFiles: Array<string>;
-  createDate: Date;
   patient: Object;
   _id: String;
 }

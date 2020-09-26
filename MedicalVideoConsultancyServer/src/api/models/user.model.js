@@ -62,7 +62,6 @@ const userSchema = new mongoose.Schema({
   },
   socketId: {
     type: String,
-    trim: true
   },
   room: {
     type: String,

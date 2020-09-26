@@ -7,8 +7,9 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { timer, of } from 'rxjs';
 import {HttpErrorResponse, HttpEventType} from "@angular/common/http";
 import {catchError, map} from "rxjs/operators";
-
+import { PatientService } from './../../../_services/patient.service';
 import {FileUploadService} from "../../../_services/file-upload.service";
+import {saveAs} from 'file-saver'
 
 @Component({
   selector: 'app-meet-call',
@@ -26,6 +27,10 @@ export class MeetCallComponent implements OnInit {
 
   dniPatient = null;
   patientsEmail: any;
+  downloadFileList=[];
+  classKey=[];
+  upClassKey=[];
+  downloadFile:string;
 
   public patient: Patient;
   public roomName = null;
@@ -34,7 +39,9 @@ export class MeetCallComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, private providerService: ProviderService,
     private meetRoomService: MeetRoomService, private _ngZone: NgZone, private _router: Router,
-    private formBuilder: FormBuilder, private renderer: Renderer2,private fileUploadService: FileUploadService) {
+    private formBuilder: FormBuilder, private renderer: Renderer2,private fileUploadService: FileUploadService,
+    private patientService:PatientService
+    ) {
     this.dniPatient = localStorage.getItem('patient_dni');
     this.route.paramMap.subscribe(params => {
       this.roomName = params.get('roomName');
@@ -71,6 +78,18 @@ export class MeetCallComponent implements OnInit {
         console.log(data)
       });
     });
+    this.meetRoomService.receiveUploadFile().subscribe(uploadFileName=>{
+      this.downloadFileList.push(uploadFileName);
+      console.log('uploadFileName')
+      console.log(uploadFileName)
+    })
+    this.meetRoomService.receiveEndCall()
+    .subscribe(text=>{
+      if(text==='endCall'){
+        this.meetRoomService.endCall(this.providerSocketId,'acceptEnd');
+        this._router.navigateByUrl("/home")
+      }
+    })
   }
 
   async loadPatient() {
@@ -80,9 +99,9 @@ export class MeetCallComponent implements OnInit {
         this.patient = patient;
       };
     });
-    this.meetRoomService.recivetext().subscribe((data) => {
+    this.meetRoomService.recivetext().subscribe((text) => {
       const p = this.renderer.createElement('p');
-      const d = this.renderer.createText(data.text);
+      const d = this.renderer.createText(text);
       this.renderer.appendChild(p, d);
       this.renderer.appendChild(this.chatText.nativeElement, p);
     });
@@ -95,14 +114,17 @@ export class MeetCallComponent implements OnInit {
     this.meetRoomService.sendtext(this.providerSocketId, "Patient: " + text);
   }
   uploadFile(file) {
-    const providerId=JSON.parse(localStorage.getItem('patient_dni'));
+    const dni=JSON.parse(localStorage.getItem('patient_dni'));
     const formData = new FormData();
     formData.append('file', file.data);
-    formData.append('dni', providerId);
+    formData.append('dni', dni);
+    formData.append('key', 'patient');
     file.inProgress = true;
     const fileType=file.data.type.split('/')[0];
     this.fileUploadService.uploadFile(formData).pipe(
       map(event => {
+        console.log('event')
+        console.log(event)
         switch (event.type) {
           case HttpEventType.UploadProgress:
             file.progress = Math.round(event.loaded * 100 / event.total);
@@ -124,6 +146,8 @@ export class MeetCallComponent implements OnInit {
           this.files = [];
         }, 1000);
         this.fileName.push(event.body)
+        this.meetRoomService.sendUploadFile(event.body,'patient',this.providerData._id);
+
       }
     });
   }
@@ -145,10 +169,35 @@ export class MeetCallComponent implements OnInit {
     };
     fileUpload.click();
   }
-  handleDownload(){
-    
-  }
 
+  changeClass(idx,key){
+    if(key==='down'){
+      this.initClass();
+      this.classKey[idx]=true;
+      this.downloadFile=this.downloadFileList[idx];
+      }else{
+        this.initClass();
+        this.upClassKey[idx]=true;
+        this.downloadFile=this.fileName[idx];
+      }
+    }
+    initClass(){
+      this.classKey=[];
+      this.upClassKey=[];
+      this.downloadFileList.forEach((item)=>{
+        this.classKey.push(false);
+      })
+      this.fileName.forEach((item)=>{
+        this.upClassKey.push(false);
+      })
+    }
+  handleDownload(){
+    if(this.downloadFile){
+      this.patientService.download('file-transfer/download/consult/'+this.downloadFile)
+      .subscribe(blob =>{
+        saveAs(blob, this.downloadFile)} )
+    }
+  }
   /*trace(...arg) {
     var now = (window.performance.now() / 1000).toFixed(3);
     console.log(now + ': ', arg);

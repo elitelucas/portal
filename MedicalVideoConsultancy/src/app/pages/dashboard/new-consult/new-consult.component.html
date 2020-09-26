@@ -100,22 +100,34 @@
         <div class="content">
             <div>
                 <p><b>Uploaded By Patient</b></p>
-                <div *ngFor="let name of iteralData.patientFiles;let i=index">
+                <div *ngFor="let name of iteralData.patientFiles;let i=index"
+                [class]="classKey[i]?'list p-bckground':'list'" 
+                (click)="changeClass(i,'down')">
                     {{i+1}}.{{name}}
                 </div>
             </div>
             <div>
                 <p><b>Uploaded By Provider</b></p>
-                <div *ngFor="let name of fileName;let i=index">
+                <div *ngFor="let name of fileName;let i=index"
+                [class]="upClassKey[i]?'list p-bckground':'list'" 
+                (click)="changeClass(i,'up')">
                     {{i+1}}.{{name}}
                 </div>
             </div>
+         
             
             <div>
+                <ng-container *ngFor="let file of files">
+                    <mat-progress-bar [value]="file.progress"></mat-progress-bar>
+                  </ng-container>
+                <div class="button-div">
+                    <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleDownload()">
+                        <mat-icon>file_download</mat-icon>
+                        Download
+                      </button>
+                </div>
                 <div class="form-file-upload">
-                    <ng-container *ngFor="let file of files">
-                      <mat-progress-bar [value]="file.progress"></mat-progress-bar>
-                    </ng-container>
+                   
                     <div class="upload-btn">
                       <input type="file" #fileUpload id="fileUpload" name="fileUpload" multiple="multiple" accept="*" style="display:none;" />
                       <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleUpload()">

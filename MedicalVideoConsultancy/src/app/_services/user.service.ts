@@ -41,6 +41,15 @@ export class UserService {
     let updateSigPayUrl = baseUrl + "/update-sigPay/" + id;
     return this.http.put<any>(updateSigPayUrl, {sigImgSrc:sig,payMethod:pay})
   }
+  updatePayment(payment, id) {
+    let updatePaymentUrl = baseUrl + "/updatePayment/" + id;
+    return this.http.put<any>(updatePaymentUrl, {payment})
+  }
+  updateSignature(signature, id) {
+    let updateSignatureUrl = baseUrl + "/updateSignature/" + id;
+    return this.http.put<any>(updateSignatureUrl, {signature})
+  }
+
 
   getPayData(id) {
     let paymentUrl=baseUrl+"/payment/"+id;
@@ -72,8 +81,8 @@ export class UserService {
   }
 
    //Delete blog data of user collection of current provider
-   deleteBlog(data) {
-    let deleteBlog=baseUrl+"/deleteBlog/"+data.idx+'/'+data.userId;
+   deleteBlog(postId) {
+    let deleteBlog=baseUrl+"/deleteBlog/"+postId;
     return this.http.delete<any>(deleteBlog);
   }
 }

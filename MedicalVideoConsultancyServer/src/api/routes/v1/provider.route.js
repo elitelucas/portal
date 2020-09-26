@@ -50,10 +50,10 @@ router.route('/roomName/:room')
 
 
 //I added 
-router.route('/allPacients')
+router.route('/allPatients')
   .get(controller.getAllPatients);
 
-router.route('/consult')
+router.route('/consult/:patientId/:startDate/:endDate')
   .get(controller.getConsult);
 
 router.route('/oneConsult')
@@ -74,6 +74,9 @@ router.route('/updateConsult')
 
 router.route('/ckImage')
   .post(controller.uploadCkImage)
+
+router.route('/getSignature/:providerId')
+  .get(controller.getSignature)
 
 //I added end
 router.route('/patientByField')

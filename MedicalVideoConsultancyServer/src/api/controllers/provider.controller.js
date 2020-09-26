@@ -14,6 +14,10 @@ const Paysubcription = require('../models/paysubcription.model');
 const Card = require('../models/card.model');
 
 const { date } = require('joi');
+const {env, emailConfig} = require('../../config/vars');
+var mime = require('mime');
+var fs = require('fs');
+
 var nodemailer = require('nodemailer');
 const Culqi = require('culqi-node');
 
@@ -201,9 +205,11 @@ exports.getAllPatients = async (req, res, next) => {
 
 exports.getConsult = async (req, res, next) => {
   try {
-    const key = req.query.key;
-    const value = req.query.value;
-    consult = await Consult.find({ patientId: value }).exec();
+    const patientId=req.params.patientId;
+    const startDate=req.params.startDate;
+    const endDate=req.params.endDate;
+    consult = await Consult.find({patientId,createdAt: {"$gte": new Date(startDate), "$lt": new Date(endDate)}})
+    .sort({createdAt:-1}).exec();
     res.status(httpStatus.OK).json(consult);
   } catch (e) {
     console.log("getConsult:", error);
@@ -213,12 +219,11 @@ exports.getConsult = async (req, res, next) => {
 
 exports.getOneConsult = async (req, res, next) => {
   try {
-    const providerId = req.query.providerId;
-    const patientId = req.query.patientId;
-    const date = req.query.date
-    patient = await Patient.findById(patientId).exec();
-    consult = await Consult.findOne({ patientId: patientId, providerId: providerId, date: new Date(date) }).exec();
-    consult.patient = patient;
+    const patientId=req.query.patientId;
+    const consultId=req.query.consultId
+    patient=await Patient.findById(patientId).exec();
+    consult = await Consult.findById(consultId).exec();
+    consult.patient=patient;  
     res.status(httpStatus.OK).json(consult);
   } catch (e) {
     console.log("getConsult:", error);
@@ -228,42 +233,38 @@ exports.getOneConsult = async (req, res, next) => {
 
 exports.updateConsult = async (req, res, next) => {
   try {
-    const providerId = req.body.providerId;
-    const patientId = req.body.patientId;
-    const date = req.body.date;
-    const updateData = req.body.updateData;
-    const symptom = [updateData.symptom0, updateData.symptom1, updateData.symptom2, updateData.symptom3];
+    console.log('req.body')
+    console.log(req.body)
+    const consultId=req.body.consultId;
+    const updateData=req.body.updateData;
+    const symptom=[updateData.symptom0,updateData.symptom1,updateData.symptom2,updateData.symptom3];
 
-    const updatedConsult = await Consult.findOneAndUpdate(
-      { patientId: patientId, providerId: providerId, date: new Date(date) },
-      {
-        "$set": {
-          allergy: updateData.allergy,
-          timeOfDisease: updateData.timeOfDisease,
-          wayOfStart: updateData.wayOfStart,
-          symptom: symptom,
-          history: updateData.history,
-          subjective: updateData.subjective,
-          objective: updateData.objective,
-          assessment: updateData.assessment,
-          plan: updateData.plan,
-          providerFiles: updateData.providerFiles,
-          new: true
-        }
-      });
+    const updatedConsult = await Consult.findByIdAndUpdate(
+      consultId, 
+      {"$set":{
+        allergy:updateData.allergy,
+        timeOfDisease:updateData.timeOfDisease,
+        wayOfStart:updateData.wayOfStart,
+        symptom:symptom,
+        history:updateData.history,
+        subjective:updateData.subjective,
+        objective:updateData.objective,
+        assessment:updateData.assessment,
+        plan:updateData.plan,
+        providerFiles:updateData.providerFiles,
+      }},
+      {new:true});
 
 
     const updatedPatient = await Patient.findOneAndUpdate(
-      { _id: req.body.patientId },
-      {
-        "$set": {
-          fullName: updateData.name,
-          age: updateData.age,
-          phoneNumber: updateData.phoneNumber,
-          new: true
-        }
-      });
-    return res.status(httpStatus.OK).json('success');
+      {_id: req.body.patientId}, 
+      {"$set":{
+        fullName:updateData.name,
+        age:updateData.age,
+        phoneNumber:updateData.phoneNumber,
+      }},
+      {new:true});
+    return res.status(httpStatus.OK).json(updatedConsult);
   } catch (e) {
     return next(APIError(e))
   }
@@ -284,60 +285,133 @@ exports.getConsultInChat = async (req, res, next) => {
 
 exports.fileUpload = async (req, res) => {
   const file = req.files.file;
-  var folderName = 'provider';
-  if (req.body._id === undefined) {
-    folderName = 'patient';
+  var fieldName='providerFiles';
+  var rand_no = Math.floor(123123123123*Math.random());
+  const fileName=rand_no+file.name;
+  const imagePath = path.join(__dirname + './../../public/consult/');
+  if(req.body.key==='newConsult'){
+    file.mv(imagePath + fileName, function (error) {
+      if (error) {
+        console.log("file upload error", error)
+      } else {
+        res.status(httpStatus.CREATED).json(fileName);
+      }
+    });
+  }else{
+    file.mv(imagePath + fileName, function (error) {
+      if (error) {
+        console.log("file upload error", error)
+      } else {
+        Consult.findOne({},{},{sort:{createdAt:-1}}).then(result=>{
+          if(req.body.key==='patient')
+          fieldName='patientFiles';          
+          result[fieldName].push(fileName);
+          result.save().then(result2=>{
+            console.log('result')
+            console.log(result)
+            res.status(httpStatus.CREATED).json(fileName);
+          })
+        })
+
+      }
+    });
   }
-  const imagePath = path.join(__dirname + './../../public/' + folderName + '/');
-  file.mv(imagePath + file.name, function (error) {
-    if (error) {
-      console.log("file upload error", error)
-    } else {
-      res.status(httpStatus.CREATED).json(file.name);
-    }
-  });
+ 
 };
 
 exports.uploadCkImage = async (req, res) => {
   const file = req.files.attachment;
+  var rand_no = Math.floor(123123123123*Math.random());
+  const fileName=rand_no+file.name;
   const imagePath = path.join(__dirname + './../../public/images/');
-  file.mv(imagePath + file.name, function (error) {
+  file.mv(imagePath + fileName, function (error) {
     if (error) {
       console.log("file upload error", error)
     } else {
-      res.status(httpStatus.CREATED).json(file.name);
+      res.status(httpStatus.CREATED).json(fileName);
     }
   });
 };
 
+
+exports.getSignature = async (req, res) => {
+    const providerId=req.params.providerId;
+    const user = await User.findById(providerId).exec();
+    console.log('user.sigImgSrc')
+    console.log(user.sigImgSrc)
+    if(user.sigImgSrc)
+    res.status(httpStatus.CREATED).json(user.sigImgSrc);
+    else{
+      console.log('no such file.')
+    }
+
+    // if(user.sigImgSrc){
+    //   const filename=user.sigImgSrc;
+
+    //   const imagePath = path.join(__dirname + './../../public/images/');
+ 
+    //   const file = imagePath+filename;
+    
+    //   if(fs.existsSync(file)){
+    //     const mimetype = mime.lookup(file);
+    
+    //     res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+    //     res.setHeader('Content-type', mimetype);
+      
+    //     var filestream = fs.createReadStream(file);
+    //     filestream.pipe(res);
+    //   }else
+    //   console.log('There is no such file.')
+    // }else{
+    //   console.log("Error: there is no such field in users collection")
+    // }
+
+};
+
+
+
 exports.mail = async (req, res) => {
-  console.log('**********dddddddddddddd********')
-  console.log('req.body')
-  console.log(req.body)
+  try {
+    console.log('**********dddddddddddddd********')
+    console.log('req.body')
+    console.log(req.body)
 
-  var transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'dremova.yulya1@mail.ru',
-      pass: 'sufdhk7k7bJABDFKer'
-    }
-  });
+    const transporter = nodemailer.createTransport({
+      host: emailConfig.host,
+      port: emailConfig.port,
+      secure: false,
+      auth: {
+        user: emailConfig.username,
+        pass: emailConfig.password
+      }
+    });
 
-  var mailOptions = {
-    from: 'dremova.yulya1@mail.ru',
-    to: 'vovochkaperepelkin@yandex.ru',
-    subject: 'Sending Email using Node.js',
-    html: '<p>That was easy!</p>'
-  };
+    /*var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'dremova.yulya1@mail.ru',
+        pass: 'sufdhk7k7bJABDFKer'
+      }
+    });*/
 
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log('Email sent: ' + info.response);
-      res.status(httpStatus.CREATED).json('sent successfully');
-    }
-  });
+    var mailOptions = {
+      from: 'dremova.yulya1@mail.ru',
+      to: req.body.email,
+      subject: 'Sending Email using Node.js',
+      html: req.body.html
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+        res.status(httpStatus.CREATED).json('sent successfully');
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
 }
 //I added end
 

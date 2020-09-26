@@ -50,3 +50,12 @@
 .upload-btn{
     margin-left:92%;
 }
+.list{
+    cursor: pointer;
+}
+.p-bckground{
+    background-color: #efbdbd;
+  }
+.button-div{
+    float:left;
+}

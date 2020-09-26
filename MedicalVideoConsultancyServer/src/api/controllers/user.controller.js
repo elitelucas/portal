@@ -2,6 +2,8 @@ const httpStatus = require('http-status');
 const path = require('path');
 const User = require('../models/user.model');
 const Admin = require('../models/admin.model');
+const Post = require('../models/post.model');
+const Payment = require('../models/payment.model');
 const nodemailer = require("nodemailer");
 const {emailConfig, smsConfig} = require("../../config/vars");
 const client = require('twilio')(smsConfig.Sid, smsConfig.authToken);
@@ -164,26 +166,29 @@ exports.sendSMS = (req, res) => {
  * */
 
 exports.fileUpload = async (req, res) => {
+  var rand_no = Math.floor(123123123123*Math.random());
   if(req.body.key){
     const file = req.files.file;
-  const imagePath = path.join(__dirname + './../../public/images/');
-  file.mv(imagePath + file.name, function (error) {
+    const fileName=rand_no+file.name;
+    const imagePath = path.join(__dirname + './../../public/images/');
+  file.mv(imagePath + fileName, function (error) {
     if (error) {
       console.log("QRimage upload error", error)
     } else {
-        res.status(httpStatus.CREATED).json({fileName:file.name});
+        res.status(httpStatus.CREATED).json({fileName:fileName});
     }
   });
   }else{
     const user = await User.findOne({_id: req.body._id});
     const userModel = user ? User : Admin;
     const file = req.files.file;
+    const fileName=rand_no+file.name;
     const imagePath = path.join(__dirname + './../../public/images/');
-    file.mv(imagePath + file.name, function (error) {
+    file.mv(imagePath + fileName, function (error) {
       if (error) {
         console.log("profile image upload error", error)
       } else {
-        userModel.findOneAndUpdate({_id: req.body._id}, {image: file.name}, {new: true}).then(result => {
+        userModel.findOneAndUpdate({_id: req.body._id}, {image: fileName}, {new: true}).then(result => {
           res.status(httpStatus.CREATED).json(result)
         }).catch(e => {
           console.log("image upload failed", e);
@@ -198,13 +203,15 @@ exports.fileUpload = async (req, res) => {
  * */
 
 exports.sigImgUpload = async (req, res) => {
+  var rand_no = Math.floor(123123123123*Math.random());
   const file = req.files.file;
+  const fileName=rand_no+file.name;
   const imagePath = path.join(__dirname + './../../public/images/');
-  file.mv(imagePath + file.name, function (error) {
+  file.mv(imagePath + fileName, function (error) {
     if (error) {
       console.log("signature image upload error", error)
     } else {
-        res.status(httpStatus.CREATED).json({fileName:file.name});
+        res.status(httpStatus.CREATED).json({fileName:fileName});
     }
   });
 };
@@ -237,48 +244,59 @@ exports.updateProfile = async (req, res) => {
  * Update signature and payment method in user profile page
  * */
 
-exports.updateSigPay = async (req, res) => {
-  const imagePath = path.join(__dirname + './../../public/images/');
-  var rand_no = Math.floor(123123123123*Math.random());
-  var signatureImgName=rand_no+"signature.png";
-  console.log('signatureImgName')
-  console.log(signatureImgName)
-  var sigImgSrc=req.body.sigImgSrc;
-  if (sigImgSrc){
-    var fs=require('fs');
-    if(sigImgSrc.indexOf(';base64,')!==-1){
-      let base64Image = sigImgSrc.split(';base64,').pop();
-      fs.writeFile(imagePath+signatureImgName, base64Image, {encoding: 'base64'}, function(err) {
-          console.log('File created');
-      });
-    }else{
-      signatureImgName=sigImgSrc;
-    }   
-  }
-  const payMethod=req.body.payMethod;
- 
-  User.findOneAndUpdate(
-    {_id: req.params.userId}, 
-    {"$set":{sigImgSrc:signatureImgName,payMethod:payMethod}},
-    {new: true}
-    )
-    .then(result => {
-      console.log('result')
-      console.log(result)
-    res.status(httpStatus.OK).json(result.sigImgSrc);
-  }).catch(e => {
-    return res.send(e)
-  })
+exports.updateSignature = async (req, res,next) => {
+  try{
+    const imagePath = path.join(__dirname + './../../public/images/');
+    var rand_no = Math.floor(123123123123*Math.random());
+    var signatureImgName=rand_no+"signature.png";
+    console.log('signatureImgName')
+    console.log(signatureImgName)
+    var sigImgSrc=req.body.signature;
+    if (sigImgSrc){
+      var fs=require('fs');
+      if(sigImgSrc.indexOf(';base64,')!==-1){
+        let base64Image = sigImgSrc.split(';base64,').pop();
+        fs.writeFile(imagePath+signatureImgName, base64Image, {encoding: 'base64'}, function(err) {
+            console.log('File created');
+        });
+      }else{
+        signatureImgName=sigImgSrc;
+      }   
+    }  
+    User.findByIdAndUpdate(
+      req.params.userId,{sigImgSrc:signatureImgName},
+      {upsert: true, setDefaultsOnInsert: true})
+      .then(result=>{
+        res.status(httpStatus.OK).json(result);    
+      }) 
+  }catch (error) {
+    next(error);
+  } 
 };
+
+exports.updatePayment = async(req,res,next)=>{
+  try{
+    const payMethod=req.body.payment;
+    Payment.findByIdAndUpdate(
+      req.params.userId, 
+      {'$set':{QRimg:payMethod.QRimg,account:payMethod.account,url:payMethod.url}},
+      {upsert: true, setDefaultsOnInsert: true,new:true})
+      .then(result=>{
+        res.status(httpStatus.OK).json(result);    
+      })
+  }catch (error) {
+    next(error);
+  }  
+}
 
 /**
  * Get payment method field from users collection
  * */
 
 exports.getPayData = async (req, res) => {
-  const id=req.params.userId;
-  User.findById(id).then(result=>{
-    res.status(httpStatus.OK).json(result.payMethod);
+  const providerId=req.params.userId;
+  Payment.findById(providerId).then(result=>{
+    res.status(httpStatus.OK).json(result);
   }).catch(e => {
     return res.send(e)
   })
@@ -304,8 +322,8 @@ exports.getSignature = async (req, res) => {
 
 exports.getBlog = async (req, res) => {
   const id=req.params.userId;
-  User.findById(id).then(result=>{
-    res.status(httpStatus.OK).json(result.blog);
+  Post.find({providerId:id}).sort({createdAt:-1}).then(result=>{
+    res.status(httpStatus.OK).json(result);
   }).catch(e => {
     return res.send(e)
   })
@@ -317,19 +335,18 @@ exports.getBlog = async (req, res) => {
 
 exports.postBlog = async (req, res) => {
 
-  const id=req.body.userId;
+  const providerId=req.body.userId;
   const postTitle=req.body.postTitle;
   const postBody=req.body.postBody;
 
-  User.findOneAndUpdate(
-    { _id: id }, 
-    { $push: { blog: {postTitle,postBody}}},
-    {new:true})
-    .then(result=>{
-      res.status(httpStatus.OK).json(result.blog);
-    }).catch(e => {
-      return res.send(e)
-    })
+  // a document instance
+  var post = new Post({providerId,postTitle,postBody});
+
+  // save model to database
+  post.save(function (err, result) {
+    if (err) return console.error(err);
+    res.status(httpStatus.OK).json(result);
+  });
 };
 
 /**
@@ -337,22 +354,19 @@ exports.postBlog = async (req, res) => {
  * */
 
 exports.updateBlog = async (req, res, next) => {
-  const idx=req.body.idx;
-  const id=req.body.userId;
+  const postId=req.body.postId;
   const postTitle=req.body.postTitle;
   const postBody=req.body.postBody;
-  User.findOne({_id: id})
+  Post.findByIdAndUpdate(
+    postId,
+    {"$set":{postTitle,postBody}},
+    {new:true}
+    )
     .then(result =>{
-      result.blog.splice(idx,1,{postTitle,postBody});
-      result.save(function(error) {
-        if (error) {
-            console.log(error);
-            return res.status(500).send(null);
-        } else {
-          return res.status(httpStatus.OK).json(result.blog);
-        }
-    });
-  })  
+      console.log('result')
+      console.log(result)
+      return res.status(httpStatus.OK).json(result);
+    })
     .catch(e =>{
       return res.send(e)
     });
@@ -363,19 +377,10 @@ exports.updateBlog = async (req, res, next) => {
  * */
 
 exports.deleteBlog = async (req, res, next) => {
-  const idx=req.params.idx;
-  const id=req.params.userId;
-  User.findById(id)
+  const postId=req.params.postId;
+  Post.findByIdAndDelete(postId)
     .then(result =>{
-      result.blog.splice(idx,1);
-      result.save(function(error) {
-        if (error) {
-            console.log(error);
-            return res.status(500).send(null);
-        } else {
-          return res.status(httpStatus.OK).json(result.blog);
-        }
-    });
+      return res.status(httpStatus.OK).json(result);
   })  
     .catch(e =>{
       return res.send(e)

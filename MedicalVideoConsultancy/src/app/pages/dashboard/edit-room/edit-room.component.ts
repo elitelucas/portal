@@ -1,18 +1,15 @@
 import { baseUrl } from './../../../_services/auth.service';
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {AuthService} from "../../../_services/auth.service";
-import {catchError, map} from "rxjs/operators";
-import {HttpErrorResponse, HttpEventType} from "@angular/common/http";
-import {of} from "rxjs";
+
 import {FileUploadService} from "../../../_services/file-upload.service";
 import {ProviderService} from "../../../_services/provider.service";
 import {environment} from "../../../../environments/environment";
-import {constant} from "../../../_config/constant";
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import SimpleUploadAdapter from '@ckeditor/ckeditor5-upload/src/adapters/simpleuploadadapter';
 import { UserService } from './../../../_services/user.service';
 import { HttpParams, HttpClient } from "@angular/common/http";
 import { DataService } from "../../../_services/data.service";
+import Swal  from 'sweetalert2';
 
 
 
@@ -50,16 +47,14 @@ export class EditRoomComponent implements OnInit {
 
   ngOnInit(): void {
     this.data.currentMessage.subscribe(message=>{
-      console.log('message')
-      console.log(message)
+
       // this.firstVal='<img src="'+this.publicUrl+'image/first.png">';
     })
     
     this.currentUser = this.authService.getCurrentUser;
     this.userService.getBlog(this.currentUser.id)
     .subscribe(res=>{
-      console.log('res')
-      console.log(res)
+
       this.literalArr=res;
       this.tmpKk=[];
       this.literalArr.forEach(item=>{
@@ -71,15 +66,13 @@ export class EditRoomComponent implements OnInit {
 
 
   publishPost(title, body){ 
-  
-
+    if(body.length>10000000){
+      Swal.fire('Blog size limit is 5Mbyte')
+      return;
+    }
     this.clickKey=true;
     if(title===''|| body==='')
     return
-    console.log('title')
-    console.log(title)
-    console.log('body')
-    console.log(body)
     this.userService.postBlog({postTitle:title, postBody:body,userId:this.currentUser.id})
     .subscribe(res=>{
       this.receiveData(res)
@@ -88,24 +81,51 @@ export class EditRoomComponent implements OnInit {
   edit(idx){
     this.kk[idx]=false;
   }
-  editOk(title, body, idx){
-    this.userService.updateBlog({idx:idx,postTitle:title, postBody:body,userId:this.currentUser.id})
+  editOk(title, body, postId,idx){
+    if(body.length>10000000){
+      Swal.fire('Blog size limit is 5Mbyte')
+      return;
+    }
+    this.userService.updateBlog({postId,postTitle:title, postBody:body})
     .subscribe(res=>{
-      this.receiveData(res)
+      this.literalArr.splice(idx,1,res);
+      this.tmpKk=[];
+      this.literalArr.forEach(item=>{
+      this.tmpKk.push(true)
+    })
+    this.kk=this.tmpKk;
     })
   }
   editCancel(idx){
     this.kk[idx]=true;
   }
-  delete(idx){
-    this.userService.deleteBlog({idx:idx,userId:this.currentUser.id})
-    .subscribe(res=>{
-      this.receiveData(res)
-
+  delete(postId,idx){
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.userService.deleteBlog(postId)
+        .subscribe(res=>{
+          this.literalArr.splice(idx,1);
+          Swal.fire(
+            'Deleted!',
+            'Your file has been deleted.',
+            'success'
+          )
+        })
+      }
     })
+    
   }
+
   receiveData(res){
-    this.literalArr=res;
+    this.literalArr.push(res);
     this.tmpKk=[];
     this.literalArr.forEach(item=>{
       this.tmpKk.push(true)
@@ -113,9 +133,8 @@ export class EditRoomComponent implements OnInit {
     this.kk=this.tmpKk;
   }
   onReady(eventData) {
+
     eventData.plugins.get('FileRepository').createUploadAdapter = function (loader) {
-      console.log('btoa(loader.file)');
-      console.log(btoa(loader.file));
       return new UploadAdapter(loader);
     };
   }
@@ -146,5 +165,6 @@ export class UploadAdapter {
     });
     return imagePromise;
   }
-
+  ngAfterViewInit(){
+  }
 }

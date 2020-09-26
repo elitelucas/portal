@@ -80,6 +80,8 @@ export class AppSidebarComponent implements OnInit {
       result.forEach( (element : Patient) => {
         this.waitingPatientsData.push(element)
       });
+      console.log('this.waitingPatientsData')
+      console.log(this.waitingPatientsData)
     });
 
   }

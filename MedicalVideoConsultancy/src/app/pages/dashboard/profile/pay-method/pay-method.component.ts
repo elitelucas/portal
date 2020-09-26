@@ -7,6 +7,7 @@ import {environment} from "../../../../../environments/environment";
 import { DataService } from "../../../../_services/data.service";
 import {UserService} from "../../../../_services/user.service";
 import {AuthService} from "../../../../_services/auth.service";
+import  Swal  from 'sweetalert2';
 
 export interface PayData {
   QRimg:object[];
@@ -46,6 +47,7 @@ export class PayMethodComponent implements OnInit {
 
   ngOnInit(): void {
     this.userService.getPayData(this.currentUser.id).subscribe(res=>{
+      
       this.payData=res;
       console.log('res')
       console.log(res)
@@ -57,17 +59,25 @@ export class PayMethodComponent implements OnInit {
         }
       }
       if(this.payData){
-        if(this.payData.QRimg[0]){
-          this.QRimgKey[0]=true;
-        }
-        if(this.payData.QRimg[1]){
-          this.QRimgKey[1]=true;
+        if(this.payData.QRimg){
+          if(this.payData.QRimg[0]){
+            this.QRimgKey[0]=true;
+          }
+          if(this.payData.QRimg[1]){
+            this.QRimgKey[1]=true;
+          }
+        }else{
+          this.payData.QRimg=[];
         }
         if(this.payData.account){
           this.accountKey=true;
+        }else{
+          this.payData.account=[];
         }
         if(this.payData.url){
           this.urlKey=true;
+        }else{
+          this.payData.url=[]
         }
       }
     })
@@ -166,7 +176,11 @@ export class PayMethodComponent implements OnInit {
   Update(){
     console.log('this.payData')
     console.log(this.payData)
-    this.data.changeMessage(this.payData);
+    // this.data.changeMessage(this.payData);
+      this.userService.updatePayment(this.payData,this.currentUser.id).subscribe(res=>{
+      if(res)
+      Swal.fire('Updated successfully');
+    })
   }
 
 }

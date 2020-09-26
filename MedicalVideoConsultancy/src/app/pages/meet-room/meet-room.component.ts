@@ -9,6 +9,10 @@ import { MeetRoomService } from "../../_services/meet-room.service";
 import { Observable, Subject } from "rxjs";
 import { RouterModule, Routes } from '@angular/router';
 import { Patient } from '../../_model/user';
+import { UserService } from './../../_services/user.service';
+import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
+
 
 
 
@@ -32,11 +36,16 @@ export class MeetRoomComponent implements OnInit {
   video: string;
   image: string;
   text: string;
+  smsData:any;
+  roomUrl:string;
+  domain = environment.domain;
+  providerEnteredKey:boolean=false;
 
   defaultVideo = constant.defaultVideo;
   defaultImage = constant.defaultImage;
   tipsImage = constant.tipsImage;
   defaultText = constant.defaultText;
+  literalArr=[];
 
   publicUrl = environment.baseUrl + "public/";
 
@@ -49,8 +58,15 @@ export class MeetRoomComponent implements OnInit {
   identify_patient = 'OK';
   no_identify_patient = 'NOK';
 
-  constructor(private route: ActivatedRoute, public dialog: MatDialog, private providerService: ProviderService,
-    private meetRoomService: MeetRoomService, private _ngZone: NgZone, private _router: Router) {
+  constructor(
+    private route: ActivatedRoute, 
+    public dialog: MatDialog, 
+    private providerService: ProviderService,
+    private meetRoomService: MeetRoomService, 
+    private _ngZone: NgZone, 
+    private _router: Router,
+    private userService:UserService
+    ) {
 
     this.dniPatient = localStorage.getItem('patient_dni');
     this.route.paramMap.subscribe(params => {
@@ -60,6 +76,8 @@ export class MeetRoomComponent implements OnInit {
   }
 
   ngOnInit(): void {
+   
+
     if (this.no_identify_patient == localStorage.getItem('patient_auth')) {
       this._router.navigateByUrl('/auth/sign-in-patient');
       this.clean();
@@ -78,6 +96,13 @@ export class MeetRoomComponent implements OnInit {
       this.getFirstPatientsEmail();
     }
 
+    //receive the info that the provider entered the pay-provider page.
+    this.meetRoomService.providerEntered().subscribe(data=>{
+      if (data){
+        this._router.navigateByUrl('/payAttetion/'+this.roomName);
+      }
+    })
+
   }
 
   getFirstPatientsEmail() {
@@ -87,7 +112,14 @@ export class MeetRoomComponent implements OnInit {
       this.providerService.checkRoomExist(this.roomName).subscribe(result => {
         if (result) {
           this.providerData = result;
+          this.roomUrl = this.domain + this.providerData.room;
           this.getRoomDataById(this.providerData._id);
+           //fetch post data from provider
+          this.userService.getBlog(this.providerData._id).subscribe(res=>{
+          console.log('res')
+          console.log(res)
+          this.literalArr=res;
+       })
           this.openCheckPatient();
         }
       });
@@ -107,6 +139,59 @@ export class MeetRoomComponent implements OnInit {
   closeinstanceSession() {
     this._router.navigateByUrl('/');
     this.clean();
+  }
+
+  
+  // copyRoomAddress(inputRoom) {
+  //   inputRoom.select();
+  //   document.execCommand('copy');
+  //   inputRoom.setSelectionRange(0, 0);
+  // }
+
+
+  sendInvite(option) {
+    switch (option) {
+      case 'sms':
+        this.providerService.sendSMS(this.smsData.data).subscribe(result => {
+          if (!result.errorCode) {
+            console.log("Invite sent by SMS", result)
+          }
+        });
+        break;
+      case 'gmail':
+        this.sendMail('GMail');
+        break;
+      case 'outlook':
+        this.sendMail('OMail');
+        break;
+      default:
+        this.sendMail('defaultMail');
+    }
+  }
+  sendMail(option) {
+    const subject = "Telemedicine meeting invitation";
+    const body = "Hello, this is " + this.providerData.role + "." + this.providerData.lastName + " - please join me for a secure video call: \n" + "https://pasatra.com/"
+      + this.providerData.room + "\n" + "%0a" + "%0a" +
+      "Use a computer or device with a good internet connection and webcam. If you run into issues connecting, restart your computer " + "%0a" + "%0a" + "or check out the pasatra.com http://help.pasatra.com \n" +
+      "Simple, free, and secure telemedicine powered by https://Pasatra.com \n";
+    const mailUrl = option === 'GMail' ? 'https://mail.google.com/mail/?view=cm&fs=1&su=' + subject + '&body=' + body :
+      (option === "OMail" ? "https://outlook.live.com/owa/?path=/mail/action/compose&?&subject=" + subject + '&body=' + body : "mailto:?Subject=" + subject + '&body=' + body);
+    this._router.navigate([]).then(result => { window.open(mailUrl, '_blank') })
+  }
+  openDialogue(option): void {
+    const smsContent = " - please join me for a secure video call: \n" + "https://pasatra.com/"
+      + this.providerData.room + "\n" +
+      "Use a computer or device with a good internet connection and webcam. If you run into issues connecting, restart your computer or check out the pasatra.com http://help.pasatra.com \n" +
+      "Simple, free, and secure telemedicine powered by https://Pasatra.com \n";
+    const dialogRef = this.dialog.open(InviteBySms2, {
+      width: '400px',
+      data: { phoneNumber: '', room: this.roomUrl, smsContent: smsContent }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.smsData = result;
+      this.sendInvite(option);
+    })
   }
 
   getRoomDataById(id) {
@@ -139,10 +224,6 @@ export class MeetRoomComponent implements OnInit {
       };
     });
 
-    this.meetRoomService.startAttetionPatientForPayListener().subscribe((payProvider) => {
-      localStorage.setItem('payProvider', JSON.stringify(payProvider));
-      this.goPayAttetion();
-    });
 
     this.meetRoomService.connectioProvider().subscribe(providerStatus => {
       this.providerData.connection = true
@@ -182,6 +263,52 @@ export class MeetRoomComponent implements OnInit {
     this.trace(urlAttetion);
     this._router.navigateByUrl(urlAttetion);
   }
+  receiveProviderId(){
+    this.meetRoomService.receiveProvideId().subscribe(providerId=>{
+      console.log('providerIdqqq')
+      console.log(providerId)
+    })
+  }
+  ngAfterViewInit(){
+   
+  }
+
+}
+@Component({
+  selector: 'invite-by-sms2',
+  templateUrl: 'invite-by-sms2.html',
+})
+export class InviteBySms2 {
+  isValidNumber: boolean = true;
+  isInvited: boolean = false;
+  constructor(
+    public dialogRef: MatDialogRef<MeetRoomComponent>,
+    @Inject(MAT_DIALOG_DATA) public data) {
+      console.log('data')
+      console.log(data)
+     }
+  onCancelClick(): void {
+  
+    this.isValidNumber = true;
+    this.dialogRef.close({ event: 'cancel' });
+  }
+
+  inviteBySms() {
+    this.isInvited = true;
+    if (!this.data.phoneNumber || (!this.isValidNumber)) {
+      return;
+    }
+    this.dialogRef.close({ event: 'sendSms', data: this.data })
+  }
+
+  hasError(status: boolean) {
+    this.isValidNumber = status;
+  }
+
+  getNumber(phoneNumber: any) {
+    this.data.phoneNumber = phoneNumber;
+  }
+ 
 
 }
 

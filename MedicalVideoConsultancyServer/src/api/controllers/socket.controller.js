@@ -136,11 +136,12 @@ const startAttetionPatientForPay = async (idProvider, idPatient , callback) => {
 
 
 const startCallProvider = async (idProvider, idPatient , callback) => {
-  try {
+  try {  
     const userProvider = await User.findOne({
       _id: idProvider
     });
     userProvider.calling = true;
+  
     const patient = await Patient.findOne({
       _id: idPatient
     });
@@ -320,6 +321,7 @@ const notifyProvider = async (patient, callback) => {
 };
 
 io.on('connection', (socket) => {
+  console.log('sssss')
   logger.info('connection active :' + socket.id);
 
   socket.on('confirmConnect', async (userProvider) => {
@@ -345,7 +347,83 @@ io.on('connection', (socket) => {
     }
   });
 
+//provider entered in pay-provider
+  socket.on('providerEnteredInPayProvider', async (userProvider,dni) => {
+    if (userProvider) {
+      logger.info('providerEnteredInPayProvider :' + userProvider);
+      logger.info('patient-dni:' + dni);
 
+      await confirmConnectProvider(userProvider.id, socket.id, userProvider);
+
+      const patient= await Patient.findOne({dni});
+      if(patient.socketId){
+        socket.to(patient.socketId).emit("providerEnteredInPayProvider", 'providerEntered');
+      }
+        else
+        console.log('There is no patient with this dni');
+    }
+  });
+
+  //patient entered in pay-patient
+  socket.on('patientEnteredInPayPatient', async (providerId,dni) => {
+    if (providerId) {
+      logger.info('patientEnteredInPayPatient :providerId' + providerId);
+      logger.info('patient-dni:' + dni);
+
+      const patient= await Patient.findOneAndUpdate({dni},{$set:{socketId:socket.id}},{new:true});
+
+      const provider= await User.findById(providerId);
+      if(provider.socketId){
+        socket.to(provider.socketId).emit("patientEnteredInPayPatient", patient.socketId);
+      }
+        else
+        console.log('There is no provider with this _id');
+    }
+  });
+
+  //send payAmount from provider to patient
+  socket.on('sendPay', async(payAmount, patientSocketId)=>{
+    logger.info('payAmount: ' + payAmount);
+    socket.to(patientSocketId).emit('sendPay',payAmount);
+  })
+
+   //send pay confirm info from patient to provider
+   socket.on('confirmPay', async(providerId)=>{
+     if(providerId){
+       const provider= await User.findById(providerId);
+       if(provider.socketId)
+       socket.to(provider.socketId).emit('confirmPay','confirm');
+       else
+       console.log('there is no such provider.socketId');
+     }
+  })
+
+  //send confirm provider info from provider to patient
+  socket.on('confirmProvider', async(dni)=>{
+    if(dni){
+      const patient= await Patient.findOne({dni});
+      if(patient.socketId)
+      socket.to(patient.socketId).emit('confirmProvider','confirmProvider');
+      else
+      console.log('there is no such patient.socketId');
+    }
+ })
+
+ socket.on('sendUploadFile', async(uploadFileName,key,othersId)=>{
+   var sender={};
+  if(key==='provider')
+     sender = await Patient.findById(othersId);
+    else 
+     sender = await User.findById(othersId);
+
+    if(sender.socketId){
+      socket.to(sender.socketId).emit('sendUploadFile',uploadFileName);
+    }
+    else
+    console.log('there is no such patient.socketId');
+})
+  
+ 
   socket.on('activate', async (userProvider) => {
     if (userProvider) {
       logger.info('activate :' + socket.id + ' - ' + userProvider.id);
@@ -442,7 +520,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('confirmReadyPatient', async (patient) => {
-    logger.info('confirmReadyPatient :' + socket.id + " - " + patient_.id);
+    logger.info('confirmReadyPatient :' + socket.id + " - " + patient._id);
     notifyProvider(patient, (provider) => {
       socket.join(provider.room)
       logger.info("confirmReadyPatient " + provider._id + " - " + provider.socketId);
@@ -464,6 +542,22 @@ io.on('connection', (socket) => {
       to: data.to
     });
   });
+  socket.on("endCall", data => {
+    console.log("endCall to: ", socket.id , data.to, data.text );
+    socket.to(data.to).emit("endCall", {
+      text: data.text,
+      from: data.from,
+      to: data.to
+    });
+  });
+  socket.on('createRoom',data=>{
+    socket.join(data);
+  })
+  socket.on('createProviderRoom',data=>{
+    socket.join(data.providerId);
+    socket.emit('receiveProviderId',data.providerId);
+    socket.to(data.dni).emit('receiveProviderId',data.providerId);
+  })
 
 });
 /* 

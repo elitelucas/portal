@@ -1,3 +1,4 @@
+import { PatientService } from './../../../_services/patient.service';
 import { ActivatedRoute } from '@angular/router';
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FileUploadService} from "../../../_services/file-upload.service";
@@ -8,6 +9,7 @@ import {AuthService} from "../../../_services/auth.service";
 import {ProviderService} from "../../../_services/provider.service";
 import {Consult} from "../../../_model/user";
 import Swal from 'sweetalert2';
+import { saveAs } from 'file-saver';
 
 
 
@@ -22,13 +24,17 @@ export class NewConsultComponent implements OnInit {
   iteralData:Consult;
   dataDisplay:boolean=false;
   fileName=[];
+  classKey=[];
+  upClassKey=[];
+  downloadFile:String;
   @ViewChild("fileUpload", {static: false}) fileUpload: ElementRef; files = [] ;
 
   constructor(
     private activatedroute: ActivatedRoute, 
     private fileUploadService: FileUploadService,
     private authService:AuthService,
-    private providerService:ProviderService
+    private providerService:ProviderService,
+    private patientService:PatientService
   ) {
     this.currentUser = this.authService.getCurrentUser;
     this.activatedroute.params.subscribe(data => {
@@ -37,7 +43,7 @@ export class NewConsultComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.providerService.getOneConsult(this.currentUser.id, this.data.id, this.data.date)
+    this.providerService.getOneConsult(this.data.id, this.data.consultId)
     .subscribe(res=>{
       this.iteralData=res;
       this.fileName=this.iteralData.providerFiles;
@@ -49,7 +55,7 @@ export class NewConsultComponent implements OnInit {
     const formData = new FormData();
     formData.append('file', file.data);
     formData.append('_id', this.data.id);
-    formData.append('date', this.data.date);
+    formData.append('key', 'newConsult');
     file.inProgress = true;
     const fileType=file.data.type.split('/')[0];
     this.fileUploadService.uploadFile(formData).pipe(
@@ -95,21 +101,63 @@ export class NewConsultComponent implements OnInit {
     };
     fileUpload.click();
   }
+
+  changeClass(idx,key){
+    if(key==='down'){
+      this.initClass();
+      this.classKey[idx]=true;
+      this.downloadFile=this.iteralData.patientFiles[idx];
+      }else{
+        this.initClass();
+        this.upClassKey[idx]=true;
+        this.downloadFile=this.fileName[idx];
+      }
+    }
+    initClass(){
+      this.classKey=[];
+      this.upClassKey=[];
+      this.iteralData.patientFiles.forEach((item)=>{
+        this.classKey.push(false);
+      })
+      this.fileName.forEach((item)=>{
+        this.upClassKey.push(false);
+      })
+    }
+   
+  handleDownload(){
+    console.log('this.downloadFile')
+    console.log(this.downloadFile)
+    if(this.downloadFile){
+      this.patientService.download('file-transfer/download/consult/'+this.downloadFile)
+      .subscribe(blob =>{
+        saveAs(blob, this.downloadFile)} )
+    }  
+  }
   saveData(updateConsult){
     updateConsult.providerFiles=this.fileName;
     const updateData={
-      providerId:this.currentUser.id,
       patientId:this.data.id,
-      date:this.data.date,
+      consultId:this.data.consultId,
       updateData:updateConsult
     }
-    this.providerService.updateConsult(updateData)
-    .subscribe(res=>{
-      console.log(res)
-      console.log(res)
-      if(res==='success')
-      Swal.fire('Updated successfully');
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, update it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.providerService.updateConsult(updateData)
+        .subscribe(res=>{
+          if(res)
+          Swal.fire('Updated successfully');
+        })
+      }
     })
+   
   }
 
 }

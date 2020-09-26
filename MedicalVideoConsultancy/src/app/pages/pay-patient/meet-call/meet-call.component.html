@@ -53,11 +53,11 @@
                   <h3 class="font-weight-bold">Text Chat</h3>
                 </mat-card-title>
                 <mat-card-content>
-                  <form [formGroup]="roomChatForm" (ngSubmit)="sendText()">
+                  <form [formGroup]="roomChatForm" (ngSubmit)="sendText();textInput.value=''">
                       <div class="w-100 p-10 border-radius-5 scroll-div" id="chatText" #chatText>
                       </div>
                       <div>
-                          <input formControlName="text" class="border-radius-5 chat-input" type="text" placeholder="message">
+                          <input #textInput formControlName="text" class="border-radius-5 chat-input" type="text" placeholder="message">
                           <button type="submit" style="bottom: 0;"
                               class="btn btn-primary">Send</button>
                       </div>
@@ -71,9 +71,18 @@
           <p>File share to consults!</p>
           <div class="main-div">
               <div class="sub-div">
-                  <div>
-                      <p class="list">sdfsfsdf</p>
-                  </div>
+                <div *ngIf="downloadFileList">
+                  <h3>Uploaded By provider</h3>
+                  <p [class]="classKey[i]?'list p-bckground':'list'" 
+                  (click)="changeClass(i,'down')" 
+                  *ngFor="let item of downloadFileList;let i=index">{{i+1}}. {{item}}</p>
+                </div>
+                <div *ngIf="fileName">
+                  <h3>Uploaded by you</h3>
+                  <p [class]="upClassKey[i]?'list p-bckground':'list'" 
+                  (click)="changeClass(i,'up')" 
+                  *ngFor="let item of fileName;let i=index">{{i+1}}. {{item}}</p>
+                </div>
                   <div class="button-div">
                       <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleDownload()">
                           <mat-icon>file_download</mat-icon>
