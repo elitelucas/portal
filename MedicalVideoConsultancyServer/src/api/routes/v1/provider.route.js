@@ -50,8 +50,15 @@ router.route('/roomName/:room')
 
 
 //I added 
-router.route('/allPatients')
-  .get(controller.getAllPatients);
+router.route('/initPatients')
+  .get(controller.getInitPatients);
+
+router.route('/filterPatients')
+  .get(controller.getFilterPatients);
+
+  
+router.route('/consult/:patientId')
+  .get(controller.getInitConsult);
 
 router.route('/consult/:patientId/:startDate/:endDate')
   .get(controller.getConsult);

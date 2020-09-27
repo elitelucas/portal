@@ -45,13 +45,26 @@ export class ProviderService {
 
   //I added new func to get all patients data.
 
-  getAllPatientsData(value, field){
-    console.log('value')
-    console.log(value)
-    const patientUrl = baseUrl + 'provider/allPatients';
+  getInitPatientsData(value, field){
+
+    const patientUrl = baseUrl + 'provider/initPatients';
     let params = new HttpParams().set("key", field).set("value", value);
     this.trace("getAllPatientsData:", patientUrl,params);
     return this.http.get<any>(patientUrl,{params});
+  }
+
+  getFilterPatientsData(value, field){
+
+    const patientUrl = baseUrl + 'provider/filterPatients';
+    let params = new HttpParams().set("key", field).set("value", value);
+    this.trace("getFilterPatientsData:", patientUrl,params);
+    return this.http.get<any>(patientUrl,{params});
+  }
+
+  getInitConsult(id){
+    const patientUrl = baseUrl + 'provider/consult/'+id;
+    this.trace("getConsult:", patientUrl);
+    return this.http.get<any>(patientUrl);
   }
 
   getConsult(id,startDate,endDate){

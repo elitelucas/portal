@@ -31,11 +31,21 @@ export class ConsultsComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
    currentUser: User;
 
-  constructor(public dialog: MatDialog, private ProviderService: ProviderService, private router: Router) {
+  constructor(public dialog: MatDialog, private providerService: ProviderService, private router: Router) {
     
   
   }
   ngOnInit(): void {
+    this.providerService.getInitConsult(this.patient._id)
+    .subscribe(res=>{
+      if(res) {
+        console.log("consult data s>>>>>>>>>>>>>", res)
+        this.initDataSource(res)
+        this.noDataToDisplay = false;
+      } else{
+        this.noDataToDisplay = true;
+      }
+    })
   }
 
 
@@ -81,7 +91,7 @@ export class ConsultsComponent implements OnInit {
       Swal.fire('Input the date correctly.')
       return;
     }
-    this.ProviderService.getConsult(this.patient._id,startDate,endDate)
+    this.providerService.getConsult(this.patient._id,startDate,endDate)
     .subscribe(res=> {
       if(res) {
         console.log("consult data s>>>>>>>>>>>>>", res)

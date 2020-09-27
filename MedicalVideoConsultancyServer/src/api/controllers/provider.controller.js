@@ -160,12 +160,12 @@ exports.checkRoomExist = (req, res, next) => {
 
 //I added
 
-exports.getAllPatients = async (req, res, next) => {
+exports.getInitPatients = async (req, res, next) => {
   try {
     const key=req.query.key;
     const value=req.query.value;
     let sendArr=[];
-    patient = await Patient.find({providerId:value}).exec();
+    patient = await Patient.find({providerId:value}).limit(10).exec();
 
     consult= await Consult.find().exec();
     consultCntArr=[];
@@ -195,6 +195,57 @@ exports.getAllPatients = async (req, res, next) => {
     res.status(httpStatus.OK).json(sendArr);
   } catch (e) {
     console.log("getAllPatients:",error);
+    return next(APIError(e));
+  }
+};
+
+exports.getFilterPatients = async (req, res, next) => {
+  try {
+    const key=req.query.key;
+    const value=req.query.value;
+    let sendArr=[];
+    patient = await Patient.find({providerId:value}).limit(10).exec();
+
+    consult= await Consult.find().exec();
+    consultCntArr=[];
+    for(let i=0;i<patient.length;i++){
+      let cnt=0;
+      for(let j=0; j<consult.length;j++){
+        if(patient[i].dni===consult[j].dni){
+          cnt++;
+        }
+      }
+      consultCntArr.push(cnt);
+    }
+    for(let i=0;i<patient.length;i++){
+      sendArr.push(
+        {
+          id:patient[i]._id,
+          dni:patient[i].dni,
+          fullName:patient[i].fullName,
+          consultCnt:consultCntArr[i],
+          lastConsult:patient[i].lastSeen
+        }
+      )
+    }
+    console.log('sendArr')
+    console.log(sendArr)
+
+    res.status(httpStatus.OK).json(sendArr);
+  } catch (e) {
+    console.log("getAllPatients:",error);
+    return next(APIError(e));
+  }
+};
+
+exports.getInitConsult = async (req, res, next) => {
+  try {
+    const patientId=req.params.patientId;
+    consult = await Consult.find({patientId})
+    .sort({createdAt:-1}).limit(10).exec();
+    res.status(httpStatus.OK).json(consult);
+  } catch (e) {
+    console.log("getConsult:",error);
     return next(APIError(e));
   }
 };

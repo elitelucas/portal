@@ -30,12 +30,11 @@ export class ConsultListComponent implements OnInit {
   displayedColumns: string[] = [ 'index', 'fullName','date','consult'];
   noDataToDisplay: boolean = false;
   dataSource: any;
-  tmpData=[];
   @Input() idName: IdName;
   @ViewChild(MatTable)  table: MatTable<any>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-  constructor(public dialog: MatDialog, private ProviderService: ProviderService, private router: Router) {
+  constructor(public dialog: MatDialog, private providerService: ProviderService, private router: Router) {
   
   }
   ngOnInit(): void {
@@ -43,7 +42,16 @@ export class ConsultListComponent implements OnInit {
   }
 
   initData() {
-    
+    this.providerService.getInitConsult(this.idName.id)
+    .subscribe(res=>{
+      if(res) {
+        console.log("consult data s>>>>>>>>>>>>>", res)
+        this.initDataSource(res)
+        this.noDataToDisplay = false;
+      } else{
+        this.noDataToDisplay = true;
+      }
+    })
   }
 
   initDataSource(data) {
@@ -76,11 +84,10 @@ export class ConsultListComponent implements OnInit {
       Swal.fire('Input the date correctly.')
       return;
     }
-    this.ProviderService.getConsult(this.idName.id,startDate,endDate)
+    this.providerService.getConsult(this.idName.id,startDate,endDate)
     .subscribe(res=> {
       if(res) {
         console.log("consult data s>>>>>>>>>>>>>", res)
-        this.tmpData=res;
         this.initDataSource(res)
         this.noDataToDisplay = false;
       } else{
