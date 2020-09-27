@@ -42,5 +42,11 @@ module.exports = {
   culqiConfing: {
     public_key: process.env.CULQI_API_PUBLIC_KEY,
     private_key: process.env.CULQI_API_PRIVATE_KEY
+  },
+  awsConfig:{
+    aws_api_id : process.env.AWS_API_ID,
+    aws_api_secret : process.env.AWS_API_SECRET,
+    bucket : process.env.AWS_BUCKET_PUBLIC,
+    region : process.env.AWS_REGION
   }
 };

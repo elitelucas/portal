@@ -7,7 +7,7 @@
     <img src="assets/images/users/1.jpg" alt="user" class="profile-pic">
   </ng-container>
   <ng-container *ngIf="currentUser.image">
-    <img [src]="publicUrl + currentUser.image" alt="user" class="profile-pic">
+    <img [src]="currentUser.image" alt="user" class="profile-pic">
   </ng-container>
 </button>
 <mat-menu #profile="matMenu" class="mymegamenu">

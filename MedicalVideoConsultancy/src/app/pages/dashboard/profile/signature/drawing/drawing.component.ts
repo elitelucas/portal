@@ -22,7 +22,7 @@ export class DrawingComponent implements OnInit {
   @ViewChild('sigPad') sigPad;
   @ViewChild('blank') blank;
   @ViewChild("fileUpload", {static: false}) fileUpload: ElementRef; files = [] ;
-  publicUrl = environment.baseUrl + "public/image/";
+  //publicUrl = environment.baseUrl + "public/image/";
 
   sigPadElement;
   blankElement;
@@ -46,7 +46,7 @@ export class DrawingComponent implements OnInit {
     this.userService.getSignature(this.currentUser.id).subscribe(res=>{
       if(res){
         this.sigImgKey=true;
-        this.img=this.publicUrl+res;
+        this.img=res;
       }
     })
   }
