@@ -2,15 +2,15 @@
   <div class="description">
     <h3>Personalize your waiting room</h3>
     <div>
-      Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui
-ratione voluptatem sequi nesciunt. Neque porro quisquam est.
+      Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
+      eos qui
+      ratione voluptatem sequi nesciunt. Neque porro quisquam est.
     </div>
   </div>
   <div class='new-post'>
     <div class="post-title">
       <input #postTitle type="text" class="title-input" />
-      <button class="btn btn-primary publish-button" 
-      (click)="
+      <button class="btn btn-primary publish-button" (click)="
       publishPost(
         postTitle.value, 
         postBody.elementRef.nativeElement.children[1].lastChild.innerHTML
@@ -27,7 +27,7 @@ ratione voluptatem sequi nesciunt. Neque porro quisquam est.
     </div>
   </div>
 
-  <div class='post-list' *ngFor="let item of literalArr; let i=index;" >
+  <div class='post-list' *ngFor="let item of literalArr; let i=index;">
     <div [class]="kk[i]===false?'switch':''">
       <div class="head-bar">
         <h3 class="each-post-title pull-left">{{item.postTitle}}</h3>
@@ -41,13 +41,12 @@ ratione voluptatem sequi nesciunt. Neque porro quisquam est.
       <div class="post-title">
 
         <input #editTitle type="text" class="edit-title-input" [value]="item.postTitle" />
-        <button class="btn btn-primary edit-button edit-margin" 
-        (click)="editOk(editTitle.value, editBody.elementRef.nativeElement.children[1].lastChild.innerHTML,item._id,i)">
+        <button class="btn btn-primary edit-button edit-margin"
+          (click)="editOk(editTitle.value, editBody.elementRef.nativeElement.children[1].lastChild.innerHTML,item._id,i)">
           Ok
         </button>
 
-        <button class="btn btn-danger edit-button"
-        (click)="editCancel(i)">Cancel
+        <button class="btn btn-danger edit-button" (click)="editCancel(i)">Cancel
         </button>
 
         <p *ngIf="editTitle.value===''&& clickKey" style="color:red">required*</p>
@@ -58,7 +57,7 @@ ratione voluptatem sequi nesciunt. Neque porro quisquam est.
         <ckeditor #editBody [editor]="Editor" [data]="item.postBody" (ready)="onReady($event)"></ckeditor>
       </div>
     </div>
-    
+
 
   </div>
 </div>

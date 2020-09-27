@@ -39,18 +39,6 @@ exports.deleteFile = async (folder, name , result) => {
   s3.deleteObject(params, result);
 };
 
-/*
-
-  s3.getObject(params, function (err, data) {
-                if (err) {
-                    reject(err);
-                } else {
-                    console.log("Successfully dowloaded data from  bucket");
-                    resolve(data);
-                }
-            });
-
-*/
 
 exports.uploadPost = async () => {
 

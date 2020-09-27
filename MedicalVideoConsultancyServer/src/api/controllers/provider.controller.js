@@ -372,10 +372,6 @@ exports.getSignature = async (req, res) => {
 
 exports.mail = async (req, res) => {
   try {
-    console.log('**********dddddddddddddd********')
-    console.log('req.body')
-    console.log(req.body)
-
     const transporter = nodemailer.createTransport({
       host: emailConfig.host,
       port: emailConfig.port,
@@ -386,18 +382,10 @@ exports.mail = async (req, res) => {
       }
     });
 
-    /*var transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'dremova.yulya1@mail.ru',
-        pass: 'sufdhk7k7bJABDFKer'
-      }
-    });*/
-
     var mailOptions = {
-      from: 'dremova.yulya1@mail.ru',
+      from: req.body.from,
       to: req.body.email,
-      subject: 'Sending Email using Node.js',
+      subject: req.body.subject,
       html: req.body.html
     };
 

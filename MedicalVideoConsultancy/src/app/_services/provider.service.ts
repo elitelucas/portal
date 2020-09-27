@@ -66,11 +66,16 @@ export class ProviderService {
     this.trace("getConsultInChat:", patientUrl,params);
     return this.http.get<any>(patientUrl,{params});
   }
-  sendMail(html,email){
+  sendMail(from,email,subject,html){
     console.log('sdfsdfsdf')
     const mailUrl = baseUrl + 'provider/mail';
     this.trace("getConsultInChat:", mailUrl);
-    return this.http.post(mailUrl,{email:email,html:html});
+    return this.http.post(mailUrl,{
+      from:from,
+      email:email,
+      subject:subject,
+      html:html
+    });
   }
 
   getOneConsult(patientId, consultId){

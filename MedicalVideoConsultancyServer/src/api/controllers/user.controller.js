@@ -382,6 +382,14 @@ exports.postBlog = async (req, res) => {
   const postTitle = req.body.postTitle;
   const postBody = req.body.postBody;
 
+  /*await Bucket.uploadFile("blog", providerId+"-"+postTitle+".html", postBody, {}, async (err, data) => {
+    if (err) {
+      console.log("Bucket Error creating the file: ", err);
+    } else {
+      console.log("Bucket Successfully created a file on S3 : " + data.Location);     
+    }
+  });*/
+
   // a document instance
   var post = new Post({ providerId, postTitle, postBody });
 
