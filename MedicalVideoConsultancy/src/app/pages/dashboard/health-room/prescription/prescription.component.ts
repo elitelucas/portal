@@ -33,8 +33,8 @@ export class PrescriptionComponent implements OnInit {
       this.patient = JSON.parse(localStorage.getItem(params.get("patientId")));
     });
     this.currentUser = JSON.parse(localStorage.getItem('provider_data'));
-    console.log('this.currentUser')
-    console.log(this.currentUser)
+    /*console.log('this.currentUser')
+    console.log(this.currentUser)*/
   }
 
   ngOnInit(): void {

@@ -13,7 +13,7 @@ import { Patient, Consult } from "../../../_model/user";
   templateUrl: './health-provider.component.html',
   styleUrls: ['./health-provider.component.css']
 })
-export class HealthProviderComponent implements OnInit{
+export class HealthProviderComponent implements OnInit {
   currentUser: any;
 
   listLastAttetions: Consult[] = null;
@@ -39,7 +39,7 @@ export class HealthProviderComponent implements OnInit{
     private meetRoomService: MeetRoomService, private _ngZone: NgZone) {
     this.currentUser = this.authService.getCurrentUser;
   }
-  
+
 
   ngOnInit(): void {
     this.initProviderRoom();
@@ -59,7 +59,7 @@ export class HealthProviderComponent implements OnInit{
   loadLastAttetions() {
     this.providerService.getLastAttetionsPatientsData(this.currentUser.id)
       .subscribe(result => {
-        console.log("loadLastAttetions", result)
+        //console.log("loadLastAttetions", result)
 
         const patientData: Consult[] = [];
         result.forEach(function (item) {
@@ -81,7 +81,10 @@ export class HealthProviderComponent implements OnInit{
 
   getWaitingPatientsData() {
     this.providerService.getWaitingPatientsData(this.currentUser.room)
-      .subscribe(result => { this.patientsData = result; console.log("waiting room patients", result) });
+      .subscribe(result => { 
+        this.patientsData = result; 
+        //console.log("waiting room patients", result) 
+      });
   }
 
   copyRoomAddress(inputRoom) {
@@ -147,8 +150,8 @@ export class HealthProviderComponent implements OnInit{
     this.webCamError.push(error);
     console.log('camera error', this.webCamError)
   }
-  detail(param){
-    this.router.navigateByUrl('/dashboard/patient/'+param.id+'/'+param.dni+'/'+param.fullName);
+  detail(param) {
+    this.router.navigateByUrl('/dashboard/patient/' + param.id + '/' + param.dni + '/' + param.fullName);
   }
 
 
@@ -165,9 +168,9 @@ export class InviteBySms {
   constructor(
     public dialogRef: MatDialogRef<HealthProviderComponent>,
     @Inject(MAT_DIALOG_DATA) public data) {
-      console.log('data')
-      console.log(data)
-     }
+    console.log('data')
+    console.log(data)
+  }
   onCancelClick(): void {
     this.isValidNumber = true;
     this.dialogRef.close({ event: 'cancel' });
@@ -188,6 +191,6 @@ export class InviteBySms {
   getNumber(phoneNumber: any) {
     this.data.phoneNumber = phoneNumber;
   }
- 
+
 
 }

@@ -38,16 +38,16 @@ export class ProviderService {
   checkRoomExist(room) {
     const checkRoomUrl = baseUrl + 'provider/roomName/' + room;
     this.trace("checkRoomExist:", checkRoomUrl);
-    console.log('checkRoomUrl')
-    console.log(checkRoomUrl)
+    /*console.log('checkRoomUrl')
+    console.log(checkRoomUrl)*/
     return this.http.get<any>(checkRoomUrl)
   }
 
   //I added new func to get all patients data.
 
   getAllPatientsData(value, field){
-    console.log('value')
-    console.log(value)
+    /*console.log('value')
+    console.log(value)*/
     const patientUrl = baseUrl + 'provider/allPatients';
     let params = new HttpParams().set("key", field).set("value", value);
     this.trace("getAllPatientsData:", patientUrl,params);
@@ -66,8 +66,9 @@ export class ProviderService {
     this.trace("getConsultInChat:", patientUrl,params);
     return this.http.get<any>(patientUrl,{params});
   }
+  
   sendMail(from,email,subject,html){
-    console.log('sdfsdfsdf')
+    //console.log('sdfsdfsdf')
     const mailUrl = baseUrl + 'provider/mail';
     this.trace("getConsultInChat:", mailUrl);
     return this.http.post(mailUrl,{
@@ -104,8 +105,8 @@ export class ProviderService {
   }
 
   getSignature(providerId: string): Observable<Blob> {
-    console.log('providerId')
-    console.log(providerId)
+    /*console.log('providerId')
+    console.log(providerId)*/
     const sigUrl = baseUrl + 'provider/getSignature/'+providerId;
     return this.http.get<any>(sigUrl)
   }
@@ -150,7 +151,7 @@ export class ProviderService {
 
   trace(...arg) {
     var now = (window.performance.now() / 1000).toFixed(3);
-    console.log(now + ': ', arg);
+    //console.log(now + ': ', arg);
   }
 
 }

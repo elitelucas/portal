@@ -28,12 +28,12 @@ export const AppRoutes: Routes = [
     canActivate: [AuthGuard]
   },
 
-
+/*
   {
     path: 'video/:roomName',
     component: VideoRoomComponent
   },
-
+*/
   {
     path: ':roomName',
     component: MeetRoomComponent
