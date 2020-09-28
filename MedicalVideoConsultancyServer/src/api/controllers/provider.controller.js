@@ -193,8 +193,8 @@ exports.getAllPatients = async (req, res, next) => {
         }
       )
     }
-    console.log('sendArr')
-    console.log(sendArr)
+    /*console.log('sendArr')
+    console.log(sendArr)*/
 
     res.status(httpStatus.OK).json(sendArr);
   } catch (e) {
@@ -233,8 +233,8 @@ exports.getOneConsult = async (req, res, next) => {
 
 exports.updateConsult = async (req, res, next) => {
   try {
-    console.log('req.body')
-    console.log(req.body)
+    /*console.log('req.body')
+    console.log(req.body)*/
     const consultId=req.body.consultId;
     const updateData=req.body.updateData;
     const symptom=[updateData.symptom0,updateData.symptom1,updateData.symptom2,updateData.symptom3];
@@ -337,12 +337,12 @@ exports.uploadCkImage = async (req, res) => {
 exports.getSignature = async (req, res) => {
     const providerId=req.params.providerId;
     const user = await User.findById(providerId).exec();
-    console.log('user.sigImgSrc')
-    console.log(user.sigImgSrc)
+    /*console.log('user.sigImgSrc')
+    console.log(user.sigImgSrc)*/
     if(user.sigImgSrc)
-    res.status(httpStatus.CREATED).json(user.sigImgSrc);
+      res.status(httpStatus.CREATED).json(user.sigImgSrc);
     else{
-      console.log('no such file.')
+      res.status(httpStatus.NOT_FOUND).send();
     }
 
     // if(user.sigImgSrc){
@@ -922,7 +922,7 @@ exports.createConsult = async (req, res, next) => {
 exports.getLastAttetions = async (req, res, next) => {
   try {
     const userId = req.params.userId;
-    console.log("getLastAttetions providerId userId: ", userId)
+    //console.log("getLastAttetions providerId userId: ", userId)
     const lastConsultAttetions = await Consult.find({ providerId: userId }).sort({ date: -1 }).limit(10).map(async (list) => {
       await Promise.all(list.map(async (c) => {
         const patient = await Patient.find({ _id: c.patientId });
@@ -931,7 +931,7 @@ exports.getLastAttetions = async (req, res, next) => {
       return list;
     });
     if (lastConsultAttetions) {
-      console.log("lastConsultAttetions: ", lastConsultAttetions)
+      //console.log("lastConsultAttetions: ", lastConsultAttetions)
       res.status(httpStatus.OK).json(lastConsultAttetions);
     }
 

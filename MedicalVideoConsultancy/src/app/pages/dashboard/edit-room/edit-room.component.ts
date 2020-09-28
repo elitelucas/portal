@@ -10,6 +10,7 @@ import { UserService } from './../../../_services/user.service';
 import { HttpParams, HttpClient } from "@angular/common/http";
 import { DataService } from "../../../_services/data.service";
 import Swal  from 'sweetalert2';
+import { ContentBlogService } from '../../../_services/content-blog.service';
 
 
 
@@ -41,23 +42,25 @@ export class EditRoomComponent implements OnInit {
     private fileUploadService: FileUploadService,
     private userService:UserService,
     private http:HttpClient,
-    private data:DataService
+    private data:DataService,
+    private contentBlogService: ContentBlogService
     ) {
   }
 
   ngOnInit(): void {
     this.data.currentMessage.subscribe(message=>{
-
       // this.firstVal='<img src="'+this.publicUrl+'image/first.png">';
     })
     
     this.currentUser = this.authService.getCurrentUser;
     this.userService.getBlog(this.currentUser.id)
     .subscribe(res=>{
-
       this.literalArr=res;
       this.tmpKk=[];
       this.literalArr.forEach(item=>{
+        this.contentBlogService.getByUrl(item.url).subscribe(html=>{
+          item.postBody = html;
+        });        
         this.tmpKk.push(true)
       })
       this.kk=this.tmpKk;
@@ -78,9 +81,11 @@ export class EditRoomComponent implements OnInit {
       this.receiveData(res)
     })
   }
+
   edit(idx){
     this.kk[idx]=false;
   }
+
   editOk(title, body, postId,idx){
     if(body.length>10000000){
       Swal.fire('Blog size limit is 5Mbyte')
@@ -96,9 +101,11 @@ export class EditRoomComponent implements OnInit {
     this.kk=this.tmpKk;
     })
   }
+
   editCancel(idx){
     this.kk[idx]=true;
   }
+
   delete(postId,idx){
     Swal.fire({
       title: 'Are you sure?',
@@ -132,8 +139,8 @@ export class EditRoomComponent implements OnInit {
     })
     this.kk=this.tmpKk;
   }
-  onReady(eventData) {
 
+  onReady(eventData) {
     eventData.plugins.get('FileRepository').createUploadAdapter = function (loader) {
       return new UploadAdapter(loader);
     };
