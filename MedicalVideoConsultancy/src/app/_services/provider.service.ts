@@ -53,12 +53,11 @@ export class ProviderService {
     return this.http.get<any>(patientUrl,{params});
   }
 
-  getFilterPatientsData(value, field){
+  getFilterPatientsData(providerId,filterValue,key){
 
-    const patientUrl = baseUrl + 'provider/filterPatients';
-    let params = new HttpParams().set("key", field).set("value", value);
-    this.trace("getFilterPatientsData:", patientUrl,params);
-    return this.http.get<any>(patientUrl,{params});
+    const patientUrl = baseUrl + 'provider/filterPatients/'+providerId+'/'+filterValue+'/'+key;
+    this.trace("getFilterPatientsData:", patientUrl);
+    return this.http.get<any>(patientUrl);
   }
 
   getInitConsult(id){
@@ -79,11 +78,16 @@ export class ProviderService {
     this.trace("getConsultInChat:", patientUrl,params);
     return this.http.get<any>(patientUrl,{params});
   }
-  sendMail(html,email){
+  sendMail(from,email,subject,html){
     console.log('sdfsdfsdf')
     const mailUrl = baseUrl + 'provider/mail';
     this.trace("getConsultInChat:", mailUrl);
-    return this.http.post(mailUrl,{email:email,html:html});
+    return this.http.post(mailUrl,{
+      from:from,
+      email:email,
+      subject:subject,
+      html:html
+    });
   }
 
   getOneConsult(patientId, consultId){

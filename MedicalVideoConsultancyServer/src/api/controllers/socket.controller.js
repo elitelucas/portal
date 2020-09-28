@@ -15,7 +15,7 @@ const {
 } = require('./provider.controller');
 const logger = require('../../config/logger')
 
-logger.info("Start socket server: " + socketPort )
+logger.info("Start socket server: " + socketPort)
 
 const updateUserPatientState = async (idc, userPatient) => {
   try {
@@ -36,7 +36,7 @@ const updateUserPatientState = async (idc, userPatient) => {
 
 const updateUserProviderState = async (idc, userProvider) => {
   try {
-    console.log("updateUserProviderState:", userProvider)
+    //console.log("updateUserProviderState:", userProvider)
     let id = null;
     if (userProvider) {
       id = userProvider._id ? userProvider._id : userProvider.id;
@@ -55,7 +55,7 @@ const updateUserProviderState = async (idc, userProvider) => {
 
 const confirmConnectProvider = async (idProvider, socketId, user) => {
   try {
-    console.log("confirmConnectProvider" , user)
+    //console.log("confirmConnectProvider", user)
     const userProvider = await User.findOne({
       _id: idProvider
     });
@@ -72,7 +72,7 @@ const confirmConnectProvider = async (idProvider, socketId, user) => {
 
 const connectProvider = async (idProvider, socketId, user, notify) => {
   try {
-    console.log("connectProvider" , user)
+    //console.log("connectProvider", user)
     const userProvider = await User.findOne({
       _id: idProvider
     });
@@ -107,7 +107,7 @@ const disconnectProvider = async (idProvider, notify) => {
 
 //-----------------------
 
-const startAttetionPatientForPay = async (idProvider, idPatient , callback) => {
+const startAttetionPatientForPay = async (idProvider, idPatient, callback) => {
   try {
     /*console.log("startAttetionPatientForPay")
     console.log(idProvider)*/
@@ -120,12 +120,12 @@ const startAttetionPatientForPay = async (idProvider, idPatient , callback) => {
     const patient = await Patient.findOne({
       _id: idPatient
     });
-   
+
     patient.calling = false;
-    console.log("userProvider")
+    /*console.log("userProvider")
     console.log(userProvider.socketId)
     console.log("patient")
-    console.log(patient.socketId)
+    console.log(patient.socketId)*/
     //await updateUserPatientState(idPatient, patient);
     //await updateUserProviderState(idProvider, userProvider);
     callback(patient.socketId, userProvider.socketId);
@@ -135,13 +135,13 @@ const startAttetionPatientForPay = async (idProvider, idPatient , callback) => {
 };
 
 
-const startCallProvider = async (idProvider, idPatient , callback) => {
-  try {  
+const startCallProvider = async (idProvider, idPatient, callback) => {
+  try {
     const userProvider = await User.findOne({
       _id: idProvider
     });
     userProvider.calling = true;
-  
+
     const patient = await Patient.findOne({
       _id: idPatient
     });
@@ -219,7 +219,7 @@ const disconnectConnection = async (socketId, notifyProviderCallback, notifyPati
         socketId: socketId
       });
       isProviderDisconnect = false;
-    }    
+    }
     userProviderOrPatient.connection = false;
     userProviderOrPatient.state = false;
     userProviderOrPatient.calling = false;
@@ -227,7 +227,7 @@ const disconnectConnection = async (socketId, notifyProviderCallback, notifyPati
     userProviderOrPatient.peerId = null;
     if (isProviderDisconnect) {
       notifyProviderCallback(userProviderOrPatient)
-    } else{
+    } else {
       notifyPatientsCallback(userProviderOrPatient)
     }
     return userProviderOrPatient.role ?
@@ -244,7 +244,7 @@ const disconnectConnection = async (socketId, notifyProviderCallback, notifyPati
 
 //-------------
 
-const countPatientRoom = async (room,callback) => {
+const countPatientRoom = async (room, callback) => {
   try {
     if (room) {
       const patientsData = await Patient.find({
@@ -257,7 +257,7 @@ const countPatientRoom = async (room,callback) => {
         room: room
       });
       logger.info("countPatientRoom send :" + providerData.id + "-" + providerData.socketId)
-      callback(providerData.socketId, patientsData);    
+      callback(providerData.socketId, patientsData);
     }
   } catch (e) {
     logger.error("countPatientRoom e :" + e)
@@ -277,11 +277,11 @@ const emitDataByRoom = async (room) => {
       const providerData = await User.findOne({
         room: room
       });
-      
+
       if (patientsData) {
         //socket.to(providerData.socketId).emit("updatePatientRoom", patientsData.length);
       }
-      
+
       /*io.emit('stateUpdated', {
         patientsData: patientsData,
         providerData: providerData
@@ -321,14 +321,14 @@ const notifyProvider = async (patient, callback) => {
 };
 
 io.on('connection', (socket) => {
-  console.log('sssss')
+  //console.log('sssss')
   logger.info('connection active :' + socket.id);
 
   socket.on('confirmConnect', async (userProvider) => {
     if (userProvider) {
       logger.info('confirmConnect :' + socket.id + ' - ' + userProvider.id);
 
-      console.log("confirmConnect ", userProvider)
+      //console.log("confirmConnect ", userProvider)
 
 
       await confirmConnectProvider(userProvider.id, socket.id, userProvider);
@@ -347,93 +347,95 @@ io.on('connection', (socket) => {
     }
   });
 
-//provider entered in pay-provider
-  socket.on('providerEnteredInPayProvider', async (userProvider,dni) => {
+  //provider entered in pay-provider
+  socket.on('providerEnteredInPayProvider', async (userProvider, dni) => {
     if (userProvider) {
       logger.info('providerEnteredInPayProvider :' + userProvider);
       logger.info('patient-dni:' + dni);
 
       await confirmConnectProvider(userProvider.id, socket.id, userProvider);
 
-      const patient= await Patient.findOne({dni});
-      if(patient.socketId){
+      const patient = await Patient.findOne({ dni });
+      if (patient.socketId) {
         socket.to(patient.socketId).emit("providerEnteredInPayProvider", 'providerEntered');
       }
-        else
-        console.log('There is no patient with this dni');
+      else {
+        logger.info('There is no patient with this dni');
+      }
     }
   });
 
   //patient entered in pay-patient
-  socket.on('patientEnteredInPayPatient', async (providerId,dni) => {
+  socket.on('patientEnteredInPayPatient', async (providerId, dni) => {
     if (providerId) {
       logger.info('patientEnteredInPayPatient :providerId' + providerId);
       logger.info('patient-dni:' + dni);
 
-      const patient= await Patient.findOneAndUpdate({dni},{$set:{socketId:socket.id}},{new:true});
+      const patient = await Patient.findOneAndUpdate({ dni }, { $set: { socketId: socket.id } }, { new: true });
 
-      const provider= await User.findById(providerId);
-      if(provider.socketId){
+      const provider = await User.findById(providerId);
+      if (provider.socketId) {
         socket.to(provider.socketId).emit("patientEnteredInPayPatient", patient.socketId);
       }
-        else
-        console.log('There is no provider with this _id');
+      else {
+        logger.info('There is no provider with this _id');
+      }
     }
   });
 
   //send payAmount from provider to patient
-  socket.on('sendPay', async(payAmount, patientSocketId)=>{
+  socket.on('sendPay', async (payAmount, patientSocketId) => {
     logger.info('payAmount: ' + payAmount);
-    socket.to(patientSocketId).emit('sendPay',payAmount);
+    socket.to(patientSocketId).emit('sendPay', payAmount);
   })
 
-   //send pay confirm info from patient to provider
-   socket.on('confirmPay', async(providerId)=>{
-     if(providerId){
-       const provider= await User.findById(providerId);
-       if(provider.socketId)
-       socket.to(provider.socketId).emit('confirmPay','confirm');
-       else
-       console.log('there is no such provider.socketId');
-     }
-  })
+  //send pay confirm info from patient to provider
+  socket.on('confirmPay', async (providerId) => {
+    if (providerId) {
+      const provider = await User.findById(providerId);
+      if (provider.socketId) {
+        socket.to(provider.socketId).emit('confirmPay', 'confirm');
+      } else {
+        logger.info('there is no such provider.socketId');
+      }
+    }
+  });
 
   //send confirm provider info from provider to patient
-  socket.on('confirmProvider', async(dni)=>{
-    if(dni){
-      const patient= await Patient.findOne({dni});
-      if(patient.socketId)
-      socket.to(patient.socketId).emit('confirmProvider','confirmProvider');
+  socket.on('confirmProvider', async (dni) => {
+    if (dni) {
+      const patient = await Patient.findOne({ dni });
+      if (patient.socketId)
+        socket.to(patient.socketId).emit('confirmProvider', 'confirmProvider');
       else
-      console.log('there is no such patient.socketId');
+        logger.info('there is no such patient.socketId');
     }
- })
+  })
 
- socket.on('sendUploadFile', async(uploadFileName,key,othersId)=>{
-   var sender={};
-  if(key==='provider')
-     sender = await Patient.findById(othersId);
-    else 
-     sender = await User.findById(othersId);
+  socket.on('sendUploadFile', async (uploadFileName, key, othersId) => {
+    var sender = {};
+    if (key === 'provider')
+      sender = await Patient.findById(othersId);
+    else
+      sender = await User.findById(othersId);
 
-    if(sender.socketId){
-      socket.to(sender.socketId).emit('sendUploadFile',uploadFileName);
+    if (sender.socketId) {
+      socket.to(sender.socketId).emit('sendUploadFile', uploadFileName);
     }
     else
-    console.log('there is no such patient.socketId');
-})
-  
- 
+      logger.info('there is no such patient.socketId');
+  })
+
+
   socket.on('activate', async (userProvider) => {
     if (userProvider) {
       logger.info('activate :' + socket.id + ' - ' + userProvider.id);
-      console.log("activate:", userProvider)
-      await connectProvider(userProvider.id, socket.id, userProvider, 
+      await connectProvider(userProvider.id, socket.id, userProvider,
         (provider) => {
           notifyPatients(provider, (patients) => {
             if (patients && patients.length > 0) {
               patients.forEach(patient => {
-                logger.info("providerConnect to patient :" + patient._id + " "+patient.socketId);
+                logger.info("providerConnect to patient :" + patient._id + " " + patient.socketId);
                 socket.to(patient.socketId).emit("providerConnect", provider.id);
               });
             }
@@ -450,7 +452,7 @@ io.on('connection', (socket) => {
           notifyPatients(provider, (patients) => {
             if (patients && patients.length > 0) {
               patients.forEach(patient => {
-                logger.info("providerDisconnect to patient :" + patient._id + " "+patient.socketId);
+                logger.info("providerDisconnect to patient :" + patient._id + " " + patient.socketId);
                 socket.to(patient.socketId).emit("providerDisconnect", provider.id);
               });
             }
@@ -464,18 +466,18 @@ io.on('connection', (socket) => {
     logger.info('disconnect :' + socket.id);
     disconnectConnection(socket.id,
       (provider) => {
-        notifyPatients(provider, (patients)=>{
-          if(patients && patients.length > 0){
+        notifyPatients(provider, (patients) => {
+          if (patients && patients.length > 0) {
             patients.forEach(patient => {
               socket.to(patient.socketId).emit("providerDisconnect", provider.id);
-              logger.info("providerDisconnect "+ patient._id);
+              logger.info("providerDisconnect " + patient._id);
             });
           }
         });
-      }, 
+      },
       (patient) => {
-        notifyProvider(patient, (provider)=>{   
-          logger.info("patientsDisconnect "+ provider._id + " - " + provider.socketId);
+        notifyProvider(patient, (provider) => {
+          logger.info("patientsDisconnect " + provider._id + " - " + provider.socketId);
           socket.to(provider.socketId).emit("patientsDisconnect", patient);
         });
       });
@@ -484,35 +486,32 @@ io.on('connection', (socket) => {
   //------------
 
   socket.on('startAttetionPatientForPay', async (provider, patient, amountPayAttetion) => {
-    logger.info('startAttetionPatientForPay :' + socket.id + " to " );
-    console.log(provider);
-    console.log(patient);
+    logger.info('startAttetionPatientForPay :' + socket.id + " to ");
     await startAttetionPatientForPay(provider.id, patient._id, (patientSocketId, providerSocketId) => {
-      socket.to(patientSocketId).emit("startAttetionPatientForPayListener", { 
-        providerId : provider.id, 
-        amount : amountPayAttetion
+      socket.to(patientSocketId).emit("startAttetionPatientForPayListener", {
+        providerId: provider.id,
+        amount: amountPayAttetion
       });
     });
   });
 
 
   socket.on('confirmPayAttetion', async (provider, patient) => {
-    logger.info('confirmPayAttetion :' + socket.id  );
+    logger.info('confirmPayAttetion :' + socket.id);
     await startAttetionPatientForPay(provider._id, patient._id, (patientSocketId, providerSocketId) => {
-      
-      socket.to(providerSocketId).emit("confirmPayAttetionListener", { 
-        patientId : patient._id,
-        providerId : provider._id
+      socket.to(providerSocketId).emit("confirmPayAttetionListener", {
+        patientId: patient._id,
+        providerId: provider._id
       });
     });
   });
 
-  
+
 
   //------------------------
 
   socket.on('startAttetion', async (provider, patient) => {
-    logger.info('startAttetion :' + socket.id + " - " + provider.id );
+    logger.info('startAttetion :' + socket.id + " - " + provider.id);
     await startCallProvider(provider.id, patient._id, (patientSocketId, providerSocketId) => {
       socket.join(provider.room)
       socket.to(patientSocketId).emit("startAttetionOfProvider", providerSocketId);
@@ -527,15 +526,15 @@ io.on('connection', (socket) => {
       socket.to(provider.socketId).emit("confirmReadyPatient", patient);
     });
   });
-  
+
   socket.on("chat_provider", data => {
-    console.log("chat_provider from: ", socket.id , data.from, data.text );
+    console.log("chat_provider from: ", socket.id, data.from, data.text);
     socket.emit("chat_provider", {
       text: data.text,
       from: data.from,
       to: data.to
     });
-    console.log("chat_provider to: ", socket.id , data.to, data.text );
+    console.log("chat_provider to: ", socket.id, data.to, data.text);
     socket.to(data.to).emit("chat_provider", {
       text: data.text,
       from: data.from,
@@ -543,283 +542,20 @@ io.on('connection', (socket) => {
     });
   });
   socket.on("endCall", data => {
-    console.log("endCall to: ", socket.id , data.to, data.text );
+    console.log("endCall to: ", socket.id, data.to, data.text);
     socket.to(data.to).emit("endCall", {
       text: data.text,
       from: data.from,
       to: data.to
     });
   });
-  socket.on('createRoom',data=>{
+  socket.on('createRoom', data => {
     socket.join(data);
   })
-  socket.on('createProviderRoom',data=>{
+  socket.on('createProviderRoom', data => {
     socket.join(data.providerId);
-    socket.emit('receiveProviderId',data.providerId);
-    socket.to(data.dni).emit('receiveProviderId',data.providerId);
+    socket.emit('receiveProviderId', data.providerId);
+    socket.to(data.dni).emit('receiveProviderId', data.providerId);
   })
 
 });
-/* 
- console.log("activeSockets:");
- console.log(activeSockets);
- console.log("mapuserProviderIdAndSocket:");
- console.log(mapuserProviderIdAndSocket);
- console.log("patientsByProviderId:");
- console.log(patientsByProviderId);
- console.log("--------------------------------------");
-
- socket.on('disconnect', () => {
-   if (connectedUser) {
-     console.log('user disconnected', connectedUser);
-     connectedUser.connection = false;
-     connectedUser.calling = true;
-     if(activeSockets[socket.id]){
-       delete  activeSockets[socket.id];
-       delete  mapuserProviderIdAndSocket[connectedUser.id];
-     }  
-     updateUserState(connectedUser).then(async result => {
-       console.log('disconnect updateUserState ',result);
-       await getUserData(result)
-     })
-   }
- });
- 
- socket.on('activate', (userProvider) => {    
-   if (userProvider) {
-     //console.log('user activate', userProvider);
-     userProvider.connection = true;
-     updateUserProviderState(userProvider).then(async result => {  
-       
-       mapuserProviderIdAndSocket[userProvider.id] = socket.id;
-       activeSockets[socket.id] = {};
-       activeSockets[socket.id]["provider"] = userProvider
-       activeSockets[socket.id]["patients"] = []
-
-       if(patientsByProviderId[userProvider.id] != undefined){
-         patientsByProviderId[userProvider.id].forEach(element=>{
-           activeSockets[socket.id]["patients"].push(element);
-           socket.to(element.socketPatient).emit("provider", {
-             userProvider
-           });
-         });
-       }    
-       //console.log('userProvider activate ', activeSockets ); 
-       //console.log('userProvider mapuserProviderIdAndSocket ', mapuserProviderIdAndSocket); 
-       //console.log('userProvider patientsByProviderId ', patientsByProviderId);      
-     })
-   }
- });
-
- socket.on('desactivate', (userProvider) => {
-   if (userProvider) {
-     //console.log('user desactivate', userProvider);
-     userProvider.connection = false;
-     updateUserProviderState(userProvider).then(async result => {
-       if(activeSockets[socket.id]){
-         delete activeSockets[socket.id];
-         delete mapuserProviderIdAndSocket[userProvider.id];
-       }        
-       //console.log('userProvider desactivate ',activeSockets , mapuserProviderIdAndSocket);
-     })
-   }
-
- });
-
- socket.on('addPatient', (data) => {    
-   if (data) {
-     userPatient = data.patient;
-     socketPatient = data.socketPatient;
-     userPatient.connection = true;
-
-     userProvider = data.userProvider;
-     socketId = mapuserProviderIdAndSocket[userProvider._id]
-     if(patientsByProviderId[userProvider._id] == undefined){
-       patientsByProviderId[userProvider._id] = []
-     }
-     let existsPatient = false
-     patientsByProviderId[userProvider._id].forEach(element => {
-       if(element.data["dni"] == userPatient["dni"]){
-         existsPatient = true;
-         element.socketPatient = socket.id;
-         element.data = userPatient;
-       }
-     });
-
-     if(!existsPatient){
-       patientsByProviderId[userProvider._id].push({
-             socketPatient: socketPatient,
-             data: userPatient
-           })
-     }
-
-     console.log("patientsByProviderId addPatient:");
-     console.log(patientsByProviderId);
-
-     if(activeSockets[socketId]){
-
-       let exists = false
-       activeSockets[socketId]["patients"].forEach(element => {
-         if(element.data["dni"] == userPatient["dni"]){
-           exists = true;
-         }
-       });
-       if(!exists){
-         activeSockets[socketId]["patients"].push({
-           socketPatient: socketPatient,
-           data: userPatient
-         });
-       }
-       updateUserState(userPatient).then(async result => {        
-         socket.to(socketId).emit("listPatients", {
-           list: activeSockets[socketId]["patients"]
-         });
-       });
-     }
-     
-   }
- });
-
- 
- socket.on("call-user", (data) => {
-   //console.log('call-user activate ', JSON.stringify(activeSockets) ); 
-   //console.log('call-user activate ', JSON.stringify(data) ); 
-  // console.log("call-user : ",socket.id);
-  // console.log("call-user : ",data.to);
-   //console.log("call-user call-made: ", data );
-   socket.to(data.to).emit("call-made", {
-     offer: data.offer,
-     socket: socket.id
-   });
- });
-
- socket.on("make-answer", data => {
-   //console.log('make-answer activate ', JSON.stringify(activeSockets) );
-  // console.log('make-answer activate ', JSON.stringify(data) );
-  // console.log("make-answer : ",socket.id);
-  // console.log("make-answer : ",data.to);
-   //console.log("make-answer make-answer: ",data);
-   socket.to(data.to).emit("answer-made", {
-     socket: socket.id,
-     answer: data.answer
-   });
- });
-
- /*  back
-
-
- socket.on('updateState', (userData) => {
-   if(userData) connectedUser = userData;
-   console.log('updateState ',userData);
-   connectedUser.connection = true;
-   updateUserState(userData).then(async result => {
-     console.log('updateState updateUserState ',result);
-     result["socketId"] = socket.id;
-     await addPatientToRoom(socket.id, result);
-     await getUserData(result)
-   });
- });
-
- socket.on('signOut', (userData) => {
-   if(userData)  userData.connection = false;
-   console.log('signOut ',userData);
-     updateUserState(userData).then( async result => {
-       console.log('signOut updateUserState ',result);
-       await getUserData(result)
-     })
- });
-
- socket.on('checkoutCompleted', (userData) => {
-   console.log('checkoutCompleted ',userData);
-    getUserData(userData);
- });
-
- socket.on('startCall', (data) => {
-   console.log('startCall :',data);
-   if(data.patient) {
-     data.patient.calling = true;
-     updateUserState(data.patient).then(async result => {
-       console.log('startCall updateUserState :',result);
-       await getUserDataOffer(result, data)
-       await createConsultEvent(result)
-     });
-
-   }
- });
-
- socket.on('sendOffertProvider', (data) => {
-   console.log('sendOffertProvider to startCallToProvider :',data);
-   io.emit('startCallToProvider', data)
-
- });
- 
-
- socket.on('endCall', (userData) => {
-   console.log('endCall ',userData);
-   if(userData) {
-     userData.calling = false; 
-     userData.connection = false;
-     updateUserState(userData).then(async result => {
-       console.log('endCall updateUserState ',result);
-       await getUserData(result)
-     })
-   }
- });
-
- //Activate or deactivate
- socket.on('changePatientRoomState', (userData) => {
-   console.log('changePatientRoomState ',userData);
-   updateUserState(userData).then(async result => {
-     console.log('changePatientRoomState updateUserState ',result);
-     await getUserData(result)
-   })
- });
-
- socket.on('amountToPay', (patientDataToPay) => {
-   console.log('amountToPay ',patientDataToPay);
-   updateUserState(patientDataToPay).then(async result => {
-     console.log('amountToPay updateUserState ',result);
-     await getUserData(result)
-   })
- })
-
- socket.on("message", (textMessage) => {
-   //socket.to(id).emit("message", socket.id, message);
- });*/
-
-/*
- */
-
-/*const addPatientToRoom = async (socketId, result) => {
-  let datauser = {
-    "socketId":socketId,
-    "dni":result["dni"],
-    "email":result["email"],
-    "phoneNumber":result["phoneNumber"],
-    "_id":result["_id"]
-  }
-  if(patients[result["room"]] && patients[result["room"]].length > 0){
-    let exists = false;
-    patients[result["room"]].forEach(element => {
-      if(element["dni"] == datauser["dni"]){
-        exists = true;
-      }
-    });
-    if(exists){
-      patients[result["room"]] = patients[result["room"]].push(datauser);
-    }       
-  } else {
-    patients[result["room"]] = [datauser]
-  }
-  console.log('updateState patients ',patients);
-};*/
-
-
-/*const updateUserState = async (userData) => {
-  try{
-    const id = userData && userData._id ? userData._id : userData.id;
-    return userData && userData.role ?  await User.findOneAndUpdate({_id: id}, userData, {new: true}) : await Patient.findOneAndUpdate({_id: id}, userData, {new: true});
-  } catch (e) {
-    console.log("updateUserState e :",e)
-  }
-};*/

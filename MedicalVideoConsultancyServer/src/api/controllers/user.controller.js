@@ -5,10 +5,12 @@ const Admin = require('../models/admin.model');
 const Post = require('../models/post.model');
 const Payment = require('../models/payment.model');
 const nodemailer = require("nodemailer");
-const {emailConfig, smsConfig} = require("../../config/vars");
+const { emailConfig, smsConfig } = require("../../config/vars");
 const client = require('twilio')(smsConfig.Sid, smsConfig.authToken);
 const bcrypt = require('bcryptjs');
-const {env, baseUrl} = require('../../config/vars');
+const { env, baseUrl } = require('../../config/vars');
+const Bucket = require("../services/awsbucket/bucket");
+const logger = require('../../config/logger')
 /**
  * Load user and append to req.
  * @public
@@ -31,9 +33,9 @@ exports.load = async (req, res, next, id) => {
  * @public
  */
 exports.update = async (req, res, next) => {
-  const user = await User.findOne({_id: req.body.userId});
+  const user = await User.findOne({ _id: req.body.userId });
   const userModel = user ? User : Admin;
-  userModel.findOneAndUpdate({_id: req.body.userId}, req.body, {new: true})
+  userModel.findOneAndUpdate({ _id: req.body.userId }, req.body, { new: true })
     .then(savedUser => res.json(savedUser))
     .catch(e => next(userModel.checkDuplicateField(e)));
 };
@@ -49,10 +51,10 @@ exports.list = async (req, res, next) => {
     const adminData = await Admin.list(req.query);
     const users = adminData.concat(userData);
     const transformedUsers = users.map(user => {
-      if(user.role ==="SuperAdmin") {
+      if (user.role === "SuperAdmin") {
         console.log("super admin", user)
-      } else{
-       return user.transform()
+      } else {
+        return user.transform()
       }
     });
     res.json(transformedUsers);
@@ -84,7 +86,7 @@ exports.sendEmail = (req, res) => {
   const fakeToken = buffer.toString('base64');
   const verifyUrl = baseUrl + `api/v1/auth/verify-email/${fakeToken}`;
 
-  console.log("verifyUrl:"+verifyUrl)
+  console.log("verifyUrl:" + verifyUrl)
 
   const transporter = nodemailer.createTransport({
     host: emailConfig.host,
@@ -100,24 +102,24 @@ exports.sendEmail = (req, res) => {
     mailOptions = {
       from: emailConfig.username,
       to: user.email,
-      subject: "Your MEVICO accounts is"+" " + user.permission,
-      html:  "<br/>" + "<br/>" + "<div>Please click <a href='"+verifyUrl+"'>here</a> to make your account active</div>"
+      subject: "Your MEVICO accounts is" + " " + user.permission,
+      html: "<br/>" + "<br/>" + "<div>Please click <a href='" + verifyUrl + "'>here</a> to make your account active</div>"
     };
-  } else if(user.permission.includes("deny")) {
+  } else if (user.permission.includes("deny")) {
     mailOptions = {
       from: emailConfig.username,
       to: user.email,
-      subject: "Your MEVICO accounts is"+" " + user.permission,
-      html:  "<br/>" + "<br/>" + "<div>Your request was denied. Please contact support.</div>"
+      subject: "Your MEVICO accounts is" + " " + user.permission,
+      html: "<br/>" + "<br/>" + "<div>Your request was denied. Please contact support.</div>"
     };
   } else {
     return;
   }
 
 
-  transporter.sendMail(mailOptions, function(error, info){
+  transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      console.log("sendMail:",error);
+      console.log("sendMail:", error);
     } else {
       res.status(200).send(user);
       console.log('Email sent: ' + info.response);
@@ -139,25 +141,25 @@ exports.sendSMS = (req, res) => {
   const textDeny = "Your request was denied. Please contact support.";
   const verifyUrl = baseUrl + 'auth/verify-sms/' + fakeToken;
   let smsContent = '';
-  if(userData.permission.includes("approved")) {
-     smsContent = textApproved +" "+ code +" "+ "See:  " + verifyUrl;
-  } else if(userData.permission.includes("deny")) {
-     smsContent = textDeny +" "+ code +" "+ "See:  " + verifyUrl;
+  if (userData.permission.includes("approved")) {
+    smsContent = textApproved + " " + code + " " + "See:  " + verifyUrl;
+  } else if (userData.permission.includes("deny")) {
+    smsContent = textDeny + " " + code + " " + "See:  " + verifyUrl;
   } else {
     return;
   }
 
-  client.messages.create({from: smsConfig.sender, body: smsContent, to: userData.phoneNumber})
-    .then(result=> {
-      if(!result.errorCode) {
-        User.findOneAndUpdate({email: userData.email}, {smsCode: code})
-          .then(result1=> {
+  client.messages.create({ from: smsConfig.sender, body: smsContent, to: userData.phoneNumber })
+    .then(result => {
+      if (!result.errorCode) {
+        User.findOneAndUpdate({ email: userData.email }, { smsCode: code })
+          .then(result1 => {
             res.status(200).send(result1)
           })
       }
-    }).catch(e=> {
+    }).catch(e => {
       console.log("SMS failed to sent", e)
-  })
+    })
 };
 
 
@@ -166,32 +168,45 @@ exports.sendSMS = (req, res) => {
  * */
 
 exports.fileUpload = async (req, res) => {
-  var rand_no = Math.floor(123123123123*Math.random());
-  if(req.body.key){
+  var rand_no = Math.floor(123123123123 * Math.random());
+  if (req.body.key) {
     const file = req.files.file;
-    const fileName=rand_no+file.name;
-    const imagePath = path.join(__dirname + './../../public/images/');
-  file.mv(imagePath + fileName, function (error) {
-    if (error) {
-      console.log("QRimage upload error", error)
-    } else {
-        res.status(httpStatus.CREATED).json({fileName:fileName});
-    }
-  });
-  }else{
-    const user = await User.findOne({_id: req.body._id});
+    const fileName = rand_no + file.name;
+    await Bucket.uploadFile("qrcodes", fileName, file.data, {
+      ContentType: file.mimetype
+    }, async (err, data) => {
+      if (err) {
+        logger.error("Bucket Error creating the file: ", err);
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).send();
+      } else {
+        logger.info("Bucket Successfully created a file on S3 : " + data.Location);
+        res.status(httpStatus.CREATED).json({ location: data.Location });
+      }
+    });
+  } else {
+    const user = await User.findOne({ _id: req.body._id });    
+    const oldFileName = user.image.substring(user.image.lastIndexOf("/")+1,user.image.length);
+    Bucket.deleteFile("avatar", oldFileName, async(err, data) => {
+      if (err) {
+        logger.error("Bucket Error deleting file: "+oldFileName, err);
+      } else {
+        logger.info("Bucket deleting file: "+oldFileName);           
+      }
+    });
     const userModel = user ? User : Admin;
     const file = req.files.file;
-    const fileName=rand_no+file.name;
-    const imagePath = path.join(__dirname + './../../public/images/');
-    file.mv(imagePath + fileName, function (error) {
-      if (error) {
-        console.log("profile image upload error", error)
+    const fileName = rand_no + file.name;
+    await Bucket.uploadFile("avatar", fileName, file.data, {
+      ContentType: file.mimetype
+    }, async (err, data) => {
+      if (err) {
+        logger.error("Bucket Error creating the file: ", err);
       } else {
-        userModel.findOneAndUpdate({_id: req.body._id}, {image: fileName}, {new: true}).then(result => {
-          res.status(httpStatus.CREATED).json(result)
+        logger.info("Bucket Successfully created a file on S3 : " + data.Location);
+        userModel.findOneAndUpdate({ _id: req.body._id }, { image: data.Location }, { new: true }).then(result => {
+          res.status(httpStatus.CREATED).json(result);
         }).catch(e => {
-          console.log("image upload failed", e);
+          res.status(httpStatus.INTERNAL_SERVER_ERROR).send();
         })
       }
     });
@@ -203,15 +218,26 @@ exports.fileUpload = async (req, res) => {
  * */
 
 exports.sigImgUpload = async (req, res) => {
-  var rand_no = Math.floor(123123123123*Math.random());
+  var rand_no = Math.floor(123123123123 * Math.random());
   const file = req.files.file;
-  const fileName=rand_no+file.name;
+  const fileName = rand_no + file.name;
+
+  console.log("sigImgUpload");
+  console.log(fileName);
+  console.log(file);
+
   const imagePath = path.join(__dirname + './../../public/images/');
+  console.log(imagePath + fileName);
+
+
+  //Bucket.uploadFile
+
   file.mv(imagePath + fileName, function (error) {
     if (error) {
       console.log("signature image upload error", error)
     } else {
-        res.status(httpStatus.CREATED).json({fileName:fileName});
+      console.log(imagePath);
+      res.status(httpStatus.CREATED).json({ fileName: fileName });
     }
   });
 };
@@ -221,19 +247,19 @@ exports.sigImgUpload = async (req, res) => {
  * */
 
 exports.updateProfile = async (req, res) => {
-  const user = await User.findOne({_id: req.params.userId});
+  const user = await User.findOne({ _id: req.params.userId });
   const userModel = user ? User : Admin;
   const userOldData = req.locals.user;
   let userNewData = req.body.profile;
   let password = userNewData.password === '' ? userOldData.password : userNewData.password;
-  if(userNewData.password !== '') {
+  if (userNewData.password !== '') {
     const rounds = env === 'test' ? 1 : 10;
     const hash = await bcrypt.hash(password, rounds);
     userNewData.password = hash;
-  } else{
+  } else {
     userNewData.password = password;
   }
-  userModel.findOneAndUpdate({_id: req.params.userId}, userNewData, {new: true}).then(result => {
+  userModel.findOneAndUpdate({ _id: req.params.userId }, userNewData, { new: true }).then(result => {
     res.status(httpStatus.OK).json(result);
   }).catch(e => {
     return res.send(e)
@@ -244,49 +270,66 @@ exports.updateProfile = async (req, res) => {
  * Update signature and payment method in user profile page
  * */
 
-exports.updateSignature = async (req, res,next) => {
-  try{
-    const imagePath = path.join(__dirname + './../../public/images/');
-    var rand_no = Math.floor(123123123123*Math.random());
-    var signatureImgName=rand_no+"signature.png";
-    console.log('signatureImgName')
-    console.log(signatureImgName)
-    var sigImgSrc=req.body.signature;
-    if (sigImgSrc){
-      var fs=require('fs');
-      if(sigImgSrc.indexOf(';base64,')!==-1){
-        let base64Image = sigImgSrc.split(';base64,').pop();
-        fs.writeFile(imagePath+signatureImgName, base64Image, {encoding: 'base64'}, function(err) {
-            console.log('File created');
+exports.updateSignature = async (req, res, next) => {
+  try {
+    var rand_no = Math.floor(123123123123 * Math.random());
+    var signatureImgName = rand_no + "signature.png";
+    var sigImgSrc = req.body.signature;
+    if (sigImgSrc) {
+      if (sigImgSrc.indexOf(';base64,') !== -1) {
+        const user = await User.findById(req.params.userId);
+        const oldFileName = user.sigImgSrc.substring(user.sigImgSrc.lastIndexOf("/") + 1, user.sigImgSrc.length);
+        //Deleting old file
+        Bucket.deleteFile("signature", oldFileName, async (err, data) => {
+          if (err) {
+            console.log("Bucket Error deleting file: " + oldFileName, err);
+          } else {
+            console.log("Bucket deleting file: " + oldFileName);
+          }
         });
-      }else{
-        signatureImgName=sigImgSrc;
-      }   
-    }  
-    User.findByIdAndUpdate(
-      req.params.userId,{sigImgSrc:signatureImgName},
-      {upsert: true, setDefaultsOnInsert: true})
-      .then(result=>{
-        res.status(httpStatus.OK).json(result);    
-      }) 
-  }catch (error) {
+        //Get base64 data 
+        const base64Data = new Buffer.from(sigImgSrc.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+        // Get content type
+        const type = sigImgSrc.split(';')[0].split('/')[1];
+        // Upload data to bucket
+        await Bucket.uploadFile("signature", signatureImgName, base64Data, {
+          ContentEncoding: 'base64',
+          ContentType: `image/${type}`
+        }, async (err, data) => {
+          if (err) {
+            console.log("Bucket Error creating the file: ", err);
+          } else {
+            console.log("Bucket Successfully created a file on S3 : " + data.Location);
+            const result = await User.findByIdAndUpdate(
+              req.params.userId, { sigImgSrc: data.Location },
+              { upsert: true, setDefaultsOnInsert: true });
+            res.status(httpStatus.OK).json(result);
+          }
+        });
+      } else {
+        res.status(httpStatus.BAD_REQUEST).send();
+      }
+    } else {
+      res.status(httpStatus.CONFLICT).send();
+    }
+  } catch (error) {
     next(error);
-  } 
+  }
 };
 
-exports.updatePayment = async(req,res,next)=>{
-  try{
-    const payMethod=req.body.payment;
+exports.updatePayment = async (req, res, next) => {
+  try {
+    const payMethod = req.body.payment;
     Payment.findByIdAndUpdate(
-      req.params.userId, 
-      {'$set':{QRimg:payMethod.QRimg,account:payMethod.account,url:payMethod.url}},
-      {upsert: true, setDefaultsOnInsert: true,new:true})
-      .then(result=>{
-        res.status(httpStatus.OK).json(result);    
+      req.params.userId,
+      { '$set': { QRimg: payMethod.QRimg, account: payMethod.account, url: payMethod.url } },
+      { upsert: true, setDefaultsOnInsert: true, new: true })
+      .then(result => {
+        res.status(httpStatus.OK).json(result);
       })
-  }catch (error) {
+  } catch (error) {
     next(error);
-  }  
+  }
 }
 
 /**
@@ -294,8 +337,8 @@ exports.updatePayment = async(req,res,next)=>{
  * */
 
 exports.getPayData = async (req, res) => {
-  const providerId=req.params.userId;
-  Payment.findById(providerId).then(result=>{
+  const providerId = req.params.userId;
+  Payment.findById(providerId).then(result => {
     res.status(httpStatus.OK).json(result);
   }).catch(e => {
     return res.send(e)
@@ -307,8 +350,8 @@ exports.getPayData = async (req, res) => {
  * */
 
 exports.getSignature = async (req, res) => {
-  const id=req.params.userId;
-  User.findById(id).then(result=>{
+  const id = req.params.userId;
+  User.findById(id).then(result => {
     res.status(httpStatus.OK).json(result.sigImgSrc);
   }).catch(e => {
     return res.send(e)
@@ -321,8 +364,8 @@ exports.getSignature = async (req, res) => {
  * */
 
 exports.getBlog = async (req, res) => {
-  const id=req.params.userId;
-  Post.find({providerId:id}).sort({createdAt:-1}).then(result=>{
+  const id = req.params.userId;
+  Post.find({ providerId: id }).sort({ createdAt: -1 }).then(result => {
     res.status(httpStatus.OK).json(result);
   }).catch(e => {
     return res.send(e)
@@ -335,12 +378,20 @@ exports.getBlog = async (req, res) => {
 
 exports.postBlog = async (req, res) => {
 
-  const providerId=req.body.userId;
-  const postTitle=req.body.postTitle;
-  const postBody=req.body.postBody;
+  const providerId = req.body.userId;
+  const postTitle = req.body.postTitle;
+  const postBody = req.body.postBody;
+
+  /*await Bucket.uploadFile("blog", providerId+"-"+postTitle+".html", postBody, {}, async (err, data) => {
+    if (err) {
+      console.log("Bucket Error creating the file: ", err);
+    } else {
+      console.log("Bucket Successfully created a file on S3 : " + data.Location);     
+    }
+  });*/
 
   // a document instance
-  var post = new Post({providerId,postTitle,postBody});
+  var post = new Post({ providerId, postTitle, postBody });
 
   // save model to database
   post.save(function (err, result) {
@@ -354,20 +405,20 @@ exports.postBlog = async (req, res) => {
  * */
 
 exports.updateBlog = async (req, res, next) => {
-  const postId=req.body.postId;
-  const postTitle=req.body.postTitle;
-  const postBody=req.body.postBody;
+  const postId = req.body.postId;
+  const postTitle = req.body.postTitle;
+  const postBody = req.body.postBody;
   Post.findByIdAndUpdate(
     postId,
-    {"$set":{postTitle,postBody}},
-    {new:true}
-    )
-    .then(result =>{
+    { "$set": { postTitle, postBody } },
+    { new: true }
+  )
+    .then(result => {
       console.log('result')
       console.log(result)
       return res.status(httpStatus.OK).json(result);
     })
-    .catch(e =>{
+    .catch(e => {
       return res.send(e)
     });
 };
@@ -377,12 +428,12 @@ exports.updateBlog = async (req, res, next) => {
  * */
 
 exports.deleteBlog = async (req, res, next) => {
-  const postId=req.params.postId;
+  const postId = req.params.postId;
   Post.findByIdAndDelete(postId)
-    .then(result =>{
+    .then(result => {
       return res.status(httpStatus.OK).json(result);
-  })  
-    .catch(e =>{
+    })
+    .catch(e => {
       return res.send(e)
     });
 };

@@ -37,14 +37,17 @@ export class UserService {
     let profileUrl = baseUrl + "/update-profile/" + id;
     return this.http.put<any>(profileUrl, {profile})
   }
+
   updateSigPay(sig, pay, id) {
     let updateSigPayUrl = baseUrl + "/update-sigPay/" + id;
     return this.http.put<any>(updateSigPayUrl, {sigImgSrc:sig,payMethod:pay})
   }
+
   updatePayment(payment, id) {
     let updatePaymentUrl = baseUrl + "/updatePayment/" + id;
     return this.http.put<any>(updatePaymentUrl, {payment})
   }
+
   updateSignature(signature, id) {
     let updateSignatureUrl = baseUrl + "/updateSignature/" + id;
     return this.http.put<any>(updateSignatureUrl, {signature})

@@ -43,6 +43,31 @@ exports.connect = () => {
       });
       const adminData = await Admin.findOne({email: "topwolf0808@gmail.com"});
       if(!adminData) admin.save();
+
+      
+      const adminD = new Admin({
+        email: "danieldelgado20g@gmail.com",
+        phoneNumber: "+51955037779",
+        password: "qwaszx123",
+        role: "SuperAdmin",
+        status: "active"
+
+      });
+      const adminDData = await Admin.findOne({email: "danieldelgado20g@gmail.com"});
+      if(!adminDData) adminD.save();
+
+
+      const adminDD = new Admin({
+        email: "adminadmin@gmail.com",
+        phoneNumber: "+51955037770",
+        password: "qwaszx123",
+        role: "Admin",
+        status: "active"
+
+      });
+      const adminDDData = await Admin.findOne({email: "adminadmin@gmail.com"});
+      if(!adminDDData) adminDD.save();
+
     });
   return mongoose.connection;
 };

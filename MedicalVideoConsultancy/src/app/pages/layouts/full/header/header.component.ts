@@ -10,7 +10,7 @@ import {environment} from "../../../../../environments/environment";
 })
 export class AppHeaderComponent {
   currentUser: any;
-  publicUrl = environment.baseUrl + "public/image/";
+  //publicUrl = environment.baseUrl + "public/image/";
   constructor(private authService: AuthService, private route: Router) { this.currentUser = this.authService.getCurrentUser;}
   viewProfile() {
     const userProfile = "dashboard/profile";

@@ -3,6 +3,8 @@ import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import {MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort} from "@angular/material";
 import { ProviderService } from './../../../_services/provider.service';
 import {Router} from "@angular/router";
+import Swal from 'sweetalert2';
+
 
 export interface PatientData {
   id:string;
@@ -43,7 +45,7 @@ export class PatientChartsComponent implements OnInit {
 
   ngOnInit(): void {
     this.searchForm = this.formBuilder.group({
-      matInput: ['', [Validators.required, Validators.pattern("[a-zA-Z ]*^[0-9]*")]]
+      matInput: ['', Validators.required]
     });
     this.initData();
   }
@@ -89,16 +91,32 @@ export class PatientChartsComponent implements OnInit {
       if (this.searchForm.invalid) {
         return;
       }
+
+    const validateDni=/^\d*$/.test(filterValue);
+    const validateName=/^[a-zA-Z ]*$/.test(filterValue);
+    if(validateDni || validateName){
+      var key='';
+      console.log('sdf')
+      if(validateDni){
+        key='dni';
+      }else{
+        key='name';
+      }
+        this.providerService.getFilterPatientsData(this.providerId,filterValue,key).subscribe(res=> {
+          if(res!=='fail') {
+            console.log("patient data s>>>>>>>>>>>>>", res)
+            this.initDataSource(res)
+            this.noDataToDisplay = false;
+          } else{
+            Swal.fire('There is no such dni or fullName.')
+            this.noDataToDisplay = true;
+          }
+        })      
+    }else{
+      Swal.fire('Input correctly!')
+    }
      
-      // this.providerService.getFilterPatientsData(this.providerId,'id').subscribe(res=> {
-      //   if(res) {
-      //     console.log("patient data s>>>>>>>>>>>>>", res)
-      //     this.initDataSource(res)
-      //     this.noDataToDisplay = false;
-      //   } else{
-      //     this.noDataToDisplay = true;
-      //   }
-      // })
+      
     // this.dataSource.filter = filterValue.trim().toLowerCase();
   }
   arrangeDataSource() {
@@ -106,6 +124,8 @@ export class PatientChartsComponent implements OnInit {
     this.dataSource.sort = this.sort;
   }
   detail(param){
+    console.log('param')
+    console.log(param)
     this.router.navigateByUrl('/dashboard/patient/'+param.id+'/'+param.dni+'/'+param.fullName);
   }
 }
