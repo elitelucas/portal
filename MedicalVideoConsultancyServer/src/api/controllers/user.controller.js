@@ -222,16 +222,22 @@ exports.sigImgUpload = async (req, res) => {
   const file = req.files.file;
   const fileName = rand_no + file.name;
 
-  console.log("sigImgUpload");
-  console.log(fileName);
-  console.log(file);
-
-  const imagePath = path.join(__dirname + './../../public/images/');
+  /*const imagePath = path.join(__dirname + './../../public/images/');
   console.log(imagePath + fileName);
+*/
 
-
-  //Bucket.uploadFile
-
+await Bucket.uploadFile("signature", fileName, file.data, {
+  ContentType: file.mimetype
+}, async (err, data) => {
+  if (err) {
+    logger.error("Bucket Error creating the file: ", err);
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send();
+  } else {
+    logger.info("Bucket Successfully created a file on S3 : " + data.Location);
+    res.status(httpStatus.CREATED).json({ location: data.Location });
+  }
+});
+/*
   file.mv(imagePath + fileName, function (error) {
     if (error) {
       console.log("signature image upload error", error)
@@ -239,7 +245,9 @@ exports.sigImgUpload = async (req, res) => {
       console.log(imagePath);
       res.status(httpStatus.CREATED).json({ fileName: fileName });
     }
-  });
+  });*/
+
+
 };
 
 /**
@@ -282,9 +290,9 @@ exports.updateSignature = async (req, res, next) => {
         //Deleting old file
         Bucket.deleteFile("signature", oldFileName, async (err, data) => {
           if (err) {
-            console.log("Bucket Error deleting file: " + oldFileName, err);
+            logger.error("Bucket Error deleting file: " + oldFileName, err);
           } else {
-            console.log("Bucket deleting file: " + oldFileName);
+            logger.info("Bucket deleting file: " + oldFileName);
           }
         });
         //Get base64 data 
@@ -297,9 +305,9 @@ exports.updateSignature = async (req, res, next) => {
           ContentType: `image/${type}`
         }, async (err, data) => {
           if (err) {
-            console.log("Bucket Error creating the file: ", err);
+            logger.error("Bucket Error creating the file: ", err);
           } else {
-            console.log("Bucket Successfully created a file on S3 : " + data.Location);
+            logger.info("Bucket Successfully created a file on S3 : " + data.Location);
             const result = await User.findByIdAndUpdate(
               req.params.userId, { sigImgSrc: data.Location },
               { upsert: true, setDefaultsOnInsert: true });
@@ -384,10 +392,10 @@ exports.postBlog = async (req, res) => {
 
   await Bucket.uploadFile("blog", providerId + "-" + postTitle + ".html", postBody, {}, async (err, data) => {
     if (err) {
-      console.log("Bucket Error creating the file: ", err);
+      logger.info("Bucket Error creating the file: ", err);
       res.status(httpStatus.INTERNAL_SERVER_ERROR).send();
     } else {
-      console.log("Bucket Successfully created a file on S3 : " + data.Location);
+      logger.info("Bucket Successfully created a file on S3 : " + data.Location);
       // a document instance
       const post = new Post({
         providerId: providerId,
@@ -415,17 +423,17 @@ exports.updateBlog = async (req, res, next) => {
 
   await Bucket.deleteFile("blog", postId + "-" + postTitle + ".html", async (err, data) => {
     if (err) {
-      console.log("Bucket Error deleting file: " + postId + "-" + postTitle + ".html", err);
+      logger.info("Bucket Error deleting file: " + postId + "-" + postTitle + ".html", err);
       res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
     } else {
-      console.log("Bucket deleting file: " + postId + "-" + postTitle + ".html");
+      logger.info("Bucket deleting file: " + postId + "-" + postTitle + ".html");
       const postBody = req.body.postBody;
       await Bucket.uploadFile("blog", postId + "-" + postTitle + ".html", postBody, {}, async (err, data) => {
         if (err) {
-          console.log("Bucket Error creating the file: ", err);
+          logger.error("Bucket Error creating the file: ", err);
           res.status(httpStatus.INTERNAL_SERVER_ERROR).send();
         } else {
-          console.log("Bucket Successfully created a file on S3 : " + data.Location);
+          logger.info("Bucket Successfully created a file on S3 : " + data.Location);
           // save model to database
           try {
             const postUpdate = await Post.findByIdAndUpdate(
@@ -440,6 +448,7 @@ exports.updateBlog = async (req, res, next) => {
             );
             res.status(httpStatus.OK).json(postUpdate);
           } catch (error) {
+            logger.error("Error ", error);
             res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
           }
         }
@@ -457,9 +466,9 @@ exports.deleteBlog = async (req, res, next) => {
   const postDelete = await Post.findById(postId);
   Bucket.deleteFile("blog", postId + "-" + postDelete.postTitle + ".html", async (err, data) => {
     if (err) {
-      console.log("Bucket Error deleting file: " + postId + "-" + postDelete.postTitle + ".html", err);
+      logger.info("Bucket Error deleting file: " + postId + "-" + postDelete.postTitle + ".html", err);
     } else {
-      console.log("Bucket deleting file: " + postId + "-" + postDelete.postTitle + ".html");
+      logger.info("Bucket deleting file: " + postId + "-" + postDelete.postTitle + ".html");
     }
   });
 
@@ -467,7 +476,7 @@ exports.deleteBlog = async (req, res, next) => {
     const postDelete = await Post.findByIdAndDelete(postId);
     res.status(httpStatus.OK).json(postDelete);
   } catch (error) {
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).send();
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
   }
 
 };
