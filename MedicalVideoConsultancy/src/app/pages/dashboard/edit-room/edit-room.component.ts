@@ -1,15 +1,15 @@
 import { baseUrl } from './../../../_services/auth.service';
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {AuthService} from "../../../_services/auth.service";
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AuthService } from "../../../_services/auth.service";
 
-import {FileUploadService} from "../../../_services/file-upload.service";
-import {ProviderService} from "../../../_services/provider.service";
-import {environment} from "../../../../environments/environment";
+import { FileUploadService } from "../../../_services/file-upload.service";
+import { ProviderService } from "../../../_services/provider.service";
+import { environment } from "../../../../environments/environment";
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { UserService } from './../../../_services/user.service';
 import { HttpParams, HttpClient } from "@angular/common/http";
 import { DataService } from "../../../_services/data.service";
-import Swal  from 'sweetalert2';
+import Swal from 'sweetalert2';
 import { ContentBlogService } from '../../../_services/content-blog.service';
 
 
@@ -22,91 +22,94 @@ import { ContentBlogService } from '../../../_services/content-blog.service';
 export class EditRoomComponent implements OnInit {
   public Editor = ClassicEditor;
 
-  postTitleArr=[];
-  postBodyArr=[];
-  literalArr=[];
-  kk=[];
-  tmpKk=[];
-  firstVal='';
+  postTitleArr = [];
+  postBodyArr = [];
+  literalArr = [];
+  kk = [];
+  tmpKk = [];
+  firstVal = '';
 
-  clickKey:boolean;
-  @ViewChild("imageUpload", {static: false}) imageUpload: ElementRef;
-  @ViewChild("videoUpload", {static: false}) videoUpload: ElementRef;
+  clickKey: boolean;
+  @ViewChild("imageUpload", { static: false }) imageUpload: ElementRef;
+  @ViewChild("videoUpload", { static: false }) videoUpload: ElementRef;
   currentUser: any;
   publicUrl = environment.baseUrl + 'public/';
 
   file = [];
   constructor(
     private authService: AuthService,
-    private providerService: ProviderService, 
+    private providerService: ProviderService,
     private fileUploadService: FileUploadService,
-    private userService:UserService,
-    private http:HttpClient,
-    private data:DataService,
+    private userService: UserService,
+    private http: HttpClient,
+    private data: DataService,
     private contentBlogService: ContentBlogService
-    ) {
+  ) {
   }
 
   ngOnInit(): void {
-    this.data.currentMessage.subscribe(message=>{
+    this.data.currentMessage.subscribe(message => {
       // this.firstVal='<img src="'+this.publicUrl+'image/first.png">';
     })
-    
+
     this.currentUser = this.authService.getCurrentUser;
     this.userService.getBlog(this.currentUser.id)
-    .subscribe(res=>{
-      this.literalArr=res;
-      this.tmpKk=[];
-      this.literalArr.forEach(item=>{
-        this.contentBlogService.getByUrl(item.url).subscribe(html=>{
-          item.postBody = html;
-        });        
-        this.tmpKk.push(true)
+      .subscribe(res => {
+        this.literalArr = res;
+        this.tmpKk = [];
+        this.literalArr.forEach(item => {
+          this.contentBlogService.getByUrl(item.url).subscribe(html => {
+            item.postBody = html;
+          });
+          this.tmpKk.push(true)
+        })
+        this.kk = this.tmpKk;
       })
-      this.kk=this.tmpKk;
-    })
   }
 
 
-  publishPost(title, body){ 
-    if(body.length>10000000){
+  publishPost(title, body) {
+    if (body.length > 10000000) {
       Swal.fire('Blog size limit is 5Mbyte')
       return;
     }
-    this.clickKey=true;
-    if(title===''|| body==='')
-    return
-    this.userService.postBlog({postTitle:title, postBody:body,userId:this.currentUser.id})
-    .subscribe(res=>{
-      this.receiveData(res)
-    })
+    this.clickKey = true;
+    if (title === '' || body === '')
+      return
+    this.userService.postBlog({ postTitle: title, postBody: body, userId: this.currentUser.id })
+      .subscribe(res => {
+        this.receiveData(res)
+      })
   }
 
-  edit(idx){
-    this.kk[idx]=false;
+  edit(idx) {
+    this.kk[idx] = false;
   }
 
-  editOk(title, body, postId,idx){
-    if(body.length>10000000){
+  editOk(title, body, postId, idx) {
+    if (body.length > 10000000) {
       Swal.fire('Blog size limit is 5Mbyte')
       return;
     }
-    this.userService.updateBlog({postId,postTitle:title, postBody:body})
-    .subscribe(res=>{
-      this.literalArr.splice(idx,1,res);
-      this.tmpKk=[];
-      this.literalArr.forEach(item=>{
-      this.tmpKk.push(true)
-    })
-    this.kk=this.tmpKk;
-    })
+    this.userService.updateBlog({ postId, postTitle: title, postBody: body })
+      .subscribe(res => {
+        this.contentBlogService.getByUrl(res.url).subscribe(html => {
+          res.postBody = html;
+        });
+        this.literalArr.splice(idx, 1, res);
+        this.tmpKk = [];
+        this.literalArr.forEach(item => {
+          this.tmpKk.push(true)
+        })
+        this.kk = this.tmpKk;
+      })
   }
 
-  editCancel(idx){
-    this.kk[idx]=true;
+  editCancel(idx) {
+    this.kk[idx] = true;
   }
 
-  delete(postId,idx){
+  delete(postId, idx) {
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -118,26 +121,29 @@ export class EditRoomComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.userService.deleteBlog(postId)
-        .subscribe(res=>{
-          this.literalArr.splice(idx,1);
-          Swal.fire(
-            'Deleted!',
-            'Your file has been deleted.',
-            'success'
-          )
-        })
+          .subscribe(res => {
+            this.literalArr.splice(idx, 1);
+            Swal.fire(
+              'Deleted!',
+              'Your file has been deleted.',
+              'success'
+            )
+          })
       }
     })
-    
+
   }
 
-  receiveData(res){
+  receiveData(res) {
+    this.contentBlogService.getByUrl(res.url).subscribe(html => {
+      res.postBody = html;
+    });
     this.literalArr.push(res);
-    this.tmpKk=[];
-    this.literalArr.forEach(item=>{
+    this.tmpKk = [];
+    this.literalArr.forEach(item => {
       this.tmpKk.push(true)
     })
-    this.kk=this.tmpKk;
+    this.kk = this.tmpKk;
   }
 
   onReady(eventData) {
@@ -146,7 +152,7 @@ export class EditRoomComponent implements OnInit {
     };
   }
 }
- 
+
 export class UploadAdapter {
   private loader;
   constructor(loader: any) {
@@ -166,12 +172,12 @@ export class UploadAdapter {
         let image = myReader.result;
         resolve({ default: "data:image/png;base64," + image });
       }
-      if(!file){
+      if (!file) {
         myReader.readAsDataURL(file);
       }
     });
     return imagePromise;
   }
-  ngAfterViewInit(){
+  ngAfterViewInit() {
   }
 }
