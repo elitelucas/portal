@@ -25,12 +25,20 @@ export class MeetRoomService {
   constructor() {
   }
 
-  public async init() {
+  public async startLocalMediaVideo() {
     this.localStream = await window.navigator.mediaDevices.getUserMedia({
       video: true,
       audio: false
     });
     this.localVideo.nativeElement.srcObject = this.localStream;
+  }
+
+  public setLocalElement(lv) {
+    this.localVideo = lv;
+  }
+
+  public setRemoteElement(rv) {
+    this.remoteVideo = rv;
   }
 
   public connect() {
@@ -91,17 +99,6 @@ export class MeetRoomService {
     })
   }
 
-  public setLocalElement(lv) {
-    this.localVideo = lv;
-    /*console.log("setLocalElement");
-    console.log(this.localVideo);*/
-  }
-
-  public setRemoteElement(rv) {
-    this.remoteVideo = rv;
-    /*console.log("setRemoteElement");
-    console.log(this.remoteVideo);*/
-  }
 
   public confirmConnect(userProvider) {
     userProvider.peerId = this.myPeerId;
@@ -346,15 +343,15 @@ export class MeetRoomService {
     });
   }
 
-  public createRoom(data) {
+  /*public createRoom(data) {
     this.trace("createRoom :", data);
     this.socket.emit('createRoom', data);
-  }
+  }*/
 
-  public createProviderRoom(data) {
+  /*public createProviderRoom(data) {
     this.trace("createProviderRoom :", data);
     this.socket.emit('createProviderRoom', data);
-  }
+  }*/
   public receiveProvideId() {
     this.trace("receiveProviderId :");
     return Observable.create((observer) => {

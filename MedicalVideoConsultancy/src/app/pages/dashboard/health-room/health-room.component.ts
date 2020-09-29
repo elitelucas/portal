@@ -51,7 +51,7 @@ export class HealthRoomComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const providerInfo=JSON.parse(localStorage.getItem('provider_data'));
+    const providerInfo = JSON.parse(localStorage.getItem('provider_data'));
     this.start();
     this.roomChatForm = this.formBuilder.group({
       text: ['', Validators.required]
@@ -65,34 +65,40 @@ export class HealthRoomComponent implements OnInit {
   async ngAfterViewInit() {
     this.meetRoomService.setLocalElement(this.localVideo);
     this.meetRoomService.setRemoteElement(this.remoteVideo);
-    this.meetRoomService.init();
+    this.meetRoomService.startLocalMediaVideo();
 
-    this.meetRoomService.connect().subscribe(async (peerId) => {
+    /*this.meetRoomService.connect().subscribe(async (peerId) => {
       console.log("peerId");
       console.log(peerId);
       this.meetRoomService.confirmConnect(this.currentUser);
       this.meetRoomService.updatePatientState().subscribe(async (pt: Patient) => {
         this.patient = pt;
-        /*console.log("this.patient provider----------------------")
-        console.log(this.patient)*/
+        console.log("this.patient provider----------------------")
+        console.log(this.patient)
         this.meetRoomService.callPatient(this.patient);
       });
     });
+
     this.meetRoomService.receiveEndCall()
     .subscribe(text=>{
       if(text==='acceptEnd'){
         this._router.navigateByUrl("/dashboard/health-provider")
       }
-    })
+    })*/
+
+  }
+
+  async startVideoCall(){
+
   }
 
   async start() {
-    this.ngZone.runOutsideAngular(() => {
-      this.meetRoomService.startAttetion(this.currentUser, this.patient);
+    /*this.ngZone.runOutsideAngular(() => {
+      //this.meetRoomService.startAttetion(this.currentUser, this.patient);
       this.providerService.getPatient(this.patient.dni, 'dni').subscribe(async (pt: Patient) => {
         this.patient = pt;
       });
-    });
+    });*/
     this.meetRoomService.recivetext().subscribe((text) => {
       const p = this.renderer.createElement('p');
       const d = this.renderer.createText(text);
@@ -107,6 +113,7 @@ export class HealthRoomComponent implements OnInit {
     const text = this.f.text.value;
     this.meetRoomService.sendtext(this.patient.socketId, "Provider: " + text);
   }
+
   changeBackground(kk){
     this.key.Prescription=false;
     this.key.Consults=false;
@@ -114,6 +121,7 @@ export class HealthRoomComponent implements OnInit {
     this.key.Charts=false;
     this.key[kk]=true;
   }
+
   public endCall(){
     this.meetRoomService.endCall(this.patient.socketId,'endCall');
   }

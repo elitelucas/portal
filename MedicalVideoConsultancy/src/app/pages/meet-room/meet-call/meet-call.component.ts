@@ -48,15 +48,15 @@ export class MeetCallComponent implements OnInit {
   async ngAfterViewInit() {
     this.meetRoomService.setLocalElement(this.localVideo);
     this.meetRoomService.setRemoteElement(this.remoteVideo);
-    this.meetRoomService.init();
-    this.meetRoomService.connect().subscribe(async (peerId) => {
+    this.meetRoomService.startLocalMediaVideo();
+    /*this.meetRoomService.connect().subscribe(async (peerId) => {
       console.log("peerId");
       console.log(peerId);
       await timer(200).toPromise();
       this.meetRoomService.confirmConnectPatient(this.patient);
       this.meetRoomService.waitCallComplete().subscribe(async (data) => {
       });
-    });
+    });*/
   }
 
   async loadPatient() {
@@ -79,6 +79,7 @@ export class MeetCallComponent implements OnInit {
     //console.log(text)
     this.meetRoomService.sendtext(this.providerSocketId, "Patient: " + text);
   }
+  
   uploadFile(file) {
     const providerId=JSON.parse(localStorage.getItem('patient_dni'));
     const formData = new FormData();

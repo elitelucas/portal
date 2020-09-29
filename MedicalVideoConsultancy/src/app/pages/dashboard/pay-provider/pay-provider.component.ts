@@ -27,6 +27,7 @@ export class PayProviderComponent implements OnInit {
   QRimgKey=[];
   accountKey=false;
   urlKey=false;
+  patient:any;
   dniPatient:any;
   patientSocketId:string;
   confirmKey:boolean=false;
@@ -37,11 +38,14 @@ export class PayProviderComponent implements OnInit {
     private authService:AuthService,
     private meetRoomService:MeetRoomService,
     private _route:Router,
-    private providerService:ProviderService
+    private providerService:ProviderService,
     ) {
     this.currentUser = this.authService.getCurrentUser; 
-    this.dniPatient = localStorage.getItem('patient_dni');
-
+    //this.dniPatient = localStorage.getItem('patient_dni');
+    this.activatedroute.paramMap.subscribe(async (params) => {
+      this.patient = JSON.parse(localStorage.getItem(params.get("patientId")));
+      this.dniPatient = this.patient.dni;
+    });
     this.activatedroute.params.subscribe(data => {
       this.data=data;
     })
