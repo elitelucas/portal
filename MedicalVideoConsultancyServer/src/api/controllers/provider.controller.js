@@ -705,8 +705,7 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
         expiration_year: cardData.expiration_year,
         email: cardData.email,
       });
-      console.log("provider.customerId");
-      console.log(provider.customerId);
+
       if(provider.customerId == undefined){
         let customerCulqi = await culqi.customers.createCustomer({
           first_name: provider.firstName,
@@ -719,12 +718,12 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
         });
         provider.customerId = customerCulqi.id;
         provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
-        console.log("token.id");
-        console.log(token.id);
+
         let cardCulqi = await culqi.cards.createCard({
           customer_id: provider.customerId,
           token_id: token.id
         });
+        
         cardExists = await new Card({
           description: cardData.description,
           cardId: cardCulqi.id,
