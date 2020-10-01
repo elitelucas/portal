@@ -708,7 +708,6 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
       console.log("provider.customerId");
       console.log(provider.customerId);
       if(provider.customerId == undefined){
-        //let password = userNewData.password === '' ? userOldData.password : userNewData.password;
         let customerCulqi = await culqi.customers.createCustomer({
           first_name: provider.firstName,
           last_name: provider.lastName,
@@ -739,7 +738,7 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
 
     const subcriptionData = req.body.subcription;
     let userProvider = await User.find({ providerId: providerId });
-    
+
     if(userProvider != undefined){
       const planSubcription = await Plan.findById(subcriptionData.id);     
       let subscriptionCulqi = await culqi.subscriptions.createSubscription({
