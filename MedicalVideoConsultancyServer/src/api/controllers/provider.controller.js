@@ -11,6 +11,7 @@ const Transaction = require('../models/transaction.model');
 const Consult = require('../models/consult.model');
 const Chart = require('../models/chart.model');
 const Paysubcription = require('../models/paysubcription.model');
+const Plan = require('../models/plan.model');
 const Card = require('../models/card.model');
 
 const { date } = require('joi');
@@ -689,13 +690,14 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     const providerId = req.body.providerId;
     const cardData = req.body.card;
     const cardExists = await Card.findOne({ card_number: cardData.card_number });
+    const culqi = new Culqi({
+      privateKey: culqiConfing.private_key,
+      pciCompliant: true,
+      publicKey: culqiConfing.private_key,
+    });
+
     if (cardExists == undefined) {
       let provider = await User.findOne({ _id: providerId });
-      const culqi = new Culqi({
-        privateKey: culqiConfing.private_key,
-        pciCompliant: true,
-        publicKey: culqiConfing.private_key,
-      });
       const token = await culqi.tokens.createToken({
         card_number: cardData.card_number,
         cvv: cardData.cvv,
@@ -703,44 +705,48 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
         expiration_year: cardData.expiration_year,
         email: cardData.email,
       });
+
       if(provider.customerId == undefined){
         let customerCulqi = await culqi.customers.createCustomer({
           first_name: provider.firstName,
           last_name: provider.lastName,
           email: provider.email,
-          address: provider.address,
-          address_city: provider.address_city,
-          country_code: provider.country_code,
-          phone_number: provider.phoneNumber,
+          address: provider.address == undefined ? cardData.address : provider.address,
+          address_city: provider.address_city == undefined ? cardData.address_city : provider.address_city ,
+          country_code: provider.country_code == undefined ? cardData.country_code : provider.country_code,
+          phone_number: provider.phoneNumber == undefined ? cardData.phoneNumber : provider.phoneNumber,
         });
         provider.customerId = customerCulqi.id;
         provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
+
+        let cardCulqi = await culqi.cards.createCard({
+          customer_id: provider.customerId,
+          token_id: token.id
+        });
+        
+        cardExists = await new Card({
+          description: cardData.description,
+          cardId: cardCulqi.id,
+          card_number: cardData.card_number,
+          providerId: providerId,
+          createDate: new Date(),
+          status: "active",
+        }).save();
       }
-      let cardCulqi = await culqi.cards.createCard({
-        customer_id: provider.customerId,
-        token_id: token.id
-      });
-      cardExists = await new Card({
-        description: cardData.description,
-        cardId: cardCulqi.id,
-        card_number: cardData.card_number,
-        providerId: providerId,
-        createDate: new Date(),
-        status: "active",
-      }).save();
     }
 
     const subcriptionData = req.body.subcription;
     let userProvider = await User.find({ providerId: providerId });
+
     if(userProvider != undefined){
-      const planSubcription = await Plan.find({ providerId: subcriptionData.planId });     
+      const planSubcription = await Plan.findById(subcriptionData.id);     
       let subscriptionCulqi = await culqi.subscriptions.createSubscription({
-        card_id: cardExists.id,
-        plan_id: planSubcription.id
+        card_id: cardExists.cardId,
+        plan_id: planSubcription.planId
       });  
       userProvider.subcriptionId = subscriptionCulqi.id;
       userProvider.subcriptionStatus = true
-      userProvider = await User.findOneAndUpdate({_id: subcriptionData.providerId}, userProvider, {new: false});
+      userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});
     
       res.status(httpStatus.OK).send()
     }else{      
