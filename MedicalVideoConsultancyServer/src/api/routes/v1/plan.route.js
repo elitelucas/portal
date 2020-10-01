@@ -27,7 +27,7 @@ router
    *
    * @apiError (Unauthorized 401)  Unauthorized  Only authenticated users can access the data
    */
-  .get(authorize(ADMIN), controller.list)
+  .get(/*authorize(ADMIN),*/ controller.list)
   /**
    * @api {post} v1/plans create plan
    */
@@ -36,7 +36,7 @@ router
 router
   .route('/:planId')
   //** */
-  .get(authorize(ADMIN),  controller.get)
+  .get(/*authorize(ADMIN),*/  controller.get)
   /**
    * @api {patch} v1/users/:id Delete User
    * @apiDescription Delete a user
@@ -53,7 +53,7 @@ router
    * @apiError (Forbidden 403)    Forbidden     Only user with same id or admins can delete the data
    * @apiError (Not Found 404)    NotFound      User does not exist
    */
-  .delete(authorize(ADMIN), controller.remove);
+  .delete(/*authorize(ADMIN),*/ controller.remove);
 
 
 module.exports = router;

@@ -135,6 +135,10 @@ const userSchema = new mongoose.Schema({
   subcriptionId: {
     type: String
   },
+  subcriptionStatus: {
+    type: Boolean,
+    default: false
+  },
 }, {
   timestamps: true,
 });

@@ -114,8 +114,6 @@ export class PayPatientComponent implements OnInit {
     this.providerService.checkRoomExist(this.roomName).subscribe(result => {
       if (result) {
         this.providerData = result;
-        console.log('this.providerData')
-        console.log(this.providerData)
         this.getRoomDataById(this.providerData._id);
         this.meetRoomService.patientEnteredInPayPatient(this.providerData._id,this.dniPatient);
 
