@@ -381,13 +381,12 @@ io.on('connection', (socket) => {
   socket.on('confirmConnect', async (userProvider) => {
     if (userProvider) {
       logger.info('confirmConnect :' + socket.id + ' - ' + userProvider.id);
-
       //console.log("confirmConnect ", userProvider)
-
-
+      //console.log("create room :", userProvider.id + "-" + userProvider.room)
       await confirmConnectProvider(userProvider.id, socket.id, userProvider);
     }
   });
+  
 
   socket.on('sendUploadFile', async (uploadFileName, key, othersId) => {
     var sender = {};
@@ -467,6 +466,7 @@ io.on('connection', (socket) => {
       logger.info('confirmConnectPatient :' + socket.id + ' - ' + patient._id);
       await connectConfirmPatient(patient._id, socket.id, patient);
       await countPatientRoom(patient.room, (socketId, patients) => {
+        logger.info('countPatientRoom :' + patients.length);
         socket.to(socketId).emit("countPatientRoom", patients.length);
         socket.to(socketId).emit("updatePatientState", patient);
       });
@@ -509,25 +509,48 @@ io.on('connection', (socket) => {
   });
 
 
+  socket.on('preparateVideoCallFormProvider', async (userProvider) => {
+    if (userProvider) {
+      await updateUserProviderState(userProvider);
+      const id = userProvider._id ? userProvider._id : userProvider.id;
+      logger.info('preparateVideoCall :' + socket.id + " - join room :"+ id + "-" + userProvider.room)
+      socket.join(id + "-" + userProvider.room);
+    }
+  });
+
+  socket.on('preparateVideoCallFormPatient', async (data) => {
+    if (data.provider) {
+      data.patient.socketId = socket.id;
+      await updateUserPatientState(data.patient)
+      const id = data.provider._id ? data.provider._id : data.provider.id;
+      logger.info('preparateVideoCall :' + socket.id + " - join room :"+ id + "-" + data.provider.room)
+      socket.join(id + "-" + data.provider.room);
+      socket.to(id + "-" + data.provider.room).broadcast.emit('patient_connected', data.patient);
+    }
+  });
+
+  socket.on('start_call_patient', async (data) => {
+    console.log(data);
+  });
 
   //------------------------
 
-  socket.on('startAttetion', async (provider, patient) => {
+  /*socket.on('startAttetion', async (provider, patient) => {
     logger.info('startAttetion :' + socket.id + " - " + provider.id);
     await startCallProvider(provider.id, patient._id, (patientSocketId, providerSocketId) => {
       socket.join(provider.room)
       socket.to(patientSocketId).emit("startAttetionOfProvider", providerSocketId);
     });
-  });
+  });*/
 
-  socket.on('confirmReadyPatient', async (patient) => {
+  /*', async (patient) => {
     logger.info('confirmReadyPatient :' + socket.id + " - " + patient._id);
     notifyProvider(patient, (provider) => {
       socket.join(provider.room)
       logger.info("confirmReadyPatient " + provider._id + " - " + provider.socketId);
       socket.to(provider.socketId).emit("confirmReadyPatient", patient);
     });
-  });
+  });*/
 
   socket.on("chat_provider", data => {
     console.log("chat_provider from: ", socket.id, data.from, data.text);
@@ -544,7 +567,7 @@ io.on('connection', (socket) => {
     });
   });
   socket.on("endCall", data => {
-    console.log("endCall to: ", socket.id, data.to, data.text);
+    console.log("endCall to: ", socket.id, data);
     socket.to(data.to).emit("endCall", {
       text: data.text,
       from: data.from,

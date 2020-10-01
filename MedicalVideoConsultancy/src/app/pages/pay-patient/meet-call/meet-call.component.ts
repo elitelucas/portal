@@ -57,20 +57,33 @@ export class MeetCallComponent implements OnInit {
     this.providerService.checkRoomExist(this.roomName).subscribe(result => {
       if (result) {
         this.providerData = result;
-        this.providerSocketId = this.providerData.socketId
+        this.providerSocketId = this.providerData.socketId;
       }
+    });    
+
+    this.providerService.getPatient(this.dniPatient, 'dni').subscribe(async (patient: Patient) => {
+      if (patient) {
+        this.patient = patient;
+        this.meetRoomService.confirmConnectPatient(this.patient);
+      };
     });
-    await this.loadPatient();
   }
 
   async ngAfterViewInit() {
     this.meetRoomService.setLocalElement(this.localVideo);
     this.meetRoomService.setRemoteElement(this.remoteVideo);
-    this.meetRoomService.init();
+    this.meetRoomService.startLocalMediaVideo();
+    await timer(2000).toPromise();
+    this.meetRoomService.connect().subscribe(peerId=>{
+      console.log("peerId");
+      console.log(peerId);
+      this.patient.peerId = peerId;
+      this.meetRoomService.preparateVideoCallFormPatient(this.providerData, this.patient);
+    });
+
     /*this.meetRoomService.connect().subscribe(async (peerId) => {
       console.log("peerId");
       console.log(peerId);
-      await timer(200).toPromise();
       this.meetRoomService.confirmConnectPatient(this.patient);
       this.meetRoomService.waitCallComplete().subscribe(async (data) => {
         console.log(data)
@@ -84,21 +97,12 @@ export class MeetCallComponent implements OnInit {
       /*console.log('uploadFileName')
       console.log(uploadFileName)*/
     })
-    /*this.meetRoomService.receiveEndCall()
+    this.meetRoomService.receiveEndCall()
     .subscribe(text=>{
       if(text==='endCall'){
         this.meetRoomService.endCall(this.providerSocketId,'acceptEnd');
         this._router.navigateByUrl("/home")
       }
-    })*/
-  }
-
-  async loadPatient() {
-
-    this.providerService.getPatient(this.dniPatient, 'dni').subscribe(async (patient: Patient) => {
-      if (patient) {
-        this.patient = patient;
-      };
     });
     this.meetRoomService.recivetext().subscribe((text) => {
       const p = this.renderer.createElement('p');

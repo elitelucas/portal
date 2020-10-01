@@ -1,4 +1,4 @@
-import { Consult } from './../../../_model/user';
+import { Consult, Provider } from './../../../_model/user';
 import { Component, OnInit, ViewChild, ElementRef, NgZone, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MeetRoomService } from '../../../_services/meet-room.service';
@@ -22,7 +22,7 @@ export class HealthRoomComponent implements OnInit {
   @ViewChild('chatText') public chatText: ElementRef;
 
   patient: Patient;
-  currentUser: User;
+  currentUser: Provider;
   consultId:any;
   key={
     Prescription:true,
@@ -51,21 +51,29 @@ export class HealthRoomComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const providerInfo = JSON.parse(localStorage.getItem('provider_data'));
     this.start();
     this.roomChatForm = this.formBuilder.group({
       text: ['', Validators.required]
     });
-    this.meetRoomService.confirmPatientCall().subscribe(data=>{
+    
+    /*this.meetRoomService.confirmPatientCall().subscribe(data=>{
       console.log('confirmPatientCall')
       console.log(data)
-    })
+    })*/
+
   }
 
   async ngAfterViewInit() {
     this.meetRoomService.setLocalElement(this.localVideo);
     this.meetRoomService.setRemoteElement(this.remoteVideo);
     this.meetRoomService.startLocalMediaVideo();
+    this.meetRoomService.connect().subscribe(peerId=>{
+      this.currentUser.peerId = peerId;
+      this.meetRoomService.preparateVideoCallFormProvider(this.currentUser);
+    });
+    this.meetRoomService.patientConnected().subscribe(patient=>{
+      this.patient = patient;    
+    });
 
     /*this.meetRoomService.connect().subscribe(async (peerId) => {
       console.log("peerId");
@@ -78,18 +86,20 @@ export class HealthRoomComponent implements OnInit {
         this.meetRoomService.callPatient(this.patient);
       });
     });
-
+*/
     this.meetRoomService.receiveEndCall()
     .subscribe(text=>{
       if(text==='acceptEnd'){
         this._router.navigateByUrl("/dashboard/health-provider")
       }
-    })*/
+    })
 
   }
 
   async startVideoCall(){
-
+    this.meetRoomService.callPatient(this.patient);
+    this.meetRoomService.waitCallComplete().subscribe(text=>{      
+    })
   }
 
   async start() {

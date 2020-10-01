@@ -17,7 +17,6 @@ export class MeetRoomService {
   private localVideo = null;
   private localStream = null;
   private remoteVideo = null;
-  private remoteStream = null;
 
   public myPeer = null;
   public myPeerId = null;
@@ -41,16 +40,6 @@ export class MeetRoomService {
     this.remoteVideo = rv;
   }
 
-  public connect() {
-    return Observable.create((observer) => {
-      this.myPeer = new Peer(undefined, {
-        host: environment.peerServerHost,
-        port: environment.peerServerPort,
-        path: environment.peerServerPath,
-        debug: 3,
-        secure: true,
-        config: {
-          'iceServers': [
                 /*{
                     url: 'stun:stun.nemiac.com:5349',
                     credential: '12345', 
@@ -60,7 +49,17 @@ export class MeetRoomService {
                     url: 'turn:turn.nemiac.com:5349',
                     credential: 'guest', 
                     username: 'somepassword'
-                }*//**/,
+                }*//**/
+  public connect() {
+    return Observable.create((observer) => {
+      let config = {
+        host: environment.peerServerHost,
+        port: environment.peerServerPort,
+        path: environment.peerServerPath,
+        debug: 3,
+        secure: true,
+        config: {
+          'iceServers': [
             { url: 'stun:stun1.l.google.com:19302' },
             { url: 'stun:stun2.l.google.com:19302' },
             { url: 'stun:stun3.l.google.com:19302' },
@@ -72,24 +71,69 @@ export class MeetRoomService {
             }
           ]
         }
-      });
+      };
+      console.log("config");
+      console.log(config);
+      this.myPeer = new Peer(undefined, config);
 
       this.myPeer.on('open', () => {
         this.myPeerId = this.myPeer.id;
         observer.next(this.myPeerId)
       });
 
-      this.myPeer.on('disconnected', () => {
+      this.myPeer.on('call', call => {
+        console.log("call")
+        call.answer(this.localStream)
+        const video = document.createElement('video')
+        call.on('stream', userVideoStream => {
+          //addVideoStream(video, userVideoStream)
+          this.remoteVideo.nativeElement.srcObject = userVideoStream;
+        })
+      })
+
+      /*this.myPeer.on('disconnected', () => {
         console.log('Connection lost. Please reconnect');
         this.myPeer.reconnect();
-      });
+      });*/
 
       this.myPeer.on('error', (err) => {
+        console.log("err")
         console.log(err);
       });
 
     })
   }
+
+
+
+  callPatient(patient) {
+    console.log("callPatient ", patient.peerId)
+    /*console.log("callPatient this.localStream", this.localStream)*/
+    var call = this.myPeer.call(patient.peerId, this.localStream);
+    //console.log("stream 2")
+    call.on('stream', (remoteStream) => {
+      //console.log("stream 3 " , remoteStream)
+      this.remoteVideo.nativeElement.srcObject = remoteStream;
+    });
+  }
+  
+    waitCallComplete() {
+      console.log("waitCallComplete")
+      return Observable.create((observer) => {
+        this.myPeer.on('call', (call) => {
+          console.log("call")
+          console.log("call this.localStream", this.localStream)
+          call.answer(this.localStream);
+          //console.log("answer localStream")
+          call.on('stream', (remoteStream) => {
+            //console.log("stream : " , remoteStream)
+            this.remoteVideo.nativeElement.srcObject = remoteStream;
+          });
+          //console.log("stream 22")
+          observer.next(call)
+        });
+      });
+    }
 
   public updatePatientState() {
     return Observable.create((observer) => {
@@ -101,14 +145,12 @@ export class MeetRoomService {
 
 
   public confirmConnect(userProvider) {
-    userProvider.peerId = this.myPeerId;
     /* console.log("confirmConnect:", userProvider);
      console.log("confirmConnect:", this.myPeerId);*/
     this.socket.emit('confirmConnect', userProvider);
   }
 
   public confirmConnectPatient(patient: Patient) {
-    patient.peerId = this.myPeerId;
     //console.log("------------confirmConnectPatient:", patient);
     this.socket.emit('confirmConnectPatient', patient);
   }
@@ -252,6 +294,14 @@ export class MeetRoomService {
     })
   }
 
+  public startCallPatient(provider, patient) {
+    this.socket.emit("start_call_patient", {
+      providerId: provider.id,
+      peerId: provider.peerId,
+      patientId: patient._id,
+    });
+  }
+
   public sendtext(to, text) {
     this.socket.emit("chat_provider", {
       text: text,
@@ -286,62 +336,55 @@ export class MeetRoomService {
   }
 
 
-  public startAttetion(provider, patient) {
-    this.trace("startAttetion :", provider, patient);
-    this.socket.emit('startAttetion', provider, patient);
-  }
+  /* public startAttetion(provider, patient) {
+     this.trace("startAttetion :", provider, patient);
+     this.socket.emit('startAttetion', provider, patient);
+   }*/
 
-  public startAttetionOfProvider() {
+  /*public startAttetionOfProvider() {
     return Observable.create((observer) => {
       this.socket.on('startAttetionOfProvider', (providerSocket) => {
         observer.next(providerSocket)
       });
     });
+  }*/
+
+
+  preparateVideoCallFormProvider(provider) {
+    this.socket.emit("preparateVideoCallFormProvider", provider);
   }
 
-
-  callPatient(patient) {
-    /*console.log("callPatient ", patient.peerId)
-    console.log("callPatient this.localStream", this.localStream)*/
-    var call = this.myPeer.call(patient.peerId, this.localStream);
-    //console.log("stream 2")
-    call.on('stream', (remoteStream) => {
-      //console.log("stream 3 " , remoteStream)
-      this.remoteVideo.nativeElement.srcObject = remoteStream;
-    });
-  }
-
-  waitCallComplete() {
-    console.log("waitCallComplete")
+  public patientConnected() {
+    this.trace("patientConnected :");
     return Observable.create((observer) => {
-      this.myPeer.on('call', (call) => {
-        /*console.log("call")
-        console.log("call this.localStream", this.localStream)*/
-        call.answer(this.localStream);
-        //console.log("answer localStream")
-        call.on('stream', (remoteStream) => {
-          //console.log("stream : " , remoteStream)
-          this.remoteVideo.nativeElement.srcObject = remoteStream;
-        });
-        //console.log("stream 22")
-        observer.next(call)
+      this.socket.on('patient_connected', (patient) => {
+        observer.next(patient)
       });
     });
   }
 
-  public confirmReadyPatient(patient) {
-    this.trace("confirmReadyPatient :", patient);
-    this.socket.emit('confirmReadyPatient', patient);
+  preparateVideoCallFormPatient(provider, patient) {
+    this.socket.emit("preparateVideoCallFormPatient", {
+      provider: provider,
+      patient: patient,
+    });
   }
 
-  public confirmPatientCall() {
+
+
+  /*public confirmReadyPatient(patient) {
+    this.trace("confirmReadyPatient :", patient);
+    this.socket.emit('confirmReadyPatient', patient);
+  }*/
+
+  /*public confirmPatientCall() {
     this.trace("confirmReadyPatient :");
     return Observable.create((observer) => {
       this.socket.on('confirmReadyPatient', (patient) => {
         observer.next(patient)
       });
     });
-  }
+  }*/
 
   /*public createRoom(data) {
     this.trace("createRoom :", data);
