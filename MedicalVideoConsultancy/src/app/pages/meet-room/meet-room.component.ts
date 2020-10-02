@@ -11,6 +11,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { Patient } from '../../_model/user';
 import { UserService } from './../../_services/user.service';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { ContentBlogService } from '../../_services/content-blog.service';
 
 
 
@@ -36,16 +37,16 @@ export class MeetRoomComponent implements OnInit {
   video: string;
   image: string;
   text: string;
-  smsData:any;
-  roomUrl:string;
+  smsData: any;
+  roomUrl: string;
   domain = environment.domain;
-  providerEnteredKey:boolean=false;
+  providerEnteredKey: boolean = false;
 
   defaultVideo = constant.defaultVideo;
   defaultImage = constant.defaultImage;
   tipsImage = constant.tipsImage;
   defaultText = constant.defaultText;
-  literalArr=[];
+  literalArr = [];
 
   publicUrl = environment.baseUrl + "public/";
 
@@ -59,24 +60,28 @@ export class MeetRoomComponent implements OnInit {
   no_identify_patient = 'NOK';
 
   constructor(
-    private route: ActivatedRoute, 
-    public dialog: MatDialog, 
+    private route: ActivatedRoute,
+    public dialog: MatDialog,
     private providerService: ProviderService,
-    private meetRoomService: MeetRoomService, 
-    private _ngZone: NgZone, 
+    private meetRoomService: MeetRoomService,
+    private _ngZone: NgZone,
     private _router: Router,
-    private userService:UserService
-    ) {
+    private userService: UserService,
+    private contentBlogService: ContentBlogService
+  ) {
 
     this.dniPatient = localStorage.getItem('patient_dni');
+  
     this.route.paramMap.subscribe(params => {
       this.roomName = params.get('roomName');
+      console.log('this.roomName')
+      console.log(this.roomName)
     });
 
   }
 
   ngOnInit(): void {
-   
+
 
     if (this.no_identify_patient == localStorage.getItem('patient_auth')) {
       this._router.navigateByUrl('/auth/sign-in-patient');
@@ -97,9 +102,9 @@ export class MeetRoomComponent implements OnInit {
     }
 
     //receive the info that the provider entered the pay-provider page.
-    this.meetRoomService.providerEntered().subscribe(data=>{
-      if (data){
-        this._router.navigateByUrl('/payAttetion/'+this.roomName);
+    this.meetRoomService.providerEntered().subscribe(data => {
+      if (data) {
+        this._router.navigateByUrl('/payAttetion/' + this.roomName);
       }
     })
 
@@ -114,12 +119,15 @@ export class MeetRoomComponent implements OnInit {
           this.providerData = result;
           this.roomUrl = this.domain + this.providerData.room;
           this.getRoomDataById(this.providerData._id);
-           //fetch post data from provider
-          this.userService.getBlog(this.providerData._id).subscribe(res=>{
-          console.log('res')
-          console.log(res)
-          this.literalArr=res;
-       })
+          //fetch post data from provider
+          this.userService.getBlog(this.providerData._id).subscribe(res => {
+            this.literalArr = res;
+            this.literalArr.forEach(item => {
+              this.contentBlogService.getByUrl(item.url).subscribe(html => {
+                item.postBody = html;
+              });
+            });
+          })
           this.openCheckPatient();
         }
       });
@@ -141,7 +149,7 @@ export class MeetRoomComponent implements OnInit {
     this.clean();
   }
 
-  
+
   // copyRoomAddress(inputRoom) {
   //   inputRoom.select();
   //   document.execCommand('copy');
@@ -263,14 +271,14 @@ export class MeetRoomComponent implements OnInit {
     this.trace(urlAttetion);
     this._router.navigateByUrl(urlAttetion);
   }
-  receiveProviderId(){
-    this.meetRoomService.receiveProvideId().subscribe(providerId=>{
+  receiveProviderId() {
+    this.meetRoomService.receiveProvideId().subscribe(providerId => {
       console.log('providerIdqqq')
       console.log(providerId)
     })
   }
-  ngAfterViewInit(){
-   
+  ngAfterViewInit() {
+
   }
 
 }
@@ -284,11 +292,11 @@ export class InviteBySms2 {
   constructor(
     public dialogRef: MatDialogRef<MeetRoomComponent>,
     @Inject(MAT_DIALOG_DATA) public data) {
-      console.log('data')
-      console.log(data)
-     }
+    console.log('data')
+    console.log(data)
+  }
   onCancelClick(): void {
-  
+
     this.isValidNumber = true;
     this.dialogRef.close({ event: 'cancel' });
   }
@@ -308,7 +316,7 @@ export class InviteBySms2 {
   getNumber(phoneNumber: any) {
     this.data.phoneNumber = phoneNumber;
   }
- 
+
 
 }
 

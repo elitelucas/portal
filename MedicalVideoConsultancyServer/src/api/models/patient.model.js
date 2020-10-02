@@ -14,15 +14,15 @@ const patientSchema = new Schema({
     type: String,
     required: true
   },
-  age:{
-    type:Number
+  age: {
+    type: Number
   },
   dni: {
     type: String,
     required: true,
     unique: true,
     trim: true,
-    minlength:8
+    minlength: 8
   },
   email: {
     type: String,
@@ -59,7 +59,7 @@ const patientSchema = new Schema({
   },
   paymentType: {
     type: String,
-    default:'-'
+    default: '-'
   },
   amountToPay: {
     type: Number,
@@ -89,25 +89,27 @@ const patientSchema = new Schema({
   },
   lastSeen: {
     type: Date,
-  }
+  },
+  newConsult: Boolean,
+  reason: String,
 }, {
-  timestamps:true
+  timestamps: true
 });
 
 
 patientSchema.statics = {
-   checkDuplicateField(error) {
+  checkDuplicateField(error) {
     let field = '';
-   for(let key in error.keyValue) {
-     field = key;
-   }
+    for (let key in error.keyValue) {
+      field = key;
+    }
     if (error.name === 'MongoError' && error.code === 11000) {
       return new APIError({
         message: 'Validation Error',
         errors: [{
           field: field,
           location: 'body',
-          messages: [field +' already exists'],
+          messages: [field + ' already exists'],
         }],
         status: httpStatus.CONFLICT,
         isPublic: true,

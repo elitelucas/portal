@@ -1,3 +1,4 @@
+import { filter } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
@@ -11,6 +12,18 @@ export class UserService {
 
   getUsers() {
     return this.http.get<any>(baseUrl);
+  }
+
+
+  getProviders() {
+    let providersUrl= baseUrl+"/super-providers";
+    return this.http.get<any>(providersUrl);
+  }
+
+  
+  getFilterData(filterValue) {
+    let filterUrl=baseUrl+"/filterProvider/"+filterValue;
+    return this.http.get<any>(filterUrl);
   }
 
   updateUserData(userData) {

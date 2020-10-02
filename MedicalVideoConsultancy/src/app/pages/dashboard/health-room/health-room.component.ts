@@ -46,8 +46,8 @@ export class HealthRoomComponent implements OnInit {
       this.consultId=params.get('consultId');
     });
     this.currentUser = Object.assign(new User(), JSON.parse(localStorage.getItem('provider_data')));
-    console.log('this.currentUser')
-    console.log(this.currentUser)
+    /*console.log('this.currentUser')
+    console.log(this.currentUser)*/
   }
 
   async ngOnInit() {
@@ -57,7 +57,7 @@ export class HealthRoomComponent implements OnInit {
       text: ['', Validators.required]
     });
     this.meetRoomService.confirmPatientCall().subscribe(data=>{
-      console.log('ertertertert')
+      console.log('confirmPatientCall')
       console.log(data)
     })
   }
@@ -73,8 +73,8 @@ export class HealthRoomComponent implements OnInit {
       this.meetRoomService.confirmConnect(this.currentUser);
       this.meetRoomService.updatePatientState().subscribe(async (pt: Patient) => {
         this.patient = pt;
-        console.log("this.patient provider----------------------")
-        console.log(this.patient)
+        /*console.log("this.patient provider----------------------")
+        console.log(this.patient)*/
         this.meetRoomService.callPatient(this.patient);
       });
     });

@@ -107,7 +107,7 @@ export class DrawingComponent implements OnInit {
 
   save() {  
     if(this.switch){
-      this.userService.updateSignature(this.userData.fileName,this.currentUser.id).subscribe(res=>{
+      this.userService.updateSignature(this.userData.location,this.currentUser.id).subscribe(res=>{
         if(res)
         Swal.fire('Updated successfully');
       })
@@ -153,7 +153,7 @@ export class DrawingComponent implements OnInit {
         }, 1000);
         this.userData = event.body;
         this.switch=true;
-        // this.data.changeMessage(this.userData.fileName);
+        //this.data.changeMessage(this.userData.location);
       }
     });
   }

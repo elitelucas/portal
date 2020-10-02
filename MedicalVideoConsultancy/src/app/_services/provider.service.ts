@@ -38,9 +38,21 @@ export class ProviderService {
   checkRoomExist(room) {
     const checkRoomUrl = baseUrl + 'provider/roomName/' + room;
     this.trace("checkRoomExist:", checkRoomUrl);
-    console.log('checkRoomUrl')
-    console.log(checkRoomUrl)
+    /*console.log('checkRoomUrl')
+    console.log(checkRoomUrl)*/
     return this.http.get<any>(checkRoomUrl)
+  }
+
+  checkPatient(dni){
+    const checkPatientUrl = baseUrl + 'provider/checkPatient/'+dni;
+    this.trace("checkPatientUrl:", dni);
+
+    return this.http.get<any>(checkPatientUrl)
+  }
+  postPatient(data){
+    const postPatientUrl = baseUrl + 'provider/postPatient';
+    this.trace("postPatientUrl:", postPatientUrl);
+    return this.http.put(postPatientUrl,{data});
   }
 
   //I added new func to get all patients data.
@@ -78,8 +90,9 @@ export class ProviderService {
     this.trace("getConsultInChat:", patientUrl,params);
     return this.http.get<any>(patientUrl,{params});
   }
+  
   sendMail(from,email,subject,html){
-    console.log('sdfsdfsdf')
+    //console.log('sdfsdfsdf')
     const mailUrl = baseUrl + 'provider/mail';
     this.trace("getConsultInChat:", mailUrl);
     return this.http.post(mailUrl,{
@@ -116,8 +129,8 @@ export class ProviderService {
   }
 
   getSignature(providerId: string): Observable<Blob> {
-    console.log('providerId')
-    console.log(providerId)
+    /*console.log('providerId')
+    console.log(providerId)*/
     const sigUrl = baseUrl + 'provider/getSignature/'+providerId;
     return this.http.get<any>(sigUrl)
   }
@@ -162,7 +175,7 @@ export class ProviderService {
 
   trace(...arg) {
     var now = (window.performance.now() / 1000).toFixed(3);
-    console.log(now + ': ', arg);
+    //console.log(now + ': ', arg);
   }
 
 }

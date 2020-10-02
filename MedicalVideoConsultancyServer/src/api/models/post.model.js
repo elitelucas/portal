@@ -7,6 +7,7 @@ const postSchema = new Schema({
       },
     postTitle:String,
     postBody:String,
+    url:String,
 },
 {
     timestamps:true

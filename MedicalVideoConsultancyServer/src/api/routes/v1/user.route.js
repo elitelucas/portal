@@ -88,6 +88,14 @@ router
    */
   .delete(authorize(ADMIN), controller.remove);
 
+
+  router.route('/super-providers')
+  .get(controller.getProviders);
+
+
+  router.route('/filterProvider/:filterValue')
+  .get(controller.getFilterProvider);
+
   /**
   api/v1/users/email-verification
   */

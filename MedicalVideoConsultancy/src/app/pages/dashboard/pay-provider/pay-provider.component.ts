@@ -90,8 +90,8 @@ export class PayProviderComponent implements OnInit {
     this.meetRoomService.patientEntered().subscribe(patientSocketId=>{
       if(patientSocketId){
         this.patientSocketId=patientSocketId;
-        console.log('patientSocketId')
-        console.log(patientSocketId)
+        /*console.log('patientSocketId')
+        console.log(patientSocketId)*/
       }else{
         alert('patient do not exist.')
       }

@@ -89,6 +89,12 @@ router.route('/getSignature/:providerId')
 router.route('/patientByField')
   .get(controller.getPatient);
 
+router.route('/checkPatient/:dni')
+  .get(controller.checkPatient);
+
+router.route('/postPatient')
+  .put(controller.postPatient);
+  
 /**
  * @api v1/provider/patient
  * @param patientData

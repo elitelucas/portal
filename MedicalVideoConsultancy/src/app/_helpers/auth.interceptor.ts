@@ -15,13 +15,22 @@ export class AuthInterceptor implements HttpInterceptor {
     const token = this.authService.getToken();
     const now = new Date();
     const tokenExpiredTime = JSON.parse(localStorage.getItem('tokenExpiredTime'));
-    if (token != null) {
-      if(now.getTime() - tokenExpiredTime > 0) {
-        this.handleExpiredToken();
-      } else{
-        authReq = req.clone({ headers: req.headers.set(TOKEN_HEADER_KEY, 'Bearer ' + token) });
+
+    /*console.log("authReq");
+    console.log(authReq.url);*/
+    let index = authReq.url.indexOf( "aws" ); 
+    if(index>0){
+      return next.handle(authReq);      
+    }else{
+      if (token != null) {
+        if(now.getTime() - tokenExpiredTime > 0) {
+          this.handleExpiredToken();
+        } else{
+          authReq = req.clone({ headers: req.headers.set(TOKEN_HEADER_KEY, 'Bearer ' + token) });
+        }
       }
     }
+
     return next.handle(authReq);
   }
 

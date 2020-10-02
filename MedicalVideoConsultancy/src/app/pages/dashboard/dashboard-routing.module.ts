@@ -11,7 +11,11 @@ import { PatientChartsComponent } from './patient-charts/patient-charts.componen
 import { PatientComponent } from './patient/patient.component';
 import { NewConsultComponent } from './new-consult/new-consult.component';
 import { PayProviderComponent } from './pay-provider/pay-provider.component';
-
+import { SuperProvidersComponent } from './super-providers/super-providers.component';
+import { SuperAdministratorsComponent } from './super-administrators/super-administrators.component';
+import { SuperFeedbacksComponent } from './super-feedbacks/super-feedbacks.component';
+import { SuperPlansComponent } from './super-plans/super-plans.component';
+import { SubscriptionPlanComponent } from './subscription-plan/subscription-plan.component';
 
 
 const routes:Routes = [{
@@ -50,11 +54,6 @@ const routes:Routes = [{
       path: 'admin',
       component: AdminComponent
     },
-
-    {
-      path: 'super',
-      component: SuperComponent,
-    },
     {
       path: 'patient/:id/:dni/:fullName',
       component: PatientComponent
@@ -66,6 +65,30 @@ const routes:Routes = [{
     {
       path: 'patient-charts',
       component: PatientChartsComponent
+    },
+    {
+      path: 'subscription-plan',
+      component: SubscriptionPlanComponent
+    },
+    {
+      path: 'super',
+      component: SuperComponent,
+    },
+    {
+      path: 'providers',
+      component: SuperProvidersComponent,
+    },
+    {
+      path: 'administrators',
+      component: SuperAdministratorsComponent,
+    },
+    {
+      path: 'feedbacks',
+      component: SuperFeedbacksComponent,
+    },
+    {
+      path: 'plans',
+      component: SuperPlansComponent,
     },
 
   ]

@@ -199,8 +199,8 @@ exports.getInitPatients = async (req, res, next) => {
         }
       )
     }
-    console.log('sendArr')
-    console.log(sendArr)
+    /*console.log('sendArr')
+    console.log(sendArr)*/
 
     res.status(httpStatus.OK).json(sendArr);
   } catch (e) {
@@ -281,8 +281,8 @@ exports.getOneConsult = async (req, res, next) => {
 
 exports.updateConsult = async (req, res, next) => {
   try {
-    console.log('req.body')
-    console.log(req.body)
+    /*console.log('req.body')
+    console.log(req.body)*/
     const consultId=req.body.consultId;
     const updateData=req.body.updateData;
     const symptom=[updateData.symptom0,updateData.symptom1,updateData.symptom2,updateData.symptom3];
@@ -385,12 +385,12 @@ exports.uploadCkImage = async (req, res) => {
 exports.getSignature = async (req, res) => {
     const providerId=req.params.providerId;
     const user = await User.findById(providerId).exec();
-    console.log('user.sigImgSrc')
-    console.log(user.sigImgSrc)
+    /*console.log('user.sigImgSrc')
+    console.log(user.sigImgSrc)*/
     if(user.sigImgSrc)
-    res.status(httpStatus.CREATED).json(user.sigImgSrc);
+      res.status(httpStatus.CREATED).json(user.sigImgSrc);
     else{
-      console.log('no such file.')
+      res.status(httpStatus.NOT_FOUND).send();
     }
 
     // if(user.sigImgSrc){
@@ -453,6 +453,8 @@ exports.mail = async (req, res) => {
 
 exports.getPatient = async (req, res, next) => {
   try {
+    console.log('req.query')
+    console.log(req.query)
     const key = req.query.key;
     const value = req.query.value;
     //console.log("getPatient key:",key," - value:",value)
@@ -478,12 +480,83 @@ exports.getPatient = async (req, res, next) => {
           if (patient) {
             const lastSeen = Date.now();
             const updated = await Patient.findOneAndUpdate({ [key]: value }, { lastSeen: lastSeen }, { new: true });
+            console.log('updated')
+            console.log(updated)
             if (updated) res.status(httpStatus.OK).json(updated);
           } else {
             res.status(httpStatus.NO_CONTENT).send()
           }
       }
     }
+
+  } catch (e) {
+    console.log("getPatient:", error);
+    return next(APIError(e));
+  }
+};
+
+exports.checkPatient = async (req, res, next) => {
+  try {
+    const dni = req.params.dni;
+   
+      const patient = await Patient.findOne({dni}).exec();
+      if(patient){
+        res.status(httpStatus.OK).json(patient);
+      }else{
+        res.status(httpStatus.OK).json('fail');
+      }
+   
+  } catch (e) {
+    console.log("getPatient:", error);
+    return next(APIError(e));
+  }
+};
+
+exports.postPatient = async (req, res, next) => {
+  try {
+    console.log('req.body')
+    console.log(req.body)
+    const dni = req.body.data.dni;
+    const room=req.body.data.room;
+    const newConsult=req.body.data.newConsult==='newConsult'?true:false;
+    const reason=req.body.data.reason;
+    const firstName=req.body.data.firstName;
+    const lastName=req.body.data.lastName;
+    const email=req.body.data.email;
+    const phoneNumber=req.body.data.phoneNumber;
+
+    const patient=await Patient.findOne({dni});
+    if(patient){
+      const updatePatient = await Patient.findOneAndUpdate(
+        {dni},
+        {"$set":{
+          room,
+          newConsult,
+          reason,
+          fullName:firstName+' '+lastName,
+          email,
+          phoneNumber
+        }},
+        {new:true}
+        ).exec();
+
+        res.status(httpStatus.OK).json(updatePatient);
+    }else{
+      const newPatient=await new Patient({
+        dni,
+        room,
+        newConsult,
+        reason,
+        fullName:firstName+' '+lastName,
+        email,
+        phoneNumber
+      }).save();      
+      res.status(httpStatus.OK).json(newPatient);
+    }
+   
+      
+     
+      
 
   } catch (e) {
     console.log("getPatient:", error);
@@ -970,7 +1043,7 @@ exports.createConsult = async (req, res, next) => {
 exports.getLastAttetions = async (req, res, next) => {
   try {
     const userId = req.params.userId;
-    console.log("getLastAttetions providerId userId: ", userId)
+    //console.log("getLastAttetions providerId userId: ", userId)
     const lastConsultAttetions = await Consult.find({ providerId: userId }).sort({ date: -1 }).limit(10).map(async (list) => {
       await Promise.all(list.map(async (c) => {
         const patient = await Patient.find({ _id: c.patientId });
@@ -979,7 +1052,7 @@ exports.getLastAttetions = async (req, res, next) => {
       return list;
     });
     if (lastConsultAttetions) {
-      console.log("lastConsultAttetions: ", lastConsultAttetions)
+      //console.log("lastConsultAttetions: ", lastConsultAttetions)
       res.status(httpStatus.OK).json(lastConsultAttetions);
     }
 

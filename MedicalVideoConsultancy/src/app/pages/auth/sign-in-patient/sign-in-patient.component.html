@@ -1,31 +1,32 @@
 <div class="patient">
-  <div class="container-fluid  d-flex min-vh-100 justify-content-center align-items-center">
+  <div class="container-fluid min-vh-100 justify-content-center align-items-center" style="width:40%">
     <ng-container *ngIf="step === 1">
 
-
-      <div class="vh-100 d-flex justify-content-center align-items-center">
+      <div class="vh-100 justify-content-center align-items-center">
         <div class="card bg-dark">
           <div class="card-title text-center mt-5">
             Please provide us your information
           </div>
           <div class="card-body text-white">
-            <form [formGroup]="roomForm" (ngSubmit)="checkRoom()">
-              <div class="form-row ">
-                <div class="form-group col">
+            <form *ngIf="!verifyKey" [formGroup]="roomForm" (ngSubmit)="checkRoom()">
+              <div>
+                <div class="form-group">
                   <label>DNI</label>
                   <input type="text" formControlName="dni" class="form-control"
-                         [ngClass]="{ 'is-invalid': submitted && f1.dni.errors }"/>
-                  <div *ngIf="submitted && f1.dni.errors" class="invalid-feedback">
-                    <div *ngIf="f1.dni.errors.required">DNI is required</div>
+                    [ngClass]="{ 'is-invalid': submitted && f.dni.errors }" />
+                  <div *ngIf="submitted && f.dni.errors" class="invalid-feedback">
+                    <div *ngIf="f.dni.errors.required">DNI is required</div>
+                    <div *ngIf="f.dni.errors.pattern">DNI is a number</div>
+                    <div *ngIf="f.dni.errors.minlength">DNI must be longer than 8 characters.</div>
                   </div>
                   <div class="d-block invalid-feedback">
                     <div *ngIf="isDuplicatedDNI">DNI is already in use.</div>
                   </div>
                 </div>
-                <div class="form-group col">
-                    <label>Please input room name</label>
-                    <input matInput class="form-control" formControlName="room" type="text"
-                           value="http://localhost:4200/" [ngClass]="{ 'is-invalid': submitted && f.room.errors }">
+                <div class="form-group">
+                  <label>Please input room name</label>
+                  <input matInput class="form-control" formControlName="room" type="text" value="http://localhost:4200/"
+                    [ngClass]="{ 'is-invalid': submitted && f.room.errors }">
                   <div *ngIf="submitted&&f.room.errors" class="invalid-feedback d-block font-20">
                     <div *ngIf="f.room.errors.minlength">
                       Please type the url of doctor room
@@ -44,10 +45,100 @@
                 </div>
               </div>
               <div class="text-center">
-                <button type="submit" style="bottom: 0;" class=" mb-3 text-white font-bold color-check-in">Check in
+                <button type="submit" style="bottom: 0;" class=" mb-3 text-white font-bold color-check-in">Verify
                 </button>
               </div>
             </form>
+
+
+
+            <form *ngIf="verifyKey" [formGroup]="enterForm" (ngSubmit)="enterRoom()">
+              <div>
+                <div class="form-group col">
+                  <label>DNI</label>
+                  <input type="text" formControlName="dni" class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && f2.dni.errors }" />
+                  <div *ngIf="submitted && f2.dni.errors" class="invalid-feedback">
+                    <div *ngIf="f2.dni.errors.required">DNI is required</div>
+                    <div *ngIf="f2.dni.errors.pattern">DNI is a number</div>
+                    <div *ngIf="f2.dni.errors.minlength">DNI must be longer than 8 characters.</div>
+                  </div>
+                  <div class="d-block invalid-feedback">
+                    <div *ngIf="isDuplicatedDNI">DNI is already in use.</div>
+                  </div>
+                </div>
+                <div class="form-group col">
+                  <label>Please input room name</label>
+                  <input matInput class="form-control" formControlName="room" type="text" value="http://localhost:4200/"
+                    [ngClass]="{ 'is-invalid': submitted && f2.room.errors }">
+                  <div *ngIf="submitted&&f2.room.errors" class="invalid-feedback d-block font-20">
+                    <div *ngIf="f2.room.errors.minlength">
+                      Please type the url of doctor room
+                    </div>
+                    <div *ngIf="f2.room.errors.required">
+                      This field is required
+                    </div>
+                  </div>
+                  <div *ngIf="isInvalidDomain" class="invalid-feedback d-block font-20">
+                    Please input valid domain
+                  </div>
+                  <div *ngIf="!isValidRoom" class="invalid-feedback d-block font-20">
+                    No available Room Name
+                  </div>
+
+                </div>
+                <div class="form-group">
+                  <div>
+                    <input id="male" type="radio" value="newConsult" name="gender" formControlName="gender">
+                    <label for="male">New Consult</label>
+                  </div>
+
+                  <div>
+                    <input id="female" type="radio" value="followUp" name="gender" formControlName="gender">
+                    <label for="female">Follow Up</label>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <textarea class="form-control" formControlName="reason"
+                    placeholder="Reason For Medical Attention"></textarea>
+                </div>
+              </div>
+
+              <div>
+                Validate or modify your information
+              </div>
+              <div class="row mb-2">
+                <div class="col-6">
+                  <input type="text" formControlName="firstName" class="form-control"
+                    [ngClass]="{ 'is-invalid': entered && f2.firstName.errors }" placeholder="FirstName" />
+                </div>
+                <div *ngIf="entered && f2.dni.errors" class="invalid-feedback">
+                  <div *ngIf="f2.dni.errors.required">DNI is required</div>
+                </div>
+                <div class="col-6">
+                  <input type="text" formControlName="lastName" class="form-control"
+                    [ngClass]="{ 'is-invalid': entered && f2.lastName.errors }" placeholder="LastName" />
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-6">
+                  <input type="email" formControlName="email" class="form-control"
+                    [ngClass]="{ 'is-invalid': entered && f2.email.errors }" placeholder="Email Address" />
+                </div>
+                <div class="col-6">
+                  <input type="text" formControlName="phoneNumber" class="form-control"
+                    [ngClass]="{ 'is-invalid': entered && f2.phoneNumber.errors }" placeholder="Phone Number" />
+                </div>
+              </div>
+              <div class="text-center">
+                <button type="submit" style="bottom: 0;" class=" mb-3 text-white font-bold color-check-in">
+                  Enter Room
+                </button>
+              </div>
+
+
+            </form>
+
           </div>
         </div>
       </div>
@@ -65,7 +156,7 @@
                 <div class="form-group col">
                   <label>Full Name</label>
                   <input type="text" formControlName="fullName" class="form-control"
-                         [ngClass]="{ 'is-invalid': submitted && f1.fullName.errors }"/>
+                    [ngClass]="{ 'is-invalid': submitted && f1.fullName.errors }" />
                   <div *ngIf="submitted && f1.fullName.errors" class="invalid-feedback">
                     <div *ngIf="f1.fullName.errors.required">Full Name is required</div>
                   </div>
@@ -73,7 +164,7 @@
                 <div class="form-group col">
                   <label>DNI</label>
                   <input type="text" formControlName="dni" class="form-control"
-                         [ngClass]="{ 'is-invalid': submitted && f1.dni.errors }"/>
+                    [ngClass]="{ 'is-invalid': submitted && f1.dni.errors }" />
                   <div *ngIf="submitted && f1.dni.errors" class="invalid-feedback">
                     <div *ngIf="f1.dni.errors.required">DNI is required</div>
                   </div>
@@ -87,7 +178,7 @@
                 <div class="form-group col">
                   <label>Email</label>
                   <input type="email" formControlName="email" class="form-control"
-                         [ngClass]="{ 'is-invalid': submitted && f1.email.errors }"/>
+                    [ngClass]="{ 'is-invalid': submitted && f1.email.errors }" />
                   <div *ngIf="submitted && f1.email.errors" class="invalid-feedback">
                     <div *ngIf="f1.email.errors.required">Email address is required</div>
                     <div *ngIf="f1.email.errors.email">Email address is invalid</div>
@@ -97,9 +188,8 @@
                 <div class="form-group col text-black-50">
                   <label class="text-white">Phone Number</label>
                   <input type="text" ng2TelInput formControlName="phoneNumber" class="form-control  text-black-50"
-                         [ngClass]="{ 'is-invalid': submitted && f1.phoneNumber.errors }"
-                         (hasError)="hasError($event)"
-                         (ng2TelOutput)="getNumber($event)"/>
+                    [ngClass]="{ 'is-invalid': submitted && f1.phoneNumber.errors }" (hasError)="hasError($event)"
+                    (ng2TelOutput)="getNumber($event)" />
                   <div class="invalid-feedback d-block" *ngIf="isEmptyPhoneNumber">Phone Number is required</div>
                   <div class="invalid-feedback d-block" *ngIf="isDuplicatedPhone">Phone Number is already in use</div>
                   <div class="invalid-feedback d-block" *ngIf="!isValidNumber">Please type valid number</div>
@@ -109,7 +199,7 @@
               <div class="form-row">
                 <label>Medical record</label>
                 <textarea formControlName="record" class="form-control" rows="5"
-                          placeholder="Please input your medical record"></textarea>
+                  placeholder="Please input your medical record"></textarea>
               </div>
 
               <!--Hidden field-->
@@ -118,7 +208,7 @@
 
               <div class="form-group form-check mt-3">
                 <input type="checkbox" formControlName="acceptTerms" id="acceptTerms" class="form-check-input cursor"
-                       [ngClass]="{ 'is-invalid': submitted && f1.acceptTerms.errors }"/>
+                  [ngClass]="{ 'is-invalid': submitted && f1.acceptTerms.errors }" />
                 <label for="acceptTerms" class="form-check-label">Accept Terms & Conditions</label>
                 <div *ngIf="submitted && f1.acceptTerms.errors" class="invalid-feedback">Accept Ts & Cs is required
                 </div>
@@ -128,7 +218,8 @@
                 <button class="btn btn-primary mr-1">Join</button>
                 <button class="btn btn-secondary ml-3" type="reset" (click)="onReset()">Cancel</button>
                 <a class="ml-3" routerLink="/"> <i class="fa fa-arrow-circle-o-left"></i> Go home</a>
-                <a class="ml-3 text-white-50" routerLink="{{directRoomUrl}}"> <i class="fa fa-arrow-circle-o-right"></i>Already
+                <a class="ml-3 text-white-50" routerLink="{{directRoomUrl}}"> <i
+                    class="fa fa-arrow-circle-o-right"></i>Already
                   had account ?</a>
               </div>
             </form>
