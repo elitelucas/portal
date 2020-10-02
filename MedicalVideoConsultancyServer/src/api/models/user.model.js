@@ -170,7 +170,7 @@ userSchema.pre('save', async function save(next) {
 userSchema.method({
   transform() {
     const transformed = {};
-    const fields = ['id', 'firstName', 'lastName', 'email','phoneNumber', 'room', 'cmp', 'socketId', 'peerId', 'role','permission', 'status', 'state', 'image','connection','calling', 'createdAt'];
+    const fields = ['id', 'firstName', 'lastName', 'email','phoneNumber','subcriptionId','subcriptionStatus', 'room', 'cmp', 'socketId', 'peerId', 'role','permission', 'status', 'state', 'image','connection','calling', 'createdAt'];
 
     fields.forEach((field) => {
       transformed[field] = this[field];
@@ -249,9 +249,9 @@ userSchema.statics = {
    * @returns {Promise<User[]>}
    */
   list({
-    page = 1, perPage = 30, id, firstName, lastName, room, cmp, socketId, peerId, email, role,permission, status, state, date
+    page = 1, perPage = 30, id, firstName, lastName, room, cmp, socketId, peerId, email, role,permission, status, state, date, subcriptionId  ,subcriptionStatus
   }) {
-    const options = omitBy({ id, firstName, lastName, room, cmp, socketId, peerId, email, role,permission, status, state, date}, isNil);
+    const options = omitBy({ id, firstName, lastName, room, cmp, socketId, peerId, email, role,permission, status, state, date, subcriptionId  ,subcriptionStatus}, isNil);
 
     return this.find(options)
     .sort({ createdAt: -1 })
