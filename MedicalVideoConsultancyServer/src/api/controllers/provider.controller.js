@@ -718,25 +718,25 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
         });
         provider.customerId = customerCulqi.id;
         provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
-
-        let cardCulqi = await culqi.cards.createCard({
-          customer_id: provider.customerId,
-          token_id: token.id
-        });
-
-        cardExists = await new Card({
-          description: cardData.description,
-          cardId: cardCulqi.id,
-          card_number: cardData.card_number,
-          providerId: providerId,
-          createDate: new Date(),
-          status: "active",
-        }).save();
       }
+
+      let cardCulqi = await culqi.cards.createCard({
+        customer_id: provider.customerId,
+        token_id: token.id
+      });
+
+      cardExists = await new Card({
+        description: cardData.description,
+        cardId: cardCulqi.id,
+        card_number: cardData.card_number,
+        providerId: providerId,
+        createDate: new Date(),
+        status: "active",
+      }).save();
     }
 
     const subcriptionData = req.body.subcription;
-    let userProvider = await User.find({ providerId: providerId });
+    let userProvider = await User.findById( providerId );
 
     if(userProvider != undefined){
       const planSubcription = await Plan.findById(subcriptionData.id);     
@@ -787,57 +787,6 @@ exports.unsubscribePlanWithCard = async (req, res, next) => {
   }    
 };
 
-
-/**
- * @api v1/provider/subcription
- * @params providerId(_id), card_number, cvv, expiration_month, expiration_year, email, amount, currency_code
- * *//*
-exports.subcription = async (req, res, next) => {
-  try {
-    const subcriptionData = req.body;
-    let userProvider = await User.find({ providerId: subcriptionData.providerId });
-    if(userProvider != undefined){
-      const cardProvider = await Card.find({ providerId: subcriptionData.providerId });
-      const planSubcription = await Plan.find({ providerId: subcriptionData.planId });
-     
-      let subscriptionCulqi = await culqi.subscriptions.createSubscription({
-        card_id: cardProvider.id,
-        plan_id: planSubcription.id
-      });
-  
-      userProvider.subcriptionId = subscriptionCulqi.id;
-      userProvider.subcriptionStatus = true
-      userProvider = await User.findOneAndUpdate({_id: subcriptionData.providerId}, userProvider, {new: false});
-    
-      res.status(httpStatus.OK).send()
-    }else{      
-      res.status(httpStatus.NOT_FOUND).send()
-    }    
-  } catch (e) {
-    console.log("error ", e)
-    error = new APIError(e);
-    return next(error)
-  }    
-};*/
-/*try {
-  const paysubcription = new Paysubcription({
-    plan: "basic",
-    providerId: providerId,
-    chargeId: charge.id,
-    createDate: new Date(),
-    currencyCode: currency_code,
-    amount: amount,
-    email: email,
-    status: "active"
-  });
-  await paysubcription.save();
-  res.status(httpStatus.OK).send()
-} catch (e) {
-  console.log("error ", e)
-  error = new APIError(e);
-  return next(error)
-}*/
-
 /**
  * @api v1/provider/cards
  * @params providerId(_id), card_number, cvv, expiration_month, expiration_year, email, amount, currency_code
@@ -856,71 +805,6 @@ exports.listCards = async (req, res, next) => {
   }
 };
 
-
-/**
- * @api v1/provider/cards
- * @params providerId(_id), card_number, cvv, expiration_month, expiration_year, email, amount, currency_code
- * *//*
-exports.saveCard = async (req, res, next) => {
-  try {
-    const cardData = req.body;
-    const cardExists = await Card.findOne({ card_number: cardData.card_number });
-    if (cardExists == undefined) {
-      const providerId = cardData.providerId;
-      let provider = await User.findOne({ _id: providerId });
-      const culqi = new Culqi({
-        privateKey: culqiConfing.private_key,
-        pciCompliant: true,
-        publicKey: culqiConfing.private_key,
-      });
-      const token = await culqi.tokens.createToken({
-        card_number: cardData.card_number,
-        cvv: cardData.cvv,
-        expiration_month: cardData.expiration_month,
-        expiration_year: cardData.expiration_year,
-        email: cardData.email,
-      });
-
-      if(provider.customerId == undefined){
-
-        let customerCulqi = await culqi.customers.createCustomer({
-          first_name: provider.firstName,
-          last_name: provider.lastName,
-          email: provider.email,
-          address: provider.address,
-          address_city: provider.address_city,
-          country_code: provider.country_code,
-          phone_number: provider.phoneNumber,
-        }
-        );
-
-        provider.customerId = customerCulqi.id;
-        provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
-      }
-
-      let cardCulqi = await culqi.cards.createCard({
-        customer_id: provider.customerId,
-        token_id: token.id
-      });
-      const cardNew = await new Card({
-        description: cardData.description,
-        cardId: cardCulqi.id,
-        card_number: cardData.card_number,
-        providerId: providerId,
-        createDate: new Date(),
-        status: "active",
-      }).save();
-      res.status(httpStatus.CREATED).send();
-    } else {
-      res.status(httpStatus.CONFLICT).send();
-    }
-  } catch (error) {
-    return next(error);
-  }
-};
-*/
-
-
 /**
  * @api v1/provider/cards
  * @params providerId(_id), card_number, cvv, expiration_month, expiration_year, email, amount, currency_code
@@ -932,6 +816,14 @@ exports.removeCard = async (req, res, next) => {
     if (cardExists == undefined) {      
       res.status(httpStatus.NOT_FOUND).send();
     } else {
+      const culqi = new Culqi({
+        privateKey: culqiConfing.private_key,
+        pciCompliant: true,
+        publicKey: culqiConfing.private_key,
+      });
+      await culqi.cards.deleteCard({
+        id: cardExists.cardId
+      });
       await cardExists.remove();
       res.status(httpStatus.OK).send()
     }
