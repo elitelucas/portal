@@ -1,8 +1,8 @@
+import { baseUrl } from './patient.service';
 import { Injectable } from '@angular/core';
 import{Observable} from 'rxjs'
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../../environments/environment";
-import { baseUrl } from "./auth.service";
 import { map } from "rxjs/operators";
 import { Patient, Consult } from '../_model/user';
 import { ArrayType } from '@angular/compiler';
@@ -171,6 +171,16 @@ export class ProviderService {
         return result;
       }
     }));
+  }
+
+  getPlans(){
+    const getPlansUrl= baseUrl + 'plans';
+    return this.http.get<any>(getPlansUrl);
+  }
+  sendSubcriptionData(data){
+    const subcriptionUrl=baseUrl + 'provider/subcription';
+    return this.http.post(subcriptionUrl,data);
+
   }
 
   trace(...arg) {

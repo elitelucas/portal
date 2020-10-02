@@ -34,12 +34,14 @@ import { SuperAdministratorsComponent } from './super-administrators/super-admin
 import { SuperFeedbacksComponent } from './super-feedbacks/super-feedbacks.component';
 import { SuperPlansComponent } from './super-plans/super-plans.component';
 import { SubscriptionPlanComponent } from './subscription-plan/subscription-plan.component';
+import { SubscriptionOldComponent } from './subscription-old/subscription-old.component';
+import { SubscriptionNewComponent } from './subscription-new/subscription-new.component';
 
 
 @NgModule({
   declarations: [AdminComponent, SuperComponent, HealthProviderComponent, 
     DialogBoxComponent, ProfileComponent, InviteBySms, EditRoomComponent, HealthRoomComponent, 
-    SignatureComponent,DrawingComponent,PatientChartsComponent, PatientComponent, ConsultListComponent, FreeTextComponent, NewConsultComponent, PrescriptionComponent, ConsultsComponent, FilesComponent, ChartsComponent, PayProviderComponent, PayMethodComponent, ConsultDialogueComponent, SuperProvidersComponent, SuperAdministratorsComponent, SuperFeedbacksComponent, SuperPlansComponent, SubscriptionPlanComponent],
+    SignatureComponent,DrawingComponent,PatientChartsComponent, PatientComponent, ConsultListComponent, FreeTextComponent, NewConsultComponent, PrescriptionComponent, ConsultsComponent, FilesComponent, ChartsComponent, PayProviderComponent, PayMethodComponent, ConsultDialogueComponent, SuperProvidersComponent, SuperAdministratorsComponent, SuperFeedbacksComponent, SuperPlansComponent, SubscriptionPlanComponent, SubscriptionOldComponent, SubscriptionNewComponent],
   imports: [
     SharedModule,
     ReactiveFormsModule,

@@ -807,6 +807,8 @@ exports.charge = async (req, res, next) => {
  * @params providerId(_id), card_number, cvv, expiration_month, expiration_year, email, amount, currency_code
  * */
 exports.subcriptionPlanWithCard = async (req, res, next) => {
+  console.log('req.body');
+  console.log(req.body);
   try {
     const providerId = req.body.providerId;
     const cardData = req.body.card;

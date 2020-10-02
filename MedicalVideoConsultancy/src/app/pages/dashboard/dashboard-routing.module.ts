@@ -16,6 +16,8 @@ import { SuperAdministratorsComponent } from './super-administrators/super-admin
 import { SuperFeedbacksComponent } from './super-feedbacks/super-feedbacks.component';
 import { SuperPlansComponent } from './super-plans/super-plans.component';
 import { SubscriptionPlanComponent } from './subscription-plan/subscription-plan.component';
+import { SubscriptionOldComponent } from './subscription-old/subscription-old.component';
+import { SubscriptionNewComponent } from './subscription-new/subscription-new.component';
 
 
 const routes:Routes = [{
@@ -69,6 +71,14 @@ const routes:Routes = [{
     {
       path: 'subscription-plan',
       component: SubscriptionPlanComponent
+    },
+    {
+      path: 'subscription-old',
+      component: SubscriptionOldComponent
+    },
+    {
+      path: 'subscription-new/:planId',
+      component: SubscriptionNewComponent
     },
     {
       path: 'super',
