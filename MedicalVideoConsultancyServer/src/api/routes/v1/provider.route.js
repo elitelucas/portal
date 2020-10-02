@@ -150,7 +150,7 @@ router.route('/charge')
  * @api v1/provider/checkout
  * */
 router.route('/subcription')
-  .post(controller.subcription);
+  .post(controller.subcriptionPlanWithCard);
   
 /**
  * @api v1/provider/notify

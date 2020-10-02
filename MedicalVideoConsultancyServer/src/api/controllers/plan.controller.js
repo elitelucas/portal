@@ -3,10 +3,10 @@ const path = require('path');
 const Plan = require('../models/plan.model');
 const Admin = require('../models/admin.model');
 const nodemailer = require("nodemailer");
-const {emailConfig, smsConfig, culqiConfing} = require("../../config/vars");
+const { emailConfig, smsConfig, culqiConfing } = require("../../config/vars");
 const client = require('twilio')(smsConfig.Sid, smsConfig.authToken);
 const bcrypt = require('bcryptjs');
-const {env, baseUrl} = require('../../config/vars');
+const { env, baseUrl } = require('../../config/vars');
 const Culqi = require('culqi-node');
 
 /**
@@ -15,8 +15,9 @@ const Culqi = require('culqi-node');
  */
 exports.list = async (req, res, next) => {
   try {
-
-    return next();
+    Plan.find({}, (err, plans) => {
+      res.send(plans);
+    });
   } catch (error) {
     return next(error);
   }
@@ -28,9 +29,9 @@ exports.list = async (req, res, next) => {
  */
 exports.create = async (req, res, next) => {
   try {
-    const planExists = await Plan.findOne({name: req.body.name});
-    if(planExists == undefined){
-      
+    const planExists = await Plan.findOne({ name: req.body.name });
+    if (planExists == undefined) {
+
       const planData = req.body;
 
       const culqi = new Culqi({
@@ -38,10 +39,10 @@ exports.create = async (req, res, next) => {
         pciCompliant: true,
         publicKey: culqiConfing.private_key,
       });
-      
+
       let planCulqi = await culqi.plans.createPlan({
         name: planData.name,
-        amount: (planData.amount*100),
+        amount: (planData.amount * 100),
         currency_code: planData.currency_code,
         interval: "meses",
         interval_count: 1
@@ -52,13 +53,13 @@ exports.create = async (req, res, next) => {
       planData['trial_days'] = 30;
       planData['createDate'] = new Date();
       planData['status'] = "active";
-      
+
       planData['planId'] = planCulqi.id;
 
       const plan = await new Plan(planData).save();
 
       res.status(httpStatus.CREATED).json(plan);
-    }else{
+    } else {
       res.status(httpStatus.CONFLICT).json({});
     }
   } catch (error) {
@@ -73,12 +74,10 @@ exports.create = async (req, res, next) => {
  */
 exports.get = async (req, res, next) => {
   try {
-   /*
-   id: req.params.userId
-   const userData = await User.findById(id);
-    const user = userData ? await User.findById(id) : await Admin.findById(id);
-    req.locals = { user };*/
-    return next();
+    const id = req.params.planId;
+    Plan.findById(id, (err, plan) => {
+      res.send(plan);
+    });
   } catch (error) {
     return next(error);
   }
@@ -91,10 +90,27 @@ exports.get = async (req, res, next) => {
  */
 exports.remove = async (req, res, next) => {
   try {
-   /* const userData = await User.findById(id);
-    const user = userData ? await User.findById(id) : await Admin.findById(id);
-    req.locals = { user };*/
-    return next();
+    const planId = req.params.planId;
+    Plan.findById(planId, async (err, plan) => {
+      if (!err) {
+
+        const culqi = new Culqi({
+          privateKey: culqiConfing.private_key,
+          pciCompliant: true,
+          publicKey: culqiConfing.private_key,
+        });
+  
+        culqi.plans.deletePlan({
+          id: plan.planId
+        });
+  
+        plan.remove();
+  
+        res.status(httpStatus.OK).send()
+      }else{
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).send()
+      }
+    });
   } catch (error) {
     return next(error);
   }
