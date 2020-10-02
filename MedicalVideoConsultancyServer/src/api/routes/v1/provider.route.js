@@ -134,10 +134,16 @@ router.route('/charge')
   .post(controller.charge);
 
 /**
- * @api v1/provider/checkout
+ * @api v1/provider/subcription
  * */
 router.route('/subcription')
   .post(controller.subcriptionPlanWithCard);
+
+/**
+   * @api v1/provider/subcription
+   * */
+  router.route('/subcription/:providerid')
+    .delete(controller.unsubscribePlanWithCard);
   
 /**
  * @api v1/provider/notify

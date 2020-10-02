@@ -723,7 +723,7 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
           customer_id: provider.customerId,
           token_id: token.id
         });
-        
+
         cardExists = await new Card({
           description: cardData.description,
           cardId: cardCulqi.id,
@@ -758,24 +758,34 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     return next(error)
   }    
 };
-/*try {
-  const paysubcription = new Paysubcription({
-    plan: "basic",
-    providerId: providerId,
-    chargeId: charge.id,
-    createDate: new Date(),
-    currencyCode: currency_code,
-    amount: amount,
-    email: email,
-    status: "active"
-  });
-  await paysubcription.save();
-  res.status(httpStatus.OK).send()
-} catch (e) {
-  console.log("error ", e)
-  error = new APIError(e);
-  return next(error)
-}*/
+
+/**
+ * @api v1/provider/subcription
+ * @params providerId(_id), card_number, cvv, expiration_month, expiration_year, email, amount, currency_code
+ * */
+exports.unsubscribePlanWithCard = async (req, res, next) => {
+  try {   
+    const providerId = req.params.providerid;
+    let userProvider = await User.findById( providerId );
+    const subcriptionId = userProvider.subcriptionId;
+    const culqi = new Culqi({
+      privateKey: culqiConfing.private_key,
+      pciCompliant: true,
+      publicKey: culqiConfing.private_key,
+    });
+    await culqi.subscriptions.deleteSubscription({
+      id: subcriptionId
+    });
+    userProvider.subcriptionId = null;
+    userProvider.subcriptionStatus = false;
+    userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});
+    res.status(httpStatus.OK).send();
+  } catch (e) {
+    console.log("error ", e)
+    error = new APIError(e);
+    return next(error)
+  }    
+};
 
 
 /**
