@@ -1,9 +1,10 @@
 import { Routes } from '@angular/router';
 import {AuthGuard} from "../_helpers/auth.guard";
-import {MeetRoomComponent} from "./meet-room/meet-room.component";
-import {VideoRoomComponent} from "./video-room/video-room.component";
-import { MeetCallComponent } from './pay-patient/meet-call/meet-call.component';
-import { PayPatientComponent } from './pay-patient/pay-patient.component';
+//import {MeetRoomComponent} from "./meet-room/meet-room.component";
+//import { VideoRoomComponent } from "./video-room/video-room.component";
+//import { MeetCallComponent } from './pay-patient/meet-call/meet-call.component';
+//import { PayPatientComponent } from './pay-patient/pay-patient.component';
+import { MeetPatientComponent } from './meet-patient/meet-patient.component';
 
 export const AppRoutes: Routes = [
   {
@@ -28,16 +29,12 @@ export const AppRoutes: Routes = [
     canActivate: [AuthGuard]
   },
 
-/*
-  {
-    path: 'video/:roomName',
-    component: VideoRoomComponent
-  },
-*/
+
   {
     path: ':roomName',
-    component: MeetRoomComponent
-  },
+    //component: MeetRoomComponent
+    component: MeetPatientComponent
+  }/*,
   {
     path: 'payAttetion/:roomName',
     component: PayPatientComponent
@@ -45,7 +42,7 @@ export const AppRoutes: Routes = [
   {
     path: 'attetion/:roomName',
     component: MeetCallComponent
-  },
+  },*/
 ];
 
 

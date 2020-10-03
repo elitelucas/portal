@@ -1,25 +1,29 @@
 import { Component, ElementRef, Inject, NgZone, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from "@angular/router";
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material";
-import { ProviderService } from "../../_services/provider.service";
-import { environment } from "../../../environments/environment";
-import { constant } from "../../_config/constant";
-import { MeetRoomService } from "../../_services/meet-room.service";
+import { ProviderService } from "../../../_services/provider.service";
+import { environment } from "../../../../environments/environment";
+import { constant } from "../../../_config/constant";
+import { MeetRoomService } from "../../../_services/meet-room.service";
 //import { WebcamInitError, WebcamUtil, WebcamImage} from "ngx-webcam";
 import { Observable, Subject } from "rxjs";
 import { RouterModule, Routes } from '@angular/router';
-import { Patient } from '../../_model/user';
-import { UserService } from './../../_services/user.service';
+import { Patient } from '../../../_model/user';
+import { UserService } from './../../../_services/user.service';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { ContentBlogService } from '../../_services/content-blog.service';
+import { ContentBlogService } from '../../../_services/content-blog.service';
+
+
+
+
 
 
 @Component({
-  selector: 'app-meet-provider',
-  templateUrl: './meet-room.component.html',
-  styleUrls: ['./meet-room.component.css']
+  selector: 'app-waiting',
+  templateUrl: './waiting-room.component.html',
+  styleUrls: ['./waiting-room.component.css']
 })
-export class MeetRoomComponent implements OnInit {
+export class WaitingRoomComponent implements OnInit {
   @ViewChild('localVideo') public localVideo: ElementRef;
 
   patientId = null;
@@ -125,7 +129,7 @@ export class MeetRoomComponent implements OnInit {
         }
       });
       if (this.providerData) {
-        this._router.navigateByUrl('/auth/sign-in-patient');
+        this._router.navigateByUrl('/auth/sign-in-patient');////// change screen
         this.clean();
       }
     });
@@ -184,7 +188,7 @@ export class MeetRoomComponent implements OnInit {
       + this.providerData.room + "\n" +
       "Use a computer or device with a good internet connection and webcam. If you run into issues connecting, restart your computer or check out the pasatra.com http://help.pasatra.com \n" +
       "Simple, free, and secure telemedicine powered by https://Pasatra.com \n";
-    /*const dialogRef = this.dialog.open(InviteBySms2, {
+    const dialogRef = this.dialog.open(InviteBySms2, {
       width: '400px',
       data: { phoneNumber: '', room: this.roomUrl, smsContent: smsContent }
     });
@@ -192,7 +196,7 @@ export class MeetRoomComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       this.smsData = result;
       this.sendInvite(option);
-    })*/
+    })
   }
 
   getRoomDataById(id) {
@@ -275,7 +279,6 @@ export class MeetRoomComponent implements OnInit {
   }
 
 }
-/*
 @Component({
   selector: 'invite-by-sms2',
   templateUrl: 'invite-by-sms2.html',
@@ -284,7 +287,7 @@ export class InviteBySms2 {
   isValidNumber: boolean = true;
   isInvited: boolean = false;
   constructor(
-    public dialogRef: MatDialogRef<MeetRoomComponent>,
+    public dialogRef: MatDialogRef<WaitingRoomComponent>,
     @Inject(MAT_DIALOG_DATA) public data) {
     console.log('data')
     console.log(data)
@@ -320,7 +323,7 @@ export class InviteBySms2 {
 
 
 
-*/
+
 
 
 

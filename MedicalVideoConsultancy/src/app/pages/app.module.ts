@@ -21,12 +21,16 @@ import { ToolbarComponent } from './layouts/default/toolbar/toolbar.component';
 import { MenubarComponent } from './layouts/default/menubar/menubar.component';
 import { FooterComponent } from './layouts/default/footer/footer.component';
 import { authInterceptorProviders } from "../_helpers/auth.interceptor";
-import { MeetRoomComponent,InviteBySms2 } from './meet-room/meet-room.component';
+//import { MeetRoomComponent,InviteBySms2 } from './meet-room/meet-room.component';
 import { FormsModule , ReactiveFormsModule} from "@angular/forms";
 import { MeetRoomService } from "../_services/meet-room.service";
 import { VideoRoomComponent } from './video-room/video-room.component';
-import { MeetCallComponent } from './pay-patient/meet-call/meet-call.component';
-import { PayPatientComponent } from './pay-patient/pay-patient.component';
+import { AdminComponent } from './layouts/admin/admin.component';
+
+import { MeetPatientComponent } from './meet-patient/meet-patient.component';
+import { MeetCallComponent } from './meet-patient/meet-call/meet-call.component';
+import { PayPatientComponent } from './meet-patient/pay-patient/pay-patient.component';
+import { WaitingRoomComponent,InviteBySms2 } from './meet-patient/wating-room/waiting-room.component';
 
 @NgModule({
   declarations: [
@@ -39,11 +43,14 @@ import { PayPatientComponent } from './pay-patient/pay-patient.component';
     ToolbarComponent,
     MenubarComponent,
     FooterComponent,
-    MeetRoomComponent,
+ //   MeetRoomComponent,
     VideoRoomComponent,
     MeetCallComponent,
     PayPatientComponent,
-    InviteBySms2
+    InviteBySms2,
+    AdminComponent,
+    MeetPatientComponent,
+    WaitingRoomComponent
   ],
   imports: [
     BrowserModule,
