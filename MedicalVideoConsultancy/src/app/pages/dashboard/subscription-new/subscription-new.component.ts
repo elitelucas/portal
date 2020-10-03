@@ -14,6 +14,8 @@ export class SubscriptionNewComponent implements OnInit {
   submitted=false;
   providerData:any;
   planId:any;
+  displayPlan=false;
+  planData:any;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -21,12 +23,17 @@ export class SubscriptionNewComponent implements OnInit {
     private providerService:ProviderService
     ) { 
     this.providerData=JSON.parse(localStorage.getItem('currentUser'));
-    console.log('this.providerData')
-    console.log(this.providerData)
+
     this.activatedRoute.params.subscribe(data=>{
-      console.log('data')
-      console.log(data)
+
       this.planId=data.planId;
+      this.providerService.getPlansById(this.planId)
+      .subscribe(res=>{
+        console.log('resasdasd')
+        console.log(res)
+        this.planData=res;
+        this.displayPlan=true;
+      })
     })
   }
 

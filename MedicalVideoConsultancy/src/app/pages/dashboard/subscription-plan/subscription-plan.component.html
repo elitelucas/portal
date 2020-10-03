@@ -33,28 +33,28 @@
               </div>
         </div>
         <div class="col-6">
-            <div class="card bg-light w-75 mx-auto">
+            <div *ngIf="displayPlan">
+                <div class="card bg-light w-75 mx-auto"  *ngFor="let plan of planData">
             
-                <div class="card-body">
-                    <div class="text-center">
-                        <h4 class="card-title">Subscription Payment</h4>
+                    <div class="card-body">
+                        <div class="text-center">
+                            <h4 class="card-title">{{plan.name}}</h4>
+                        </div>
+                        <div [innerHtml]="plan.description">
+                        
+                        </div>
+                        <div class="text-center">
+                            <h2>$/{{plan.amount}}</h2>
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-primary" (click)="Subscribe(plan._id)">Subscribe now</button>
+                        </div>
+                
                     </div>
-                    <div>
-                        <p class="card-text">- Send prescriptions with signature.</p>
-                        <p class="card-text">- Video-call available.</p>
-                        <p class="card-text">- Online patient medical records.</p>
-                        <p class="card-text">- Payments with 0 commision and direct to your bank account.</p>
-                    </div>
-                    <div class="text-center">
-                        <h2>$/45.00</h2>
-                    </div>
-                    <div class="text-center">
-                        <button class="btn btn-primary" (click)="Subscribe()">Subscribe now</button>
-                    </div>
-            
+        
                 </div>
-    
-              </div>
+            </div>
+          
         </div>
         
     </div>

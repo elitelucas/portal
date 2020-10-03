@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 export class SubscriptionPlanComponent implements OnInit {
   providerData:any;
   planData:any;
+  displayPlan=false;
 
   constructor(
     private providerService:ProviderService,
@@ -20,19 +21,20 @@ export class SubscriptionPlanComponent implements OnInit {
     this.providerData=JSON.parse(localStorage.getItem('currentUser'));
     console.log('this.providerData')
     console.log(this.providerData)
-    if(this.providerData.subcriptionId){
-      this.router.navigateByUrl('/dashboard/subscription-old')
-    }
-    else{
+    // if(this.providerData.subcriptionId){
+    //   this.router.navigateByUrl('/dashboard/subscription-old')
+    // }
+    // else{
     this.providerService.getPlans().subscribe(res=>{
       console.log('Res')
       console.log(res)
       this.planData=res;
+      this.displayPlan=true;
     })
-    }   
+    // }   
   }
-  Subscribe(){
-    this.router.navigateByUrl('/dashboard/subscription-new/'+this.planData[0].planId);
+  Subscribe(planId){
+    this.router.navigateByUrl('/dashboard/subscription-new/'+planId);
   }
 
 }
