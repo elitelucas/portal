@@ -182,6 +182,14 @@ export class ProviderService {
     return this.http.post(subcriptionUrl,data);
 
   }
+  getPlansById(planId){
+    const getPlansUrl= baseUrl + 'plans/'+planId;
+    return this.http.get<any>(getPlansUrl);
+  }
+  getCard(providerId){
+    const getCardUrl= baseUrl + 'provider/card/'+providerId;
+    return this.http.get<any>(getCardUrl);
+  }
 
   trace(...arg) {
     var now = (window.performance.now() / 1000).toFixed(3);

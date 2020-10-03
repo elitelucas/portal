@@ -7,8 +7,26 @@
         <p>You can set-up automatic payments or pay as you go. If you are a small clinic or hospital and want to
             know how we can improve your practice, contact us, we ll be happy to help.</p>
     </div>
-    <div>
+    <div class="row">
+        <div class="col-4">
+            <span>Card:{{cardData && cardData.card_number}}</span>
 
+        </div>
+        <div class="col-4">
+            <button class="btn btn-danger" (click)="Delete(cardData.card_number)">Remove</button>
+        </div>
+        <div class="col-2">
+            Plan Basic
+
+        </div>
+        <div class="col-2">
+            $/30
+
+        </div>
+
+    </div>
+    <div class="mb-3">
+        <button class="btn btn-primary">Add Card</button>
     </div>
 
     <div class="row">
@@ -25,7 +43,7 @@
                     <p class="card-text">- Payments with 0 commision and direct to your bank account.</p>
                 </div>
                 <div class="text-center">
-                    <h2>$/45.00</h2>
+                    <h2>$/{{planData && planData.amount}}</h2>
                 </div>
                 <div class="text-center">
                     <button class="btn btn-primary">Subscribe now</button>

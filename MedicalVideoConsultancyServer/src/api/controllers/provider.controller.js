@@ -910,6 +910,18 @@ exports.unsubscribePlanWithCard = async (req, res, next) => {
   }    
 };
 
+exports.getCard=async (req, res, next)=>{
+  try{
+    const providerId=req.params.providerId;
+    const card=await Card.findOne({providerId:providerId});
+    res.status(httpStatus.OK).json(card);
+  }catch(e){
+    console.log("error ", e)
+    error = new APIError(e);
+    return next(error)
+  }
+}
+
 
 /**
  * @api v1/provider/subcription

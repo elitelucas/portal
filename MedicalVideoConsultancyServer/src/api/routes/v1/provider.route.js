@@ -155,8 +155,11 @@ router.route('/subcription')
 /**
    * @api v1/provider/subcription
    * */
-  router.route('/subcription/:providerid')
+router.route('/subcription/:providerid')
     .delete(controller.unsubscribePlanWithCard);
+
+router.route('/card/:providerId')
+    .get(controller.getCard)
   
 /**
  * @api v1/provider/notify
