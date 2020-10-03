@@ -88,12 +88,28 @@ export class HealthRoomComponent implements OnInit {
     });
 */
     this.meetRoomService.receiveEndCall()
-    .subscribe(text=>{
+    .subscribe(async (text)=>{
       if(text==='acceptEnd'){
         this._router.navigateByUrl("/dashboard/health-provider")
       }
     })
 
+  }
+
+  public mute(){
+    this.meetRoomService.localMuteActive(true);
+  }
+
+  public desmute(){
+    this.meetRoomService.localMuteActive(false);
+  }
+
+  public videomute(){
+    this.meetRoomService.localVideoActive(true);
+  }
+
+  public videodesmute(){
+    this.meetRoomService.localVideoActive(false);
   }
 
   async startVideoCall(){
@@ -132,7 +148,8 @@ export class HealthRoomComponent implements OnInit {
     this.key[kk]=true;
   }
 
-  public endCall(){
+  public endCall(){    
+    this.meetRoomService.stopVideoAudio();
     this.meetRoomService.endCall(this.patient.socketId,'endCall');
   }
 

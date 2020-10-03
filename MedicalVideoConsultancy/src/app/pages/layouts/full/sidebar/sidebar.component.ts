@@ -115,6 +115,14 @@ export class AppSidebarComponent implements OnInit {
     this.meetRoomService.desactiveProvider(this.currentUser);
   }
 
+  publicMe(){
+    this.meetRoomService.publicMe(this.currentUser.id);
+  }
+
+  privateMe(){
+    this.meetRoomService.privateMe(this.currentUser.id);
+  }
+
   nextAttetion() {
     // console.log("startPreCall")
     //console.log(this.waitingPatientsData)this.meetRoomService.init();

@@ -19,7 +19,9 @@ export class MeetRoomService {
   private remoteVideo = null;
 
   public myPeer = null;
+  public localCall = null;
   public myPeerId = null;
+
 
   constructor() {
   }
@@ -27,29 +29,56 @@ export class MeetRoomService {
   public async startLocalMediaVideo() {
     this.localStream = await window.navigator.mediaDevices.getUserMedia({
       video: true,
-      audio: false
+      audio: true
     });
     this.localVideo.nativeElement.srcObject = this.localStream;
   }
 
+  public stopVideoAudio() {
+    if (this.localStream != null) {
+      this.localStream.getTracks().forEach((track) => {
+        track.stop();
+      });
+      this.localStream = null;
+    }
+    if (this.localVideo != null) {
+      this.localVideo.nativeElement.srcObject = null;
+      this.localVideo = null;
+    }
+    this.remoteVideo = null;
+    if (this.localCall != null) {
+      this.localCall.close();
+    }
+  }
+
   public setLocalElement(lv) {
     this.localVideo = lv;
+    this.localVideo.nativeElement.volume = 0;
+    this.localVideo.nativeElement.muted = 0;
   }
 
   public setRemoteElement(rv) {
     this.remoteVideo = rv;
   }
 
-                /*{
-                    url: 'stun:stun.nemiac.com:5349',
-                    credential: '12345', 
-                    username: 'robin'
-                },
-                {
-                    url: 'turn:turn.nemiac.com:5349',
-                    credential: 'guest', 
-                    username: 'somepassword'
-                }*//**/
+  public localMuteActive(active) {
+    this.localStream.getAudioTracks()[0].enabled = !active;
+  }
+
+  public localVideoActive(active) {
+    this.localStream.getVideoTracks()[0].enabled = !active;
+  }
+
+  /*{
+      url: 'stun:stun.nemiac.com:5349',
+      credential: '12345', 
+      username: 'robin'
+  },
+  {
+      url: 'turn:turn.nemiac.com:5349',
+      credential: 'guest', 
+      username: 'somepassword'
+  }*//**/
   public connect() {
     return Observable.create((observer) => {
       let config = {
@@ -82,19 +111,13 @@ export class MeetRoomService {
       });
 
       this.myPeer.on('call', call => {
-        console.log("call")
+        console.log("call               ---------------------------------------")
+        this.localCall = call;
         call.answer(this.localStream)
-        const video = document.createElement('video')
         call.on('stream', userVideoStream => {
-          //addVideoStream(video, userVideoStream)
           this.remoteVideo.nativeElement.srcObject = userVideoStream;
         })
       })
-
-      /*this.myPeer.on('disconnected', () => {
-        console.log('Connection lost. Please reconnect');
-        this.myPeer.reconnect();
-      });*/
 
       this.myPeer.on('error', (err) => {
         console.log("err")
@@ -109,31 +132,33 @@ export class MeetRoomService {
   callPatient(patient) {
     console.log("callPatient ", patient.peerId)
     /*console.log("callPatient this.localStream", this.localStream)*/
-    var call = this.myPeer.call(patient.peerId, this.localStream);
+    this.localCall = this.myPeer.call(patient.peerId, this.localStream);
     //console.log("stream 2")
-    call.on('stream', (remoteStream) => {
+    this.localCall.on('stream', (remoteStream) => {
       //console.log("stream 3 " , remoteStream)
       this.remoteVideo.nativeElement.srcObject = remoteStream;
     });
   }
-  
-    waitCallComplete() {
-      console.log("waitCallComplete")
-      return Observable.create((observer) => {
-        this.myPeer.on('call', (call) => {
-          console.log("call")
-          console.log("call this.localStream", this.localStream)
-          call.answer(this.localStream);
-          //console.log("answer localStream")
-          call.on('stream', (remoteStream) => {
-            //console.log("stream : " , remoteStream)
-            this.remoteVideo.nativeElement.srcObject = remoteStream;
-          });
-          //console.log("stream 22")
-          observer.next(call)
+
+  waitCallComplete() {
+    console.log("waitCallComplete")
+    return Observable.create((observer) => {
+      this.myPeer.on('call', (call) => {
+        console.log("call               23432423324-----------------")
+        this.localCall = call;
+        console.log("call")
+        console.log("call this.localStream", this.localStream)
+        call.answer(this.localStream);
+        //console.log("answer localStream")
+        call.on('stream', (remoteStream) => {
+          //console.log("stream : " , remoteStream)
+          this.remoteVideo.nativeElement.srcObject = remoteStream;
         });
+        //console.log("stream 22")
+        observer.next(call)
       });
-    }
+    });
+  }
 
   public updatePatientState() {
     return Observable.create((observer) => {
@@ -402,6 +427,14 @@ export class MeetRoomService {
         observer.next(providerId)
       });
     });
+  }
+
+  public publicMe(providerId){
+    this.socket.emit("publicMe", providerId);
+  }
+
+  public privateMe(providerId){
+    this.socket.emit("publicMe", providerId);
   }
 
   trace(...arg) {

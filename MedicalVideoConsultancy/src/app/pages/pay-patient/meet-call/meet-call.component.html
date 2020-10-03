@@ -39,6 +39,21 @@
                   Please watch video and Imagine how to do consultancy
                 </mat-card-title>
                 <mat-card-content>
+                  <div>
+
+                    <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="mute()">
+                      Mute
+                    </button>
+                    <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="desmute()">
+                      DesMute
+                    </button>
+                    <button type="button" mat-button color="warn" class="mt-5 p-2 h-p-40" (click)="videomute()">
+                      Video Mute
+                    </button>
+                    <button type="button" mat-button color="warn" class="mt-5 p-2 h-p-40" (click)="videodesmute()">
+                      Video Desmute
+                    </button>
+                  </div>
                   <div class="video-container">
                     <video autoplay class="remote-video" #remoteVideo id="remoteVideo"></video>
                     <video autoplay muted class="local-video" #localVideo id="localVideo"></video>
@@ -48,68 +63,67 @@
             </ng-container>
           </div>
           <div class="col-lg-4">
-              <mat-card>
-                <mat-card-title class="display-6 pt-5 d-flex justify-content-center">
-                  <h3 class="font-weight-bold">Text Chat</h3>
-                </mat-card-title>
-                <mat-card-content>
-                  <form [formGroup]="roomChatForm" (ngSubmit)="sendText();textInput.value=''">
-                      <div class="w-100 p-10 border-radius-5 scroll-div" id="chatText" #chatText>
-                      </div>
-                      <div>
-                          <input #textInput formControlName="text" class="border-radius-5 chat-input" type="text" placeholder="message">
-                          <button type="submit" style="bottom: 0;"
-                              class="btn btn-primary">Send</button>
-                      </div>
-                  </form>
+            <mat-card>
+              <mat-card-title class="display-6 pt-5 d-flex justify-content-center">
+                <h3 class="font-weight-bold">Text Chat</h3>
+              </mat-card-title>
+              <mat-card-content>
+                <form [formGroup]="roomChatForm" (ngSubmit)="sendText();textInput.value=''">
+                  <div class="w-100 p-10 border-radius-5 scroll-div" id="chatText" #chatText>
+                  </div>
+                  <div>
+                    <input #textInput formControlName="text" class="border-radius-5 chat-input" type="text"
+                      placeholder="message">
+                    <button type="submit" style="bottom: 0;" class="btn btn-primary">Send</button>
+                  </div>
+                </form>
               </mat-card-content>
             </mat-card>
           </div>
         </div>
-     
+
         <div class="super">
           <p>File share to consults!</p>
           <div class="main-div">
-              <div class="sub-div">
-                <div *ngIf="downloadFileList">
-                  <h3>Uploaded By provider</h3>
-                  <p [class]="classKey[i]?'list p-bckground':'list'" 
-                  (click)="changeClass(i,'down')" 
+            <div class="sub-div">
+              <div *ngIf="downloadFileList">
+                <h3>Uploaded By provider</h3>
+                <p [class]="classKey[i]?'list p-bckground':'list'" (click)="changeClass(i,'down')"
                   *ngFor="let item of downloadFileList;let i=index">{{i+1}}. {{item}}</p>
-                </div>
-                <div *ngIf="fileName">
-                  <h3>Uploaded by you</h3>
-                  <p [class]="upClassKey[i]?'list p-bckground':'list'" 
-                  (click)="changeClass(i,'up')" 
+              </div>
+              <div *ngIf="fileName">
+                <h3>Uploaded by you</h3>
+                <p [class]="upClassKey[i]?'list p-bckground':'list'" (click)="changeClass(i,'up')"
                   *ngFor="let item of fileName;let i=index">{{i+1}}. {{item}}</p>
+              </div>
+              <div class="button-div">
+                <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleDownload()">
+                  <mat-icon>file_download</mat-icon>
+                  Download
+                </button>
+              </div>
+            </div>
+            <div class="sub-div">
+              <div *ngFor="let name of fileName;let i=index">
+                {{i+1}}.{{name}}
+              </div>
+              <div class="form-file-upload button-div">
+                <ng-container *ngFor="let file of files">
+                  <mat-progress-bar [value]="file.progress"></mat-progress-bar>
+                </ng-container>
+                <div class="upload-btn">
+                  <input type="file" #fileUpload id="fileUpload" name="fileUpload" multiple="multiple" accept="*"
+                    style="display:none;" />
+                  <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleUpload()">
+                    <mat-icon>file_upload</mat-icon>
+                    Upload
+                  </button>
                 </div>
-                  <div class="button-div">
-                      <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleDownload()">
-                          <mat-icon>file_download</mat-icon>
-                          Download
-                        </button>
-                  </div>
               </div>
-              <div class="sub-div">
-                  <div *ngFor="let name of fileName;let i=index">
-                      {{i+1}}.{{name}}
-                  </div>
-                  <div class="form-file-upload button-div">
-                      <ng-container *ngFor="let file of files">
-                        <mat-progress-bar [value]="file.progress"></mat-progress-bar>
-                      </ng-container>
-                      <div class="upload-btn">
-                        <input type="file" #fileUpload id="fileUpload" name="fileUpload" multiple="multiple" accept="*" style="display:none;" />
-                        <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleUpload()">
-                          <mat-icon>file_upload</mat-icon>
-                          Upload
-                        </button>
-                      </div>
-                    </div>
-              </div>
+            </div>
           </div>
-    
-      
+
+
         </div>
       </div>
     </mat-sidenav-content>

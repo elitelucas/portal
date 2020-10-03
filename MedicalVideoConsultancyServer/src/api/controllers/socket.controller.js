@@ -51,6 +51,22 @@ const updateUserProviderState = async (idc, userProvider) => {
   }
 };
 
+
+const publicUserProviderState = async (providerId) => {
+  try {
+    let userProvider = await User.findOne({
+      _id: providerId
+    });
+    userProvider.providerPublic = userProvider.providerPublic ? !userProvider.providerPublic : true;
+    return await User.findOneAndUpdate({
+      _id: providerId
+    }, userProvider);
+  } catch (e) {
+    logger.error("updateUserProviderState e :" + e)
+  }
+};
+
+
 //------------------------------------------
 
 const confirmConnectProvider = async (idProvider, socketId, user) => {
@@ -381,12 +397,10 @@ io.on('connection', (socket) => {
   socket.on('confirmConnect', async (userProvider) => {
     if (userProvider) {
       logger.info('confirmConnect :' + socket.id + ' - ' + userProvider.id);
-      //console.log("confirmConnect ", userProvider)
-      //console.log("create room :", userProvider.id + "-" + userProvider.room)
       await confirmConnectProvider(userProvider.id, socket.id, userProvider);
     }
   });
-  
+
 
   socket.on('sendUploadFile', async (uploadFileName, key, othersId) => {
     var sender = {};
@@ -513,7 +527,7 @@ io.on('connection', (socket) => {
     if (userProvider) {
       await updateUserProviderState(userProvider);
       const id = userProvider._id ? userProvider._id : userProvider.id;
-      logger.info('preparateVideoCall :' + socket.id + " - join room :"+ id + "-" + userProvider.room)
+      logger.info('preparateVideoCall :' + socket.id + " - join room :" + id + "-" + userProvider.room)
       socket.join(id + "-" + userProvider.room);
     }
   });
@@ -523,64 +537,36 @@ io.on('connection', (socket) => {
       data.patient.socketId = socket.id;
       await updateUserPatientState(data.patient)
       const id = data.provider._id ? data.provider._id : data.provider.id;
-      logger.info('preparateVideoCall :' + socket.id + " - join room :"+ id + "-" + data.provider.room)
+      logger.info('preparateVideoCall :' + socket.id + " - join room :" + id + "-" + data.provider.room)
       socket.join(id + "-" + data.provider.room);
       socket.to(id + "-" + data.provider.room).broadcast.emit('patient_connected', data.patient);
     }
   });
 
-  socket.on('start_call_patient', async (data) => {
-    console.log(data);
+  socket.on("publicMe", providerId => {
+    publicUserProviderState(providerId); 
   });
 
-  //------------------------
-
-  /*socket.on('startAttetion', async (provider, patient) => {
-    logger.info('startAttetion :' + socket.id + " - " + provider.id);
-    await startCallProvider(provider.id, patient._id, (patientSocketId, providerSocketId) => {
-      socket.join(provider.room)
-      socket.to(patientSocketId).emit("startAttetionOfProvider", providerSocketId);
-    });
-  });*/
-
-  /*', async (patient) => {
-    logger.info('confirmReadyPatient :' + socket.id + " - " + patient._id);
-    notifyProvider(patient, (provider) => {
-      socket.join(provider.room)
-      logger.info("confirmReadyPatient " + provider._id + " - " + provider.socketId);
-      socket.to(provider.socketId).emit("confirmReadyPatient", patient);
-    });
-  });*/
-
   socket.on("chat_provider", data => {
-    console.log("chat_provider from: ", socket.id, data.from, data.text);
     socket.emit("chat_provider", {
       text: data.text,
       from: data.from,
       to: data.to
     });
-    console.log("chat_provider to: ", socket.id, data.to, data.text);
+
     socket.to(data.to).emit("chat_provider", {
       text: data.text,
       from: data.from,
       to: data.to
     });
   });
+
   socket.on("endCall", data => {
-    console.log("endCall to: ", socket.id, data);
     socket.to(data.to).emit("endCall", {
       text: data.text,
       from: data.from,
       to: data.to
     });
   });
-  /*socket.on('createRoom', data => {
-    socket.join(data);
-  })*/
-  /*socket.on('createProviderRoom', data => {
-    socket.join(data.providerId);
-    socket.emit('receiveProviderId', data.providerId);
-    socket.to(data.dni).emit('receiveProviderId', data.providerId);
-  })*/
 
 });

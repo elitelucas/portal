@@ -110,15 +110,15 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  sigImgSrc:{
-    type:String,
-    default:''
+  sigImgSrc: {
+    type: String,
+    default: ''
   },
-  payMethod:{
-    type:Object
+  payMethod: {
+    type: Object
   },
-  blog:{
-    type:Array
+  blog: {
+    type: Array
   },
   address: {
     type: String
@@ -136,6 +136,10 @@ const userSchema = new mongoose.Schema({
     type: String
   },
   subcriptionStatus: {
+    type: Boolean,
+    default: false
+  },
+  providerPublic: {
     type: Boolean,
     default: false
   },
@@ -170,7 +174,7 @@ userSchema.pre('save', async function save(next) {
 userSchema.method({
   transform() {
     const transformed = {};
-    const fields = ['id', 'firstName', 'lastName', 'email','phoneNumber','subcriptionId','subcriptionStatus', 'room', 'cmp', 'socketId', 'peerId', 'role','permission', 'status', 'state', 'image','connection','calling', 'createdAt'];
+    const fields = ['id', 'firstName', 'lastName', 'email', 'phoneNumber', 'subcriptionId', 'subcriptionStatus', 'providerPublic', 'room', 'cmp', 'socketId', 'peerId', 'role', 'permission', 'status', 'state', 'image', 'connection', 'calling', 'createdAt'];
 
     fields.forEach((field) => {
       transformed[field] = this[field];
@@ -249,15 +253,15 @@ userSchema.statics = {
    * @returns {Promise<User[]>}
    */
   list({
-    page = 1, perPage = 30, id, firstName, lastName, room, cmp, socketId, peerId, email, role,permission, status, state, date, subcriptionId  ,subcriptionStatus
+    page = 1, perPage = 30, id, firstName, lastName, room, cmp, socketId, peerId, email, role, permission, status, state, providerPublic, date, subcriptionId, subcriptionStatus
   }) {
-    const options = omitBy({ id, firstName, lastName, room, cmp, socketId, peerId, email, role,permission, status, state, date, subcriptionId  ,subcriptionStatus}, isNil);
+    const options = omitBy({ id, firstName, lastName, room, cmp, socketId, peerId, email, role, permission, status, state, providerPublic, date, subcriptionId, subcriptionStatus }, isNil);
 
     return this.find(options)
-    .sort({ createdAt: -1 })
-    .skip(perPage * (page - 1))
-    .limit(perPage)
-    .exec();
+      .sort({ createdAt: -1 })
+      .skip(perPage * (page - 1))
+      .limit(perPage)
+      .exec();
   },
 
   /**
@@ -269,7 +273,7 @@ userSchema.statics = {
    */
   checkDuplicateField(error) {
     let field = '';
-    for(let key in error.keyValue) {
+    for (let key in error.keyValue) {
       field = key;
     }
     if (error.name === 'MongoError' && error.code === 11000) {
@@ -278,7 +282,7 @@ userSchema.statics = {
         errors: [{
           field: field,
           location: 'body',
-          messages: [field +' already exists'],
+          messages: [field + ' already exists'],
         }],
         status: httpStatus.CONFLICT,
         isPublic: true,

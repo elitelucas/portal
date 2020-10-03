@@ -15,7 +15,7 @@ const Plan = require('../models/plan.model');
 const Card = require('../models/card.model');
 
 const { date } = require('joi');
-const {env, emailConfig} = require('../../config/vars');
+const { env, emailConfig } = require('../../config/vars');
 var mime = require('mime');
 var fs = require('fs');
 
@@ -206,11 +206,11 @@ exports.getAllPatients = async (req, res, next) => {
 
 exports.getConsult = async (req, res, next) => {
   try {
-    const patientId=req.params.patientId;
-    const startDate=req.params.startDate;
-    const endDate=req.params.endDate;
-    consult = await Consult.find({patientId,createdAt: {"$gte": new Date(startDate), "$lt": new Date(endDate)}})
-    .sort({createdAt:-1}).exec();
+    const patientId = req.params.patientId;
+    const startDate = req.params.startDate;
+    const endDate = req.params.endDate;
+    consult = await Consult.find({ patientId, createdAt: { "$gte": new Date(startDate), "$lt": new Date(endDate) } })
+      .sort({ createdAt: -1 }).exec();
     res.status(httpStatus.OK).json(consult);
   } catch (e) {
     console.log("getConsult:", error);
@@ -220,11 +220,11 @@ exports.getConsult = async (req, res, next) => {
 
 exports.getOneConsult = async (req, res, next) => {
   try {
-    const patientId=req.query.patientId;
-    const consultId=req.query.consultId
-    patient=await Patient.findById(patientId).exec();
+    const patientId = req.query.patientId;
+    const consultId = req.query.consultId
+    patient = await Patient.findById(patientId).exec();
     consult = await Consult.findById(consultId).exec();
-    consult.patient=patient;  
+    consult.patient = patient;
     res.status(httpStatus.OK).json(consult);
   } catch (e) {
     console.log("getConsult:", error);
@@ -236,35 +236,39 @@ exports.updateConsult = async (req, res, next) => {
   try {
     /*console.log('req.body')
     console.log(req.body)*/
-    const consultId=req.body.consultId;
-    const updateData=req.body.updateData;
-    const symptom=[updateData.symptom0,updateData.symptom1,updateData.symptom2,updateData.symptom3];
+    const consultId = req.body.consultId;
+    const updateData = req.body.updateData;
+    const symptom = [updateData.symptom0, updateData.symptom1, updateData.symptom2, updateData.symptom3];
 
     const updatedConsult = await Consult.findByIdAndUpdate(
-      consultId, 
-      {"$set":{
-        allergy:updateData.allergy,
-        timeOfDisease:updateData.timeOfDisease,
-        wayOfStart:updateData.wayOfStart,
-        symptom:symptom,
-        history:updateData.history,
-        subjective:updateData.subjective,
-        objective:updateData.objective,
-        assessment:updateData.assessment,
-        plan:updateData.plan,
-        providerFiles:updateData.providerFiles,
-      }},
-      {new:true});
+      consultId,
+      {
+        "$set": {
+          allergy: updateData.allergy,
+          timeOfDisease: updateData.timeOfDisease,
+          wayOfStart: updateData.wayOfStart,
+          symptom: symptom,
+          history: updateData.history,
+          subjective: updateData.subjective,
+          objective: updateData.objective,
+          assessment: updateData.assessment,
+          plan: updateData.plan,
+          providerFiles: updateData.providerFiles,
+        }
+      },
+      { new: true });
 
 
     const updatedPatient = await Patient.findOneAndUpdate(
-      {_id: req.body.patientId}, 
-      {"$set":{
-        fullName:updateData.name,
-        age:updateData.age,
-        phoneNumber:updateData.phoneNumber,
-      }},
-      {new:true});
+      { _id: req.body.patientId },
+      {
+        "$set": {
+          fullName: updateData.name,
+          age: updateData.age,
+          phoneNumber: updateData.phoneNumber,
+        }
+      },
+      { new: true });
     return res.status(httpStatus.OK).json(updatedConsult);
   } catch (e) {
     return next(APIError(e))
@@ -286,11 +290,11 @@ exports.getConsultInChat = async (req, res, next) => {
 
 exports.fileUpload = async (req, res) => {
   const file = req.files.file;
-  var fieldName='providerFiles';
-  var rand_no = Math.floor(123123123123*Math.random());
-  const fileName=rand_no+file.name;
+  var fieldName = 'providerFiles';
+  var rand_no = Math.floor(123123123123 * Math.random());
+  const fileName = rand_no + file.name;
   const imagePath = path.join(__dirname + './../../public/consult/');
-  if(req.body.key==='newConsult'){
+  if (req.body.key === 'newConsult') {
     file.mv(imagePath + fileName, function (error) {
       if (error) {
         console.log("file upload error", error)
@@ -298,16 +302,16 @@ exports.fileUpload = async (req, res) => {
         res.status(httpStatus.CREATED).json(fileName);
       }
     });
-  }else{
+  } else {
     file.mv(imagePath + fileName, function (error) {
       if (error) {
         console.log("file upload error", error)
       } else {
-        Consult.findOne({},{},{sort:{createdAt:-1}}).then(result=>{
-          if(req.body.key==='patient')
-          fieldName='patientFiles';          
+        Consult.findOne({}, {}, { sort: { createdAt: -1 } }).then(result => {
+          if (req.body.key === 'patient')
+            fieldName = 'patientFiles';
           result[fieldName].push(fileName);
-          result.save().then(result2=>{
+          result.save().then(result2 => {
             console.log('result')
             console.log(result)
             res.status(httpStatus.CREATED).json(fileName);
@@ -317,13 +321,13 @@ exports.fileUpload = async (req, res) => {
       }
     });
   }
- 
+
 };
 
 exports.uploadCkImage = async (req, res) => {
   const file = req.files.attachment;
-  var rand_no = Math.floor(123123123123*Math.random());
-  const fileName=rand_no+file.name;
+  var rand_no = Math.floor(123123123123 * Math.random());
+  const fileName = rand_no + file.name;
   const imagePath = path.join(__dirname + './../../public/images/');
   file.mv(imagePath + fileName, function (error) {
     if (error) {
@@ -336,36 +340,36 @@ exports.uploadCkImage = async (req, res) => {
 
 
 exports.getSignature = async (req, res) => {
-    const providerId=req.params.providerId;
-    const user = await User.findById(providerId).exec();
-    /*console.log('user.sigImgSrc')
-    console.log(user.sigImgSrc)*/
-    if(user.sigImgSrc)
-      res.status(httpStatus.CREATED).json(user.sigImgSrc);
-    else{
-      res.status(httpStatus.NOT_FOUND).send();
-    }
+  const providerId = req.params.providerId;
+  const user = await User.findById(providerId).exec();
+  /*console.log('user.sigImgSrc')
+  console.log(user.sigImgSrc)*/
+  if (user.sigImgSrc)
+    res.status(httpStatus.CREATED).json(user.sigImgSrc);
+  else {
+    res.status(httpStatus.NOT_FOUND).send();
+  }
 
-    // if(user.sigImgSrc){
-    //   const filename=user.sigImgSrc;
+  // if(user.sigImgSrc){
+  //   const filename=user.sigImgSrc;
 
-    //   const imagePath = path.join(__dirname + './../../public/images/');
- 
-    //   const file = imagePath+filename;
-    
-    //   if(fs.existsSync(file)){
-    //     const mimetype = mime.lookup(file);
-    
-    //     res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-    //     res.setHeader('Content-type', mimetype);
-      
-    //     var filestream = fs.createReadStream(file);
-    //     filestream.pipe(res);
-    //   }else
-    //   console.log('There is no such file.')
-    // }else{
-    //   console.log("Error: there is no such field in users collection")
-    // }
+  //   const imagePath = path.join(__dirname + './../../public/images/');
+
+  //   const file = imagePath+filename;
+
+  //   if(fs.existsSync(file)){
+  //     const mimetype = mime.lookup(file);
+
+  //     res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+  //     res.setHeader('Content-type', mimetype);
+
+  //     var filestream = fs.createReadStream(file);
+  //     filestream.pipe(res);
+  //   }else
+  //   console.log('There is no such file.')
+  // }else{
+  //   console.log("Error: there is no such field in users collection")
+  // }
 
 };
 
@@ -390,7 +394,7 @@ exports.mail = async (req, res) => {
       html: req.body.html
     };
 
-    transporter.sendMail(mailOptions, function(error, info){
+    transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
         console.log(error);
       } else {
@@ -649,7 +653,7 @@ exports.charge = async (req, res, next) => {
       email: email,
     });
     charge = await culqi.charges.createCharge({
-      amount: (amount*100),
+      amount: (amount * 100),
       currency_code: currency_code,
       email: email,
       source_id: token.id,
@@ -658,7 +662,7 @@ exports.charge = async (req, res, next) => {
     console.log("error ", e)
     error = new APIError(e);
     return next(error)
-  }    
+  }
   try {
     const paysubcription = new Paysubcription({
       plan: "basic",
@@ -667,7 +671,7 @@ exports.charge = async (req, res, next) => {
       createDate: new Date(),
       currencyCode: currency_code,
       card: card_number,
-      amount: (amount*100),
+      amount: (amount * 100),
       email: email,
       status: "active"
     });
@@ -706,18 +710,18 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
         email: cardData.email,
       });
 
-      if(provider.customerId == undefined){
+      if (provider.customerId == undefined) {
         let customerCulqi = await culqi.customers.createCustomer({
           first_name: provider.firstName,
           last_name: provider.lastName,
           email: provider.email,
           address: provider.address == undefined ? cardData.address : provider.address,
-          address_city: provider.address_city == undefined ? cardData.address_city : provider.address_city ,
+          address_city: provider.address_city == undefined ? cardData.address_city : provider.address_city,
           country_code: provider.country_code == undefined ? cardData.country_code : provider.country_code,
           phone_number: provider.phoneNumber == undefined ? cardData.phoneNumber : provider.phoneNumber,
         });
         provider.customerId = customerCulqi.id;
-        provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
+        provider = await User.findOneAndUpdate({ _id: providerId }, provider, { new: false });
       }
 
       let cardCulqi = await culqi.cards.createCard({
@@ -736,27 +740,27 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     }
 
     const subcriptionData = req.body.subcription;
-    let userProvider = await User.findById( providerId );
+    let userProvider = await User.findById(providerId);
 
-    if(userProvider != undefined){
-      const planSubcription = await Plan.findById(subcriptionData.id);     
+    if (userProvider != undefined) {
+      const planSubcription = await Plan.findById(subcriptionData.id);
       let subscriptionCulqi = await culqi.subscriptions.createSubscription({
         card_id: cardExists.cardId,
         plan_id: planSubcription.planId
-      });  
+      });
       userProvider.subcriptionId = subscriptionCulqi.id;
       userProvider.subcriptionStatus = true
-      userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});
-    
+      userProvider = await User.findOneAndUpdate({ _id: providerId }, userProvider, { new: false });
+
       res.status(httpStatus.OK).send()
-    }else{      
+    } else {
       res.status(httpStatus.NOT_FOUND).send()
-    }    
+    }
   } catch (e) {
     console.log("error ", e)
     error = new APIError(e);
     return next(error)
-  }    
+  }
 };
 
 /**
@@ -764,9 +768,9 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
  * @params providerId(_id), card_number, cvv, expiration_month, expiration_year, email, amount, currency_code
  * */
 exports.unsubscribePlanWithCard = async (req, res, next) => {
-  try {   
+  try {
     const providerId = req.params.providerid;
-    let userProvider = await User.findById( providerId );
+    let userProvider = await User.findById(providerId);
     const subcriptionId = userProvider.subcriptionId;
     const culqi = new Culqi({
       privateKey: culqiConfing.private_key,
@@ -778,14 +782,63 @@ exports.unsubscribePlanWithCard = async (req, res, next) => {
     });
     userProvider.subcriptionId = null;
     userProvider.subcriptionStatus = false;
-    userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});
+    userProvider = await User.findOneAndUpdate({ _id: providerId }, userProvider, { new: false });
     res.status(httpStatus.OK).send();
   } catch (e) {
     console.log("error ", e)
     error = new APIError(e);
     return next(error)
-  }    
+  }
 };
+
+
+/**
+ * @api v1/provider/subcription
+ * @params providerId(_id), card_number, cvv, expiration_month, expiration_year, email, amount, currency_code
+ * */
+exports.changeSubscribePlan = async (req, res, next) => {
+  try {
+    const providerId = req.params.providerid;
+    const cardData = req.body.card;
+    const subcriptionData = req.body.subcription;
+
+    let userProvider = await User.findById(providerId);
+    const subcriptionId = userProvider.subcriptionId;
+    
+    const culqi = new Culqi({
+      privateKey: culqiConfing.private_key,
+      pciCompliant: true,
+      publicKey: culqiConfing.private_key,
+    });
+
+    await culqi.subscriptions.deleteSubscription({
+      id: subcriptionId
+    });
+
+    const cardExists = await Card.findOne({ card_number: cardData.card_number });
+
+    const planSubcription = await Plan.findById(subcriptionData.id);
+    let subscriptionCulqi = await culqi.subscriptions.createSubscription({
+      card_id: cardExists.cardId,
+      plan_id: planSubcription.planId
+    });
+    userProvider.subcriptionId = subscriptionCulqi.id;
+    userProvider.subcriptionStatus = true
+    userProvider = await User.findOneAndUpdate({ _id: providerId }, userProvider, { new: false });
+
+    res.status(httpStatus.OK).send()
+
+    /*userProvider.subcriptionId = null;
+    userProvider.subcriptionStatus = false;
+    userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});*/
+    res.status(httpStatus.OK).send();
+  } catch (e) {
+    console.log("error ", e)
+    error = new APIError(e);
+    return next(error)
+  }
+};
+
 
 /**
  * @api v1/provider/cards
@@ -794,7 +847,7 @@ exports.unsubscribePlanWithCard = async (req, res, next) => {
 exports.listCards = async (req, res, next) => {
   try {
     const cardData = req.body;
-    const cards = await Card.find({ providerId:  cardData.providerId });
+    const cards = await Card.find({ providerId: cardData.providerId });
     if (cards == undefined) {
       res.status(httpStatus.CREATED).json(cards);
     } else {
@@ -813,7 +866,7 @@ exports.removeCard = async (req, res, next) => {
   try {
     const cardId = req.params.cardId;
     const cardExists = await Card.findOne({ _id: cardId });
-    if (cardExists == undefined) {      
+    if (cardExists == undefined) {
       res.status(httpStatus.NOT_FOUND).send();
     } else {
       const culqi = new Culqi({

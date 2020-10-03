@@ -1,4 +1,4 @@
-import { Component, ElementRef,OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from "@angular/router";
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material";
 import { ProviderService } from "../../_services/provider.service";
@@ -6,12 +6,12 @@ import { environment } from "../../../environments/environment";
 import { constant } from "../../_config/constant";
 import { MeetRoomService } from "../../_services/meet-room.service";
 import { Patient } from '../../_model/user';
-import {UserService} from "../../_services/user.service";
-import {AuthService} from "../../_services/auth.service";
+import { UserService } from "../../_services/user.service";
+import { AuthService } from "../../_services/auth.service";
 
 
 export interface PayData {
-  QRimg:object[];
+  QRimg: object[];
   account: string[];
   url: string[];
 }
@@ -36,13 +36,13 @@ export class PayPatientComponent implements OnInit {
   image: string;
   text: string;
 
-  data:any;
-  currentUser: any;
-  payData:PayData;
-  QRimgKey=[];
-  accountKey=false;
-  urlKey=false;
-  payAmount:string;
+  data: any;
+  //currentUser: any;
+  payData: PayData;
+  QRimgKey = [];
+  accountKey = false;
+  urlKey = false;
+  payAmount: string;
 
 
   defaultVideo = constant.defaultVideo;
@@ -60,62 +60,65 @@ export class PayPatientComponent implements OnInit {
   no_identify_patient = 'NOK';
 
   constructor(
-    private route: ActivatedRoute, 
-    public dialog: MatDialog, 
+    private route: ActivatedRoute,
+    public dialog: MatDialog,
     private providerService: ProviderService,
-    private meetRoomService: MeetRoomService, 
-    private userService:UserService,
-    private authService:AuthService,
-    private _route:Router
-    ) {
+    private meetRoomService: MeetRoomService,
+    private userService: UserService,
+    private authService: AuthService,
+    private _route: Router
+  ) {
 
+    this.route.paramMap.subscribe(params => {
+      this.roomName = params.get('roomName');
+    });
     this.dniPatient = localStorage.getItem('patient_dni');
-    this.currentUser = this.authService.getCurrentUser; 
-    this.QRimgKey[0]=false;
-    this.QRimgKey[1]=false;
-    this.route.params.subscribe(data=>{
-      this.roomName=data.roomName;
-    })
+    this.QRimgKey[0] = false;
+    this.QRimgKey[1] = false;
   }
 
   ngOnInit(): void {
-    this.userService.getPayData(this.currentUser.id).subscribe(res=>{
-      this.payData=res;
-      if(res===null || res.length===0){
-        this.payData={
-          QRimg:[],
-          account:[],
-          url:[]
-        }
-      }
-      if(this.payData){
-        if(this.payData.QRimg){
-          if(this.payData.QRimg[0]){
-            this.QRimgKey[0]=true;
-          }
-          if(this.payData.QRimg[1]){
-            this.QRimgKey[1]=true;
-          }
-        }else{
-          this.payData.QRimg=[];
-        }
-        if(this.payData.account){
-          this.accountKey=true;
-        }else{
-          this.payData.account=[];
-        }
-        if(this.payData.url){
-          this.urlKey=true;
-        }else{
-          this.payData.url=[]
-        }
-      }
-    })
+
+    
     this.providerService.checkRoomExist(this.roomName).subscribe(result => {
       if (result) {
         this.providerData = result;
+        console.log("providerData");
+        console.log(this.providerData);
+        this.userService.getPayData(this.providerData._id).subscribe(res => {
+          this.payData = res;
+          if (res === null || res.length === 0) {
+            this.payData = {
+              QRimg: [],
+              account: [],
+              url: []
+            }
+          }
+          if (this.payData) {
+            if (this.payData.QRimg) {
+              if (this.payData.QRimg[0]) {
+                this.QRimgKey[0] = true;
+              }
+              if (this.payData.QRimg[1]) {
+                this.QRimgKey[1] = true;
+              }
+            } else {
+              this.payData.QRimg = [];
+            }
+            if (this.payData.account) {
+              this.accountKey = true;
+            } else {
+              this.payData.account = [];
+            }
+            if (this.payData.url) {
+              this.urlKey = true;
+            } else {
+              this.payData.url = []
+            }
+          }
+        });
         this.getRoomDataById(this.providerData._id);
-        this.meetRoomService.patientEnteredInPayPatient(this.providerData._id,this.dniPatient);
+        this.meetRoomService.patientEnteredInPayPatient(this.providerData._id, this.dniPatient);
 
       }
     });
@@ -128,19 +131,19 @@ export class PayPatientComponent implements OnInit {
       this.text = this.roomData && this.roomData.text ? this.roomData.text : this.defaultText;
     })
   }
-  async ngAfterViewInit(){
-    this.meetRoomService.receivePay().subscribe(payAmount=>{
-      this.payAmount=payAmount;
+  async ngAfterViewInit() {
+    this.meetRoomService.receivePay().subscribe(payAmount => {
+      this.payAmount = payAmount;
     })
-    this.meetRoomService.receiveConfirmProvider().subscribe(confirmProvider=>{
-      if(confirmProvider)
-    this._route.navigateByUrl('attetion/'+this.roomName)
-  })
+    this.meetRoomService.receiveConfirmProvider().subscribe(confirmProvider => {
+      if (confirmProvider)
+        this._route.navigateByUrl('attetion/' + this.roomName)
+    })
   }
-  confirmPay(){
+  confirmPay() {
     this.meetRoomService.confirmPay(this.providerData._id);
   }
-  Cancel(){
+  Cancel() {
     this._route.navigateByUrl('/auth/sign-in-patient');
     this.clean();
     return;

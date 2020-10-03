@@ -1,10 +1,10 @@
-import { Component, OnInit, ElementRef, ViewChild, NgZone, Renderer2 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, ElementRef, ViewChild, NgZone, Renderer2, OnDestroy } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router, RouterEvent } from '@angular/router';
 import { ProviderService } from '../../../_services/provider.service';
 import { MeetRoomService } from '../../../_services/meet-room.service';
 import { Patient } from '../../../_model/user';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { timer, of } from 'rxjs';
+import { timer, of, Subject } from 'rxjs';
 import { HttpErrorResponse, HttpEventType } from "@angular/common/http";
 import { catchError, map } from "rxjs/operators";
 import { PatientService } from './../../../_services/patient.service';
@@ -17,6 +17,7 @@ import { saveAs } from 'file-saver'
   styleUrls: ['./meet-call.component.css']
 })
 export class MeetCallComponent implements OnInit {
+
   roomChatForm: FormGroup;
   fileName = [];
 
@@ -49,6 +50,9 @@ export class MeetCallComponent implements OnInit {
     this.roomChatForm = this.formBuilder.group({
       text: ['', Validators.required]
     });
+
+
+
   }
 
   get f() { return this.roomChatForm.controls; }
@@ -59,7 +63,7 @@ export class MeetCallComponent implements OnInit {
         this.providerData = result;
         this.providerSocketId = this.providerData.socketId;
       }
-    });    
+    });
 
     this.providerService.getPatient(this.dniPatient, 'dni').subscribe(async (patient: Patient) => {
       if (patient) {
@@ -74,9 +78,7 @@ export class MeetCallComponent implements OnInit {
     this.meetRoomService.setRemoteElement(this.remoteVideo);
     this.meetRoomService.startLocalMediaVideo();
     await timer(2000).toPromise();
-    this.meetRoomService.connect().subscribe(peerId=>{
-      console.log("peerId");
-      console.log(peerId);
+    this.meetRoomService.connect().subscribe(peerId => {
       this.patient.peerId = peerId;
       this.meetRoomService.preparateVideoCallFormPatient(this.providerData, this.patient);
     });
@@ -98,12 +100,21 @@ export class MeetCallComponent implements OnInit {
       console.log(uploadFileName)*/
     })
     this.meetRoomService.receiveEndCall()
-    .subscribe(text=>{
-      if(text==='endCall'){
-        this.meetRoomService.endCall(this.providerSocketId,'acceptEnd');
-        this._router.navigateByUrl("/home")
-      }
-    });
+      .subscribe(async (text) => {
+        if (text === 'endCall') {
+          this.meetRoomService.stopVideoAudio();
+          this.meetRoomService.endCall(this.providerSocketId, 'acceptEnd');
+          //await timer(5000).toPromise();
+          //this._router.onSameUrlNavigation = 'reload';
+          //this._router.navigateByUrl("/", {skipLocationChange: true});
+          /*this._router.routeReuseStrategy.shouldReuseRoute = function(){
+            return false;
+          }
+          this._router.navigate(["/"]);*/
+          this._router.navigated = false;
+          this._router.navigate(["/"]);
+        }
+      });
     this.meetRoomService.recivetext().subscribe((text) => {
       const p = this.renderer.createElement('p');
       const d = this.renderer.createText(text);
@@ -112,6 +123,21 @@ export class MeetCallComponent implements OnInit {
     });
   }
 
+  public mute() {
+    this.meetRoomService.localMuteActive(true);
+  }
+
+  public desmute() {
+    this.meetRoomService.localMuteActive(false);
+  }
+
+  public videomute() {
+    this.meetRoomService.localVideoActive(true);
+  }
+
+  public videodesmute() {
+    this.meetRoomService.localVideoActive(false);
+  }
 
   public sendText() {
     const text = this.f.text.value;
@@ -197,7 +223,7 @@ export class MeetCallComponent implements OnInit {
       this.upClassKey.push(false);
     })
   }
-  
+
   handleDownload() {
     if (this.downloadFile) {
       this.patientService.download('file-transfer/download/consult/' + this.downloadFile)
@@ -210,6 +236,7 @@ export class MeetCallComponent implements OnInit {
     var now = (window.performance.now() / 1000).toFixed(3);
     console.log(now + ': ', arg);
   }*/
+
 }
 
 
