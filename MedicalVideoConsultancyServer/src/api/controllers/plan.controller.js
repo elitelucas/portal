@@ -45,7 +45,8 @@ exports.create = async (req, res, next) => {
         amount: (planData.amount * 100),
         currency_code: planData.currency_code,
         interval: "meses",
-        interval_count: 1
+        interval_count: 1,
+        description: planData.description
       });
 
       planData['interval'] = "meses";
