@@ -191,6 +191,23 @@ export class ProviderService {
     return this.http.get<any>(getCardUrl);
   }
 
+  createPlan(data){
+
+    const createPlanUrl=baseUrl + 'plans';
+    return this.http.post(createPlanUrl,data);
+
+  }
+  updatePlans(data){
+    const updatePlansUrl = baseUrl + 'plans/update';
+    this.trace("updatePlansUrl:", updatePlansUrl);
+    return this.http.put(updatePlansUrl,data);
+  }
+  deletePlans(planId){
+    const deletePlansUrl = baseUrl + 'plans/'+planId;
+    this.trace("deletePlansUrl:", deletePlansUrl);
+    return this.http.delete(deletePlansUrl);
+  }
+
   trace(...arg) {
     var now = (window.performance.now() / 1000).toFixed(3);
     //console.log(now + ': ', arg);
