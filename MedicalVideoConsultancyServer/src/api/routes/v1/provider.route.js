@@ -191,7 +191,7 @@ router.route('/consult')
    * @api v1/provider/consult
    * @method post
    * */
-  router.route('/consult/:userId')
+router.route('/consult/:userId')
     .get(controller.getLastAttetions);
 
 /**

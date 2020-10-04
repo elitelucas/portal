@@ -18,6 +18,8 @@ import { SuperPlansComponent } from './super-plans/super-plans.component';
 import { SubscriptionPlanComponent } from './subscription-plan/subscription-plan.component';
 import { SubscriptionOldComponent } from './subscription-old/subscription-old.component';
 import { SubscriptionNewComponent } from './subscription-new/subscription-new.component';
+import { SuperUpdateComponent } from './super-providers/super-update/super-update.component';
+import { AdminUpdateComponent } from './super-administrators/admin-update/admin-update.component';
 
 
 const routes:Routes = [{
@@ -91,6 +93,14 @@ const routes:Routes = [{
     {
       path: 'administrators',
       component: SuperAdministratorsComponent,
+    },
+    {
+      path: 'super-update/:data',
+      component: SuperUpdateComponent,
+    },
+    {
+      path: 'admin-update/:data',
+      component: AdminUpdateComponent,
     },
     {
       path: 'feedbacks',

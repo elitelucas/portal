@@ -69,6 +69,8 @@ exports.list = async (req, res, next) => {
  */
 exports.remove = (req, res, next) => {
   const { user } = req.locals;
+  console.log('req.locals')
+  console.log(req.locals)
   user.remove()
     .then(() => res.status(httpStatus.NO_CONTENT).end())
     .catch(e => next(e));
@@ -78,18 +80,17 @@ exports.remove = (req, res, next) => {
 exports.getProviders = (req, res, next) => {
   User.find()
     .then((user) => {
-      console.log('usersdf')
-      console.log(user)
       res.status(httpStatus.OK).json(user)})
     .catch(e => next(e));
 };
 
+
+
 exports.getFilterProvider = (req, res, next) => {
   const fullName=req.params.filterValue;
-  const firstName=fullName.split( )[0];
-  const lastName=fullName.split( )[1];
-  console.log('fullName.split( )')
-  console.log(fullName.split( ))
+  const firstName=fullName.split(' ')[0];
+  const lastName=fullName.split(' ')[1];
+
   User.find({firstName,lastName})
     .then((user) => {
       console.log('user')
@@ -97,6 +98,77 @@ exports.getFilterProvider = (req, res, next) => {
       res.status(httpStatus.OK).json(user)})
     .catch(e => next(e));
 };
+
+/**
+ * Delete provider of users collection
+ * */
+
+exports.deleteProvider =async(req, res, next)=>{
+  try{
+    const providerId=req.params.providerId;
+    const user = await User.findByIdAndDelete(providerId);
+    res.status(httpStatus.OK).send();
+  }catch (error) {
+   res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
+ }
+
+}
+
+exports.getAdmins = (req, res, next) => {
+  Admin.find()
+    .then((admin) => {
+      res.status(httpStatus.OK).json(admin)})
+    .catch(e => next(e));
+};
+
+exports.createAdmin = async (req, res, next) => {
+  try{
+    await new Admin(req.body).save();
+    res.status(httpStatus.OK).json('ok');
+  }catch (error) {
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
+  }  
+};
+
+exports.updateAdmin = async (req, res, next) => {
+  try{
+    console.log('req.body')
+    console.log(req.body)
+    console.log('req.params.adminId')
+    console.log(req.params.adminId)
+    await Admin.findByIdAndUpdate(req.params.adminId,req.body);
+    res.status(httpStatus.OK).json('ok');
+  }catch (error) {
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
+  }  
+};
+
+exports.getFilterAdmin = (req, res, next) => {
+  const fullName=req.params.filterValue;
+  const firstName=fullName.split(' ')[0];
+  const lastName=fullName.split(' ')[1];
+
+  Admin.find({firstName,lastName})
+    .then((admin) => {
+      res.status(httpStatus.OK).json(admin)})
+    .catch(e => next(e));
+};
+
+/**
+ * Delete provider of users collection
+ * */
+
+exports.deleteAdmin =async(req, res, next)=>{
+  try{
+    const providerId=req.params.providerId;
+    const admin = await Admin.findByIdAndDelete(providerId);
+    res.status(httpStatus.OK).send();
+  }catch (error) {
+   res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
+ }
+
+}
+
 /**
  Send email when change user's status to approved or deny to user's email
  */
@@ -502,5 +574,8 @@ exports.deleteBlog = async (req, res, next) => {
   }
 
 };
+
+
+
 
 

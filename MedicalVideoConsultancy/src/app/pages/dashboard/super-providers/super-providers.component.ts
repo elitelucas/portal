@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import {MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort} from "@angular/material";
 import {DialogBoxComponent} from "../dialog-box/dialog-box.component";
 import {UserService} from "../../../_services/user.service";
-import {Router} from "@angular/router";
+import {ActivatedRoute,  Router} from "@angular/router";
 import Swal from 'sweetalert2';
 
 export interface UsersData {
@@ -30,11 +30,17 @@ export class SuperProvidersComponent implements OnInit {
   displayedColumns: string[] = ['userId', 'name', 'role', 'room', 'email', 'cmp','phoneNumber','permission', 'status', 'createdAt', 'action'];
   noDataToDisplay: boolean = false;
   dataSource: any;
+  tmpData:any;
 
   @ViewChild(MatTable)  table: MatTable<any>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-  constructor(public dialog: MatDialog, private userService: UserService, private router: Router) {
+  constructor(
+    public dialog: MatDialog, 
+    private userService: UserService, 
+    private router: Router,
+    private activatedRoute:ActivatedRoute
+    ) {
   }
 
 
@@ -50,6 +56,7 @@ export class SuperProvidersComponent implements OnInit {
          console.log("Token expired")
          this.router.navigateByUrl('/super')
        } else  {
+         this.tmpData=res;
          this.initDataSource(res);
        }
         this.noDataToDisplay = false;
@@ -63,7 +70,7 @@ export class SuperProvidersComponent implements OnInit {
     const userData: UsersData[] = [];
     data.forEach(function(item){
       if(item) {
-        userData.push({userId: item.id, name: item.firstName +" " + item.lastName, role: item.role, room: item.room, email: item.email, cmp: item.cmp, phoneNumber: item.phoneNumber, status: item.status,permission: item.permission, createdAt: item.createdAt});
+        userData.push({userId: item._id, name: item.firstName +" " + item.lastName, role: item.role, room: item.room, email: item.email, cmp: item.cmp, phoneNumber: item.phoneNumber, status: item.status,permission: item.permission, createdAt: item.createdAt});
       }
     });
 
@@ -78,8 +85,6 @@ export class SuperProvidersComponent implements OnInit {
       this.userService.getFilterData(filterValue)
       .subscribe(res=>{
         if(res){
-          console.log('res')
-          console.log(res)
           this.initDataSource(res);
           this.noDataToDisplay = false;
 
@@ -158,6 +163,43 @@ export class SuperProvidersComponent implements OnInit {
   arrangeDataSource() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+  }
+
+  New(){
+    this.router.navigateByUrl('/dashboard/super-update/new')
+  }
+  Update(data){
+    const sendData=JSON.stringify(data);
+    this.router.navigateByUrl('/dashboard/super-update/'+sendData);
+  }
+  Delete(providerId,idx){
+    console.log('idx')
+    console.log(idx)
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.userService.deleteProvider(providerId)
+          .subscribe(res => {
+            console.log('res')
+            console.log(res)
+            this.tmpData.splice(idx, 1);
+            this.initDataSource(this.tmpData);
+
+            Swal.fire(
+              'Deleted!',
+              'Your file has been deleted.',
+              'success'
+            )
+          })
+      }
+    })
   }
 
 

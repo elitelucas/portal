@@ -26,6 +26,39 @@ export class UserService {
     return this.http.get<any>(filterUrl);
   }
 
+   //Delete provider in users collection
+   deleteProvider(providerId) {
+    let deleteProvider=baseUrl+"/deleteProvider/"+providerId;
+    return this.http.delete<any>(deleteProvider);
+  }
+
+  getAdmins() {
+    let adminsUrl= baseUrl+"/super-admins";
+    return this.http.get<any>(adminsUrl);
+  }
+
+  createAdmin(data){
+    let adminsUrl= baseUrl+"/super-admins";
+    return this.http.post<any>(adminsUrl,data);
+  }
+  updateAdmin(data,adminId){
+    let adminsUrl= baseUrl+"/super-admins/"+adminId;
+    return this.http.put<any>(adminsUrl,data);
+  }
+
+  
+  getAdminFilterData(filterValue) {
+    let filterUrl=baseUrl+"/filterAdmin/"+filterValue;
+    return this.http.get<any>(filterUrl);
+  }
+
+   //Delete administrator in admins collection
+   deleteAdmin(providerId) {
+    let deleteAdmin=baseUrl+"/deleteAdmin/"+providerId;
+    return this.http.delete<any>(deleteAdmin);
+  }
+
+
   updateUserData(userData) {
     let updateUrl = baseUrl+ "/"+userData.userId;
     return this.http.patch<any>(updateUrl, userData)
@@ -101,4 +134,6 @@ export class UserService {
     let deleteBlog=baseUrl+"/deleteBlog/"+postId;
     return this.http.delete<any>(deleteBlog);
   }
+
+ 
 }

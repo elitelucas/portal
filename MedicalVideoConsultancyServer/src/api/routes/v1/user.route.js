@@ -92,9 +92,29 @@ router
   router.route('/super-providers')
   .get(controller.getProviders);
 
-
   router.route('/filterProvider/:filterValue')
   .get(controller.getFilterProvider);
+
+    /**
+   * api/v1/users/deleteProvider
+   * */
+  router.route('/deleteProvider/:providerId')
+  .delete(controller.deleteProvider);
+
+  router.route('/super-admins')
+  .get(controller.getAdmins);
+
+  router.route('/super-admins')
+  .post(controller.createAdmin);
+
+  router.route('/super-admins/:adminId')
+  .put(controller.updateAdmin);
+
+  router.route('/filterAdmin/:filterValue')
+  .get(controller.getFilterAdmin);
+
+  router.route('/deleteAdmin/:providerId')
+  .delete(controller.deleteAdmin);
 
   /**
   api/v1/users/email-verification
@@ -164,16 +184,18 @@ router
   router.route('/postBlog')
   .post(controller.postBlog);
 
-      /**
+    /**
    * api/v1/users/updateBlog
    * */
   router.route('/updateBlog')
   .put(authorize(),controller.updateBlog);
 
-       /**
+    /**
    * api/v1/users/deleteBlog
    * */
   router.route('/deleteBlog/:postId')
   .delete(authorize(),controller.deleteBlog);
+
+
 
 module.exports = router;
