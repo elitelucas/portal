@@ -45,6 +45,16 @@ const consultSchema = new Schema({
     type:String,
     default:''
   },
+  status: {
+    type:String,
+    default:'temporaly'
+  },
+  typeAttetion: {
+    type:String
+  },
+  reason: {
+    type:String
+  },
   plan: {
     type:String,
     default:''

@@ -64,6 +64,9 @@ export class Consult {
   objective: String;
   assessment: String;
   plan: String;
+  status: String;
+  typeAttetion: String;
+  reason: String;
   providerFiles: Array<string>;
   patientFiles: Array<string>;
   patient: Object;

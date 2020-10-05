@@ -998,30 +998,6 @@ exports.getLastAttetions = async (req, res, next) => {
 };
 
 
-/**
- * 
- * @param Consult result 
- *//*
-exports.createConsultEvent = async (result) => {
-  try {
-    const patientsData = await Patient.find({ room: result.room, connection: true });
-    const providerData = await User.findOne({ room: result.room });
-
-    //console.log("patientsData:",patientsData," \n providerData:",providerData);
-
-    const consult = await new Consult({
-      patientId: patientsData[0]._id,
-      providerId: providerData._id,
-      dni: patientsData[0].dni,
-      createDate: new Date()
-    }).save();
-
-    res.status(httpStatus.OK).send();
-  } catch (e) {
-    return new APIError(e)
-  }
-};*/
-
 
 exports.createFeedback = async (req, res, next) => {
   try {
