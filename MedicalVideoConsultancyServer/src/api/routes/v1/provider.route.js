@@ -178,6 +178,14 @@ router.route('/consult')
   router.route('/consult/:userId')
     .get(controller.getLastAttetions);
 
+
+/**
+ * @api v1/provider/consult
+ * @method post
+ * */
+router.route('/feedback')
+  .post(controller.createFeedback);
+
 /**
  * @api v1/provider/consult
  * @method post

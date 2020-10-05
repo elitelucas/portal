@@ -13,6 +13,8 @@ const Chart = require('../models/chart.model');
 const Paysubcription = require('../models/paysubcription.model');
 const Plan = require('../models/plan.model');
 const Card = require('../models/card.model');
+const FeedbackProvider = require('../models/feedbackProvider.model');
+const FeedbackApplication = require('../models/feedbackApplication.model');
 
 const { date } = require('joi');
 const { env, emailConfig } = require('../../config/vars');
@@ -999,7 +1001,7 @@ exports.getLastAttetions = async (req, res, next) => {
 /**
  * 
  * @param Consult result 
- */
+ *//*
 exports.createConsultEvent = async (result) => {
   try {
     const patientsData = await Patient.find({ room: result.room, connection: true });
@@ -1014,8 +1016,36 @@ exports.createConsultEvent = async (result) => {
       createDate: new Date()
     }).save();
 
-    return consult;
+    res.status(httpStatus.OK).send();
   } catch (e) {
     return new APIError(e)
+  }
+};*/
+
+
+exports.createFeedback = async (req, res, next) => {
+  try {
+    const patientsData = await Patient.findById(req.body.patientId);
+    const providerData = await User.findById(req.body.providerId);
+
+    await new FeedbackProvider({
+      patientId: patientsData._id,
+      providerId: providerData._id,
+      raking: req.body.feeback.rakingProvider,
+      comment: req.body.feeback.feedBackProvider
+    }).save();
+
+    await new FeedbackApplication({
+     patientId: patientsData._id,
+     providerId: providerData._id,
+     raking: req.body.feeback.rakingApp,
+     comment: req.body.feeback.feedBackApp
+   }).save();
+
+   res.status(httpStatus.OK).send();
+  } catch (e) {
+    console.log("error ", e)
+    error = new APIError(e);
+    return next(error)
   }
 };

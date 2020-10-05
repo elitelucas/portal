@@ -31,6 +31,7 @@ import { MeetPatientComponent } from './meet-patient/meet-patient.component';
 import { MeetCallComponent } from './meet-patient/meet-call/meet-call.component';
 import { PayPatientComponent } from './meet-patient/pay-patient/pay-patient.component';
 import { WaitingRoomComponent,InviteBySms2 } from './meet-patient/wating-room/waiting-room.component';
+import { FeebackComponent } from './meet-patient/feeback/feeback.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { WaitingRoomComponent,InviteBySms2 } from './meet-patient/wating-room/wa
     InviteBySms2,
     AdminComponent,
     MeetPatientComponent,
-    WaitingRoomComponent
+    WaitingRoomComponent,
+    FeebackComponent
   ],
   imports: [
     BrowserModule,

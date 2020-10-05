@@ -35,9 +35,16 @@ export class MeetRoomService {
   }
 
   public stopVideoAudio() {
+    try {
+      
     if (this.localStream != null) {
       this.localStream.getTracks().forEach((track) => {
-        track.stop();
+        if (track.readyState == 'live' && track.kind === 'video') {
+          track.stop();
+        }
+        if (track.readyState == 'live' && track.kind === 'audio') {
+          track.stop();
+        }
       });
       this.localStream = null;
     }
@@ -48,6 +55,9 @@ export class MeetRoomService {
     this.remoteVideo = null;
     if (this.localCall != null) {
       this.localCall.close();
+    }
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -101,8 +111,8 @@ export class MeetRoomService {
           ]
         }
       };
-      console.log("config");
-      console.log(config);
+      //console.log("config");
+      //console.log(config);
       this.myPeer = new Peer(undefined, config);
 
       this.myPeer.on('open', () => {
@@ -111,7 +121,7 @@ export class MeetRoomService {
       });
 
       this.myPeer.on('call', call => {
-        console.log("call               ---------------------------------------")
+        //console.log("call               ---------------------------------------")
         this.localCall = call;
         call.answer(this.localStream)
         call.on('stream', userVideoStream => {
@@ -361,32 +371,26 @@ export class MeetRoomService {
   }
 
 
-  /* public startAttetion(provider, patient) {
-     this.trace("startAttetion :", provider, patient);
-     this.socket.emit('startAttetion', provider, patient);
-   }*/
+  preparateVideoCallFormProvider(provider, patientId) {
+    this.socket.emit("preparateVideoCallFormProvider", provider, patientId);
+  }
 
-  /*public startAttetionOfProvider() {
+  public preparateVideoCallFormProviderListener() {
     return Observable.create((observer) => {
-      this.socket.on('startAttetionOfProvider', (providerSocket) => {
-        observer.next(providerSocket)
+      this.socket.on('preparateVideoCallFormProvider', (provider) => {
+        observer.next(provider)
       });
     });
-  }*/
-
-
-  preparateVideoCallFormProvider(provider) {
-    this.socket.emit("preparateVideoCallFormProvider", provider);
   }
 
   public patientConnected() {
-    this.trace("patientConnected :");
     return Observable.create((observer) => {
       this.socket.on('patient_connected', (patient) => {
         observer.next(patient)
       });
     });
   }
+
 
   preparateVideoCallFormPatient(provider, patient) {
     this.socket.emit("preparateVideoCallFormPatient", {
@@ -429,11 +433,11 @@ export class MeetRoomService {
     });
   }
 
-  public publicMe(providerId){
+  public publicMe(providerId) {
     this.socket.emit("publicMe", providerId);
   }
 
-  public privateMe(providerId){
+  public privateMe(providerId) {
     this.socket.emit("publicMe", providerId);
   }
 

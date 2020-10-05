@@ -117,7 +117,9 @@ export class ProviderService {
   getPatient(value, field) {
     const patientUrl = baseUrl + 'provider/patientByField';
     let params = new HttpParams().set("key", field).set("value", value);
-    this.trace("getPatient:", patientUrl, params);
+    /*console.log(patientUrl);
+    console.log(params);*/
+    //this.trace("getPatient:", patientUrl, params);
     return this.http.get(patientUrl, { params });
   }
 

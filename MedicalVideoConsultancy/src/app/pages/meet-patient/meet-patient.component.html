@@ -18,11 +18,7 @@
                 <br />
 
                 <div class="font-weight-bold text-dark mt-5">Profile</div>
-
-                <mat-divider class="mt-3"></mat-divider>
-                <br />
-
-<!--                 <div class="d-flex justify-content-around mt-2">
+                <div class="d-flex justify-content-around mt-2">
                     <ng-container *ngIf="providerData">
                         <div><img class="profile-image" src="{{image}}" alt="provider"></div>
                         <div class="d-block">
@@ -40,14 +36,28 @@
                 </ng-container>
                 <ng-container *ngIf="providerData && !providerData.connection">
                     <div class="font-weight-bold text-warning">&nbsp;No Available</div>
-                </ng-container> -->
+                </ng-container>
+                <br />
             </div>
         </mat-sidenav>
 
         <div class="container-fluid">
-
-                <app-waiting></app-waiting>
-
+            <div *ngIf="step == step_waiting_page && patientData != undefined">
+                <app-waiting [patientData]="patientData" [providerData]="providerData" [roomName]="roomName">
+                </app-waiting>
+            </div>
+            <div *ngIf="step == step_payment_page && patientData != undefined">
+                <app-pay-patient [patientData]="patientData" [providerData]="providerData" [roomName]="roomName">
+                </app-pay-patient>
+            </div>
+            <div *ngIf="step == step_attetion_page && patientData != undefined">
+                <app-meet-call [patientData]="patientData" [providerData]="providerData" [roomName]="roomName">
+                </app-meet-call>
+            </div>    
+            <div *ngIf="step == step_feeback_page && patientData != undefined">
+                <app-feeback [patientData]="patientData" [providerData]="providerData" [roomName]="roomName">
+                </app-feeback>
+            </div>            
         </div>
     </mat-sidenav-container>
 </div>

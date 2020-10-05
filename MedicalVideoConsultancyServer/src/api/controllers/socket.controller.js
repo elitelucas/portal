@@ -9,7 +9,7 @@ const socketIo = require('socket.io');
 const io = socketIo.listen(server);
 const Patient = require('./../models/patient.model');
 const User = require('./../models/user.model');
-const Room = require('./../models/room.model')
+//const Room = require('./../models/room.model')
 const {
   createConsultEvent
 } = require('./provider.controller');
@@ -43,11 +43,15 @@ const updateUserProviderState = async (idc, userProvider) => {
     } else {
       id = idc;
     }
+    if (!userProvider._id) {
+      userProvider["_id"] = id
+      delete userProvider["id"]
+    }
     return await User.findOneAndUpdate({
       _id: id
     }, userProvider);
   } catch (e) {
-    logger.error("updateUserProviderState e :" + e)
+    logger.error("updateUserProviderState e :" + e);
   }
 };
 
@@ -78,8 +82,12 @@ const confirmConnectProvider = async (idProvider, socketId, user) => {
     userProvider.connection = false;
     userProvider.calling = false;
     userProvider.state = true;
-    userProvider.socketId = socketId;
-    userProvider.peerId = user.peerId;
+    if (socketId) {
+      userProvider.socketId = socketId;
+    }
+    if (user.peerId) {
+      userProvider.peerId = user.peerId;
+    }
     return await updateUserProviderState(idProvider, userProvider);
   } catch (e) {
     logger.error("confirmConnectProvider e :" + e)
@@ -95,8 +103,12 @@ const connectProvider = async (idProvider, socketId, user, notify) => {
     userProvider.connection = true;
     userProvider.calling = false;
     userProvider.state = true;
-    userProvider.socketId = socketId;
-    userProvider.peerId = user.peerId;
+    if (socketId) {
+      userProvider.socketId = socketId;
+    }
+    if (user.peerId) {
+      userProvider.peerId = user.peerId;
+    }
     await updateUserProviderState(idProvider, userProvider);
     notify(userProvider)
   } catch (e) {
@@ -199,8 +211,12 @@ const connectConfirmPatient = async (idPatient, socketId, p) => {
     });
     patient.connection = true;
     patient.calling = false;
-    patient.socketId = socketId;
-    patient.peerId = p.peerId;
+    if (socketId) {
+      patient.socketId = socketId;
+    }
+    if (p.peerId) {
+      patient.peerId = p.peerId;
+    }
     return await updateUserPatientState(idPatient, patient);
   } catch (e) {
     logger.error("connectConfirmPatient e :" + e)
@@ -280,6 +296,15 @@ const countPatientRoom = async (room, callback) => {
   }
 };
 
+//-------------
+
+const getPatientById = async (patientId) => {
+  try {
+    return await Patient.findById(patientId);
+  } catch (e) {
+    logger.error("countPatientRoom e :" + e)
+  }
+};
 
 const emitDataByRoom = async (room) => {
   try {
@@ -348,7 +373,8 @@ io.on('connection', (socket) => {
 
       await confirmConnectProvider(userProvider.id, socket.id, userProvider);
 
-      const patient = await Patient.findOne({ dni });
+      const patient = await Patient.findOne({ dni: dni });
+      logger.info('patient.socketId:' + patient.socketId);
       if (patient.socketId) {
         socket.to(patient.socketId).emit("providerEnteredInPayProvider", 'providerEntered');
       }
@@ -364,9 +390,11 @@ io.on('connection', (socket) => {
       logger.info('patientEnteredInPayPatient :providerId' + providerId);
       logger.info('patient-dni:' + dni);
 
-      const patient = await Patient.findOneAndUpdate({ dni }, { $set: { socketId: socket.id } }, { new: true });
+      const patient = await Patient.findOneAndUpdate({ dni: dni }, { $set: { socketId: socket.id } }, { new: true });
 
       const provider = await User.findById(providerId);
+      logger.info('provider.socketId:' + provider.socketId);
+      logger.info('patient.socketId:' + patient.socketId);
       if (provider.socketId) {
         socket.to(provider.socketId).emit("patientEnteredInPayPatient", patient.socketId);
       }
@@ -523,12 +551,17 @@ io.on('connection', (socket) => {
   });
 
 
-  socket.on('preparateVideoCallFormProvider', async (userProvider) => {
+  socket.on('preparateVideoCallFormProvider', async (userProvider, patientId) => {
     if (userProvider) {
-      await updateUserProviderState(userProvider);
       const id = userProvider._id ? userProvider._id : userProvider.id;
-      logger.info('preparateVideoCall :' + socket.id + " - join room :" + id + "-" + userProvider.room)
+      userProvider.socketId = socket.id;
+      await updateUserProviderState(id, userProvider);
       socket.join(id + "-" + userProvider.room);
+      const patient = await getPatientById(patientId);
+      socket.to(patient.socketId).emit("preparateVideoCallFormProvider", userProvider);
+      logger.info('preparateVideoCall :' + socket.id + 
+      " - join room :" + id + "-" + userProvider.room + " - wait patient: "+ patient.socketId)
+      
     }
   });
 
@@ -544,7 +577,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on("publicMe", providerId => {
-    publicUserProviderState(providerId); 
+    publicUserProviderState(providerId);
   });
 
   socket.on("chat_provider", data => {
