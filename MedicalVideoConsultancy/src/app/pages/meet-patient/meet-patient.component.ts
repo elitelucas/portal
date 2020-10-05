@@ -66,11 +66,9 @@ export class MeetPatientComponent implements OnInit {
     }
 
     this.meetRoomService.connectioProvider().subscribe(providerStatus => {
-      console.log(providerStatus);
       this.providerData.connection = true
     });
     this.meetRoomService.disconnectioProvider().subscribe(providerStatus => {
-      console.log(providerStatus);
       this.providerData.connection = false
     });
 
@@ -107,12 +105,10 @@ export class MeetPatientComponent implements OnInit {
 
     this.meetRoomService.receiveEndCall()
       .subscribe(async (text) => {
-        console.log("receiveEndCall:" + text);
         if (text === 'endCall') {
           this.meetRoomService.stopVideoAudio();
           this.step = this.step_feeback_page;
           localStorage.setItem('step_attetion', this.step.toString());
-          console.log("receiveEndCall acceptEnd:" + this.providerData.socketId + " | " + text);
           this.meetRoomService.endCall(this.providerData.socketId, 'acceptEnd');
         }
       });

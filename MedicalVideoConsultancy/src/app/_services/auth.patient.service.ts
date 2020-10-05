@@ -6,6 +6,8 @@ import {catchError, map} from "rxjs/operators";
 import {BehaviorSubject, Observable, throwError} from "rxjs";
 import {constant} from "../_config/constant";
 
+export const baseUrl = env.baseUrl;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -45,8 +47,9 @@ export class AuthPatientService {
   }
 
   public setToken(result) {
+    console.log(result);
     const now = new Date();
-    localStorage.setItem('token', result.token.accessToken);
+    localStorage.setItem('token', result.token);
     localStorage.setItem('tokenExpiredTime',JSON.stringify(constant.TTL + now.getTime()))
   }
 
@@ -55,13 +58,15 @@ export class AuthPatientService {
   }
 
   public setCurrentUser(result) {
-    localStorage.setItem('currentUser', JSON.stringify(result.user));
-    this.userSubject.next(result.user)
+    console.log(result);
+    localStorage.setItem('currentUser', JSON.stringify(result.patient));
+    this.userSubject.next(result.patient)
   }
 
   public get getCurrentUser(): currentUser {
     return this.userSubject.value
   }
+
   public isLoggedIn(){
     return localStorage.getItem('token') !== null; }
 
@@ -86,6 +91,15 @@ export class AuthPatientService {
     const joinUrl = baseUrl + "auth/join";
     return this.http.post<any>(joinUrl, patientData)
   }
+  public joinValidatePatient(patientData) {
+    const joinUrl = baseUrl + "auth/join/validate/patient";
+    return this.http.post<any>(joinUrl, patientData).pipe(map(res => {
+      if(res.token) {
+        this.setToken(res);
+        this.setCurrentUser(res);
+      }
+      return res;
+    }));
+  }
 }
 
-export const baseUrl = env.baseUrl;

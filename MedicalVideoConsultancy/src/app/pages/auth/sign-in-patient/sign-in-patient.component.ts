@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {Router} from "@angular/router";
-import {environment} from "../../../../environments/environment";
-import {ProviderService} from "../../../_services/provider.service";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
+import { environment } from "../../../../environments/environment";
+import { ProviderService } from "../../../_services/provider.service";
 import { AuthPatientService } from '../../../_services/auth.patient.service';
 
 @Component({
@@ -16,7 +16,8 @@ export class SignInPatientComponent implements OnInit {
   joinForm: FormGroup;
   submitted = false;
   domain = environment.domain;
-  dniData: any;
+  //dniData: any;
+  patientData: any;
   providerData: any;
   isInvalidDomain: boolean = false;
   isValidRoom: boolean = true;
@@ -26,14 +27,14 @@ export class SignInPatientComponent implements OnInit {
   isDuplicatedPhone: boolean = false;
   isValidNumber: boolean = true;
   isDuplicatedDNI: boolean = false;
-  directRoomUrl : string = '';
+  directRoomUrl: string = '';
   private phoneNumber: any;
 
   identify_patient = 'OK';
   no_identify_patient = 'NOK';
 
   constructor(private formBuilder: FormBuilder, private authPatientService: AuthPatientService,
-              private router: Router, private providerService: ProviderService) { }
+    private router: Router, private providerService: ProviderService) { }
 
   ngOnInit(): void {
     this.initData();
@@ -46,14 +47,14 @@ export class SignInPatientComponent implements OnInit {
     localStorage.removeItem('provider');
     localStorage.removeItem('patient_dni');
     this.roomForm = this.formBuilder.group({
-      room: ['', [Validators.required ,Validators.minLength(this.domain.length+ 1)]],
+      room: ['', [Validators.required, Validators.minLength(this.domain.length + 1)]],
       dni: ['', Validators.required],
-      reason: ['', Validators.required],
+      reason: ['', [Validators.required, Validators.minLength(1)]],
       typeAttetion: ['', Validators.required]
     });
-    
+
     this.f.dni.setValue("12312323");
-    this.f.room.setValue(this.domain+"testroom2");
+    this.f.room.setValue(this.domain + "testroom2");
     // this.f.room.setValue(this.domain);
 
     this.joinForm = this.formBuilder.group({
@@ -64,57 +65,47 @@ export class SignInPatientComponent implements OnInit {
       acceptTerms: [false, Validators.requiredTrue],
       providerId: ['', Validators.required],
       room: ['', Validators.required],
-      record: ['']
-    }, );
+      record: [''],
+      reason: ['', [Validators.required, Validators.minLength(1)]],
+      typeAttetion: ['', Validators.required]
+    });
   }
 
-  get f() {return this.roomForm.controls;}
-  get f1() {return this.joinForm.controls;}
+  get f() { return this.roomForm.controls; }
+  get f1() { return this.joinForm.controls; }
 
   checkRoom() {
-    console.log(this.roomForm.value);
     localStorage.setItem('patient_auth', this.no_identify_patient);
-    this.submitted = true;
-    const room = this.f.room.value.substring(this.domain.length);
-    const dniPatient = this.f.dni.value;
-    // if(this.roomForm.invalid) {
-    //   console.log('sssss')
-    //   return;
-    // }
-    // if(!this.f.room.value.includes(this.domain)) {
-    //   this.isInvalidDomain = true;
-    //   return;
-    // }
-    this.providerService.checkRoomExist(room)
-      .subscribe(result => {
-        //console.log('eee')
-        if(result)   {
-          this.providerService.getPatient(dniPatient, 'dni').subscribe(resultPatient  => {
-            //console.log("getPatients dni:", resultPatient)
-            this.step = 2;
-            this.submitted = false;
-            this.dniData = dniPatient;
-            this.providerData = result;
-            this.directRoomUrl = '/' + this.providerData.room;
-
-            if(resultPatient) {
-              localStorage.setItem('patient', JSON.stringify(resultPatient));
-              localStorage.setItem('provider', JSON.stringify(this.providerData));
-              localStorage.setItem('patient_auth', this.identify_patient);
-              this.router.navigateByUrl(this.directRoomUrl);
-              return;
+    if (this.roomForm.valid) {
+      this.authPatientService.joinValidatePatient(this.roomForm.value).subscribe(resultPatient => {
+        this.submitted = true;
+        const room = this.f.room.value.substring(this.domain.length);
+        const dniPatient = this.f.dni.value;
+        this.providerService.checkRoomExist(room)
+          .subscribe(result => {
+            if (result) {
+              this.step = 2;
+              this.submitted = false;
+              this.patientData = resultPatient.patient;
+              this.providerData = result;
+              this.directRoomUrl = '/' + this.providerData.room;
+              if (this.patientData) {
+                localStorage.setItem('patient', JSON.stringify(this.patientData));
+                localStorage.setItem('provider', JSON.stringify(this.providerData));
+                localStorage.setItem('patient_auth', this.identify_patient);
+                this.router.navigateByUrl(this.directRoomUrl);
+                return;
+              }
+              this.f1.room.setValue(this.providerData.room);
+              this.f1.dni.setValue(dniPatient);
+              this.f1.providerId.setValue(this.providerData._id);
             }
-
-            this.f1.room.setValue(this.providerData.room);
-            this.f1.dni.setValue(this.dniData);
-            this.f1.providerId.setValue(this.providerData._id);
-
+            else {
+              this.isValidRoom = false;
+            }
           });
-        }
-        else {
-          this.isValidRoom = false;
-        }
       });
+    }
   }
 
   hasError(event: boolean) {
@@ -129,24 +120,26 @@ export class SignInPatientComponent implements OnInit {
   join() {
     localStorage.setItem('patient_auth', this.no_identify_patient);
     this.submitted = true;
-    if(this.joinForm.invalid) {
+    if (this.joinForm.invalid) {
       return;
     }
     this.joinForm.value.phoneNumber = this.phoneNumber;
     this.authPatientService.join(this.joinForm.value)
       .subscribe(result => {
-        if(result) {
-          localStorage.setItem('patient_dni', this.dniData);
-          localStorage.setItem('patient_auth', this.identify_patient);
-          this.router.navigateByUrl(this.directRoomUrl);
-          this.step = 1
-          this.dniData = null;
-          this.providerData = null;
-          this.directRoomUrl = null;
+        if (result) {
+          this.authPatientService.joinValidatePatient(result).subscribe(resultPatient => {
+            this.patientData = resultPatient.patient;
+            localStorage.setItem('patient', this.patientData);
+            localStorage.setItem('patient_auth', this.identify_patient);
+            this.router.navigateByUrl(this.directRoomUrl);
+            this.step = 1
+            this.providerData = null;
+            this.directRoomUrl = null;
+          });
         }
       }, error => {
-        if(error) {
-          if(error.error) error.error.errors[0].field === "dni" ? this.isDuplicatedDNI = true: (error.error.errors[0].field === 'phoneNumber' ? this.isDuplicatedPhone = true: this.isDuplicatedEmail = true);
+        if (error) {
+          if (error.error) error.error.errors[0].field === "dni" ? this.isDuplicatedDNI = true : (error.error.errors[0].field === 'phoneNumber' ? this.isDuplicatedPhone = true : this.isDuplicatedEmail = true);
         }
       })
   }
