@@ -48,18 +48,18 @@ exports.register = async (req, res) => {
  */
 exports.login = async (req, res, next) => {
   try {
-    console.log("login")
-    console.log(req.body.email)
+    /*console.log("login")
+    console.log(req.body.email)*/
     const userData = await User.findOne({ 'email': req.body.email });
-    console.log("userData")
-    console.log(userData)
+    /*console.log("userData")
+    console.log(userData)*/
     const userModel = userData ? User : Admin;
     const { user, accessToken } = await userModel.findAndGenerateToken(req.body);
-    console.log("accessToken")
-    console.log(accessToken)
+    /*console.log("accessToken")
+    console.log(accessToken)*/
     const token = generateTokenResponse(user, accessToken);
-    console.log(token);
-    console.log(accessToken);
+    /*console.log(token);
+    console.log(accessToken);*/
     const userTransformed = user.transform();
     return res.json({ token, user: userTransformed });
   } catch (error) {

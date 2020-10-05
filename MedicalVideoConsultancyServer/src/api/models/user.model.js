@@ -8,6 +8,7 @@ const uuidv4 = require('uuid/v4');
 const APIError = require('../utils/APIError');
 const { env, jwtSecret, jwtExpirationInterval } = require('../../config/vars');
 const { string } = require('joi');
+const logger = require('../../config/logger')
 
 /**
 * User Roles
@@ -193,9 +194,9 @@ userSchema.method({
   },
 
   async passwordMatches(password) {
-    console.log("passwordMatches")
+    /*console.log("passwordMatches")
     console.log(password)
-    console.log(this.password)
+    console.log(this.password)*/
 
     return bcrypt.compare(password, this.password);
   },
@@ -217,11 +218,11 @@ userSchema.statics = {
   async findAndGenerateToken(options) {
     const { email, password, refreshObject } = options;
     if (!email) throw new APIError({ message: 'An email is required to generate a token' });
-    console.log("findAndGenerateToken")
+    /*console.log("findAndGenerateToken")
     console.log("email")
     console.log(email)
     console.log("password")
-    console.log(password)
+    console.log(password)*/
 
     const user = await this.findOne({ email }).exec();
     const err = {
@@ -230,14 +231,18 @@ userSchema.statics = {
     };
     if (password) {
       if (user && await user.passwordMatches(password)) {
-        return { user, accessToken: user.token() };
+        const token = user.token();
+        logger.info("generate user :" + user._id + " | " +token  )
+        return { user, accessToken: token };
       }
       err.message = 'Incorrect email or password';
     } else if (refreshObject && refreshObject.userEmail === email) {
       if (moment(refreshObject.expires).isBefore()) {
         err.message = 'Invalid refresh token.';
       } else {
-        return { user, accessToken: user.token() };
+        const token = user.token();
+        logger.info("generate user :" + user._id + " | " +token  )
+        return { user, accessToken: token };
       }
     } else {
       err.message = 'Incorrect email or refreshToken';
