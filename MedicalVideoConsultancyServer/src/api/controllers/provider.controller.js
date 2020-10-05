@@ -807,8 +807,7 @@ exports.charge = async (req, res, next) => {
  * @params providerId(_id), card_number, cvv, expiration_month, expiration_year, email, amount, currency_code
  * */
 exports.subcriptionPlanWithCard = async (req, res, next) => {
-  console.log('req.body');
-  console.log(req.body);
+
   try {
     const providerId = req.body.providerId;
     const cardData = req.body.card;
@@ -861,9 +860,6 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
 
     const subcriptionData = req.body.subcription;
 
-    console.log("provider");
-    console.log(provider);
-
     if(provider != undefined){
       const planSubcription = await Plan.findById(subcriptionData.id);     
       let subscriptionCulqi = await culqi.subscriptions.createSubscription({
@@ -873,12 +869,6 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
       provider.subcriptionId = subscriptionCulqi.id;
       provider.subcriptionStatus = true
       provider.planId = planSubcription._id;
-
-      console.log("planSubcription");
-      console.log(planSubcription);
-      console.log("provider");
-      console.log(provider);
-
       provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
     
       res.status(httpStatus.OK).send()
