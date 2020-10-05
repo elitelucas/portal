@@ -869,6 +869,7 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
       });  
       userProvider.subcriptionId = subscriptionCulqi.id;
       userProvider.subcriptionStatus = true
+      userProvider.planId = planSubcription._id
       userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});
     
       res.status(httpStatus.OK).send()
@@ -900,6 +901,7 @@ exports.unsubscribePlanWithCard = async (req, res, next) => {
       id: subcriptionId
     });
     userProvider.subcriptionId = null;
+    userProvider.planId = null;
     userProvider.subcriptionStatus = false;
     userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});
     res.status(httpStatus.OK).send();
