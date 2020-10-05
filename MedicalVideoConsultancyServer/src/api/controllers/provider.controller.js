@@ -813,6 +813,8 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     const providerId = req.body.providerId;
     const cardData = req.body.card;
     const cardExists = await Card.findOne({ card_number: cardData.card_number });
+    let provider = await User.findOne({ _id: providerId });
+
     const culqi = new Culqi({
       privateKey: culqiConfing.private_key,
       pciCompliant: true,
@@ -820,7 +822,6 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     });
 
     if (cardExists == undefined) {
-      let provider = await User.findOne({ _id: providerId });
       const token = await culqi.tokens.createToken({
         card_number: cardData.card_number,
         cvv: cardData.cvv,
@@ -859,18 +860,26 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     }
 
     const subcriptionData = req.body.subcription;
-    let userProvider = await User.find({ providerId: providerId });
 
-    if(userProvider != undefined){
+    console.log("provider");
+    console.log(provider);
+
+    if(provider != undefined){
       const planSubcription = await Plan.findById(subcriptionData.id);     
       let subscriptionCulqi = await culqi.subscriptions.createSubscription({
         card_id: cardExists.cardId,
         plan_id: planSubcription.planId
       });  
-      userProvider.subcriptionId = subscriptionCulqi.id;
-      userProvider.subcriptionStatus = true
-      userProvider.planId = planSubcription._id
-      userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});
+      provider.subcriptionId = subscriptionCulqi.id;
+      provider.subcriptionStatus = true
+      provider.planId = planSubcription._id;
+
+      console.log("planSubcription");
+      console.log(planSubcription);
+      console.log("provider");
+      console.log(provider);
+
+      provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
     
       res.status(httpStatus.OK).send()
     }else{      
