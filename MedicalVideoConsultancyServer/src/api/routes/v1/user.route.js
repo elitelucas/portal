@@ -196,6 +196,17 @@ router
   router.route('/deleteBlog/:postId')
   .delete(authorize(),controller.deleteBlog);
 
+ /**
+   * api/v1/users/updatePlanId
+   * */
+  router.route('/updatePlanId')
+  .put(controller.updatePlanId);
+
+ /**
+   * api/v1/users/deletePlanId
+   * */
+  router.route('/deletePlanId/:providerId')
+  .delete(controller.deletePlanId);
 
 
 module.exports = router;

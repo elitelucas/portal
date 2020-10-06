@@ -191,6 +191,17 @@ export class ProviderService {
     return this.http.get<any>(getCardUrl);
   }
 
+  updateCard(data){
+    const updateCardUrl = baseUrl + 'provider/card';
+    this.trace("updateCardUrl:", updateCardUrl);
+    return this.http.put(updateCardUrl,data);
+  }
+
+  removeCard(cardId){
+    const deleteCardUrl = baseUrl + 'provider/card/'+cardId;
+    this.trace("deletePlansUrl:", deleteCardUrl);
+    return this.http.delete(deleteCardUrl);
+  }
   createPlan(data){
 
     const createPlanUrl=baseUrl + 'plans';
@@ -207,6 +218,7 @@ export class ProviderService {
     this.trace("deletePlansUrl:", deletePlansUrl);
     return this.http.delete(deletePlansUrl);
   }
+
 
   trace(...arg) {
     var now = (window.performance.now() / 1000).toFixed(3);

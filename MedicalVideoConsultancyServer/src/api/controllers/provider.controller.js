@@ -922,6 +922,19 @@ exports.getCard=async (req, res, next)=>{
   }
 }
 
+exports.updateCard=async (req, res, next)=>{
+  try{
+
+    const providerId=req.body.providerId;
+    const card=await Card.findOneAndUpdate({providerId:providerId},{card_number:req.body.card_number},{new:true});
+    res.status(httpStatus.OK).json(card);
+  }catch(e){
+    console.log("error ", e)
+    error = new APIError(e);
+    return next(error)
+  }
+}
+
 
 /**
  * @api v1/provider/subcription
@@ -1068,7 +1081,7 @@ exports.removeCard = async (req, res, next) => {
       res.status(httpStatus.NOT_FOUND).send();
     } else {
       await cardExists.remove();
-      res.status(httpStatus.OK).send()
+      res.status(httpStatus.OK).json('ok')
     }
   } catch (error) {
     return next(error);

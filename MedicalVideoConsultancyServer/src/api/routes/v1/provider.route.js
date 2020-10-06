@@ -160,6 +160,12 @@ router.route('/subcription/:providerid')
 
 router.route('/card/:providerId')
     .get(controller.getCard)
+
+router.route('/card')
+    .put(controller.updateCard)
+
+router.route('/card/:cardId')
+    .delete(controller.removeCard)
   
 /**
  * @api v1/provider/notify

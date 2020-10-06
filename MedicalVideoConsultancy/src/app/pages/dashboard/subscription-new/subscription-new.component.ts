@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProviderService } from './../../../_services/provider.service';
 
 
@@ -10,30 +10,31 @@ import { ProviderService } from './../../../_services/provider.service';
   styleUrls: ['./subscription-new.component.css']
 })
 export class SubscriptionNewComponent implements OnInit {
-  cardForm:FormGroup;
-  submitted=false;
-  providerData:any;
-  planId:any;
-  displayPlan=false;
-  planData:any;
+  cardForm: FormGroup;
+  submitted = false;
+  providerData: any;
+  planId: any;
+  displayPlan = false;
+  planData: any;
 
   constructor(
     private formBuilder: FormBuilder,
-    private activatedRoute:ActivatedRoute,
-    private providerService:ProviderService
-    ) { 
-    this.providerData=JSON.parse(localStorage.getItem('currentUser'));
+    private activatedRoute: ActivatedRoute,
+    private providerService: ProviderService,
+    private router: Router
+  ) {
+    this.providerData = JSON.parse(localStorage.getItem('currentUser'));
 
-    this.activatedRoute.params.subscribe(data=>{
+    this.activatedRoute.params.subscribe(data => {
 
-      this.planId=data.planId;
+      this.planId = data.planId;
       this.providerService.getPlansById(this.planId)
-      .subscribe(res=>{
-        console.log('resasdasd')
-        console.log(res)
-        this.planData=res;
-        this.displayPlan=true;
-      })
+        .subscribe(res => {
+          console.log('resasdasd')
+          console.log(res)
+          this.planData = res;
+          this.displayPlan = true;
+        })
     })
   }
 
@@ -58,29 +59,32 @@ export class SubscriptionNewComponent implements OnInit {
     if (this.cardForm.invalid) {
       return;
     }
-    const sendData={
-      providerId:this.providerData.id,
-      card:{
-        card_number:this.f.cardNumber.value,       
-        cvv:this.f.cvv.value,       
-        expiration_month:this.f.month.value,       
-        expiration_year:this.f.year.value,       
-        email:this.f.email.value,       
-        first_name:this.f.firstName.value,       
-        last_name:this.f.lastName.value,       
-        address:this.f.address.value,       
-        address_city:this.f.addressCity.value,       
-        country_code:this.f.country.value,       
-        phone_number:this.providerData.phoneNumber,       
+    const sendData = {
+      providerId: this.providerData.id,
+      card: {
+        card_number: this.f.cardNumber.value,
+        cvv: this.f.cvv.value,
+        expiration_month: this.f.month.value,
+        expiration_year: this.f.year.value,
+        email: this.f.email.value,
+        first_name: this.f.firstName.value,
+        last_name: this.f.lastName.value,
+        address: this.f.address.value,
+        address_city: this.f.addressCity.value,
+        country_code: this.f.country.value,
+        phone_number: this.providerData.phoneNumber,
       },
-      subcription:{
-        id:this.planId
+      subcription: {
+        id: this.planId
       }
     }
-    this.providerService.sendSubcriptionData(sendData).subscribe(res=>{
+    this.providerService.sendSubcriptionData(sendData).subscribe(res => {
       console.log('res')
       console.log(res)
     })
+  }
+  Cancel() {
+    this.router.navigateByUrl('/dashboard/subscription-plan');
   }
 
 

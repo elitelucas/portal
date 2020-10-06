@@ -2,6 +2,8 @@ import { ProviderService } from './../../../_services/provider.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import  Swal  from 'sweetalert2';
+import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
 
 @Component({
   selector: 'app-super-plans',
@@ -9,6 +11,9 @@ import  Swal  from 'sweetalert2';
   styleUrls: ['./super-plans.component.css']
 })
 export class SuperPlansComponent implements OnInit {
+  public Editor = ClassicEditor;
+
+
   planForm:FormGroup;
   submitted=false;
   displayData=false;
@@ -26,7 +31,6 @@ export class SuperPlansComponent implements OnInit {
     this.planForm=this.formBuilder.group({
       name:['',Validators.required],
       amount:['',[Validators.required, Validators.pattern('[0-9]*')]],
-      description:''
     })
 
     this.providerService.getPlans().subscribe(res=>{
@@ -41,14 +45,14 @@ export class SuperPlansComponent implements OnInit {
   }
   get f() {return this.planForm.controls;}
 
-  onSubmit(){
+  onSubmit(descriptionData){
     this.submitted=true;
     if(this.planForm.invalid)
     return;
     const sendData={
       name:this.f.name.value,
       amount:this.f.amount.value,
-      description:this.f.description.value,
+      description:descriptionData,
       currency_code:'us'
     }
     this.providerService.createPlan(sendData).subscribe(res=>{
@@ -58,7 +62,13 @@ export class SuperPlansComponent implements OnInit {
         this.tmpKk.push(true)
       })
       this.kk = this.tmpKk;
+      // this.onReset();
     })
+  }
+
+  onReset() {
+    this.submitted = false;
+    this.planForm.reset();
   }
   Edit(idx){
     this.kk[idx] = false;

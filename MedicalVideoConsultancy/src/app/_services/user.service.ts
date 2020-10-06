@@ -135,5 +135,15 @@ export class UserService {
     return this.http.delete<any>(deleteBlog);
   }
 
+  updateUserPlanId(data){
+    let updatePlanId=baseUrl+"/updatePlanId";
+    return this.http.put<any>(updatePlanId,data);
+  }
+
+  deleteUserPlanId(providerId){
+    const deleteUserPlanId = baseUrl + '/deletePlanId/'+providerId;
+    return this.http.delete(deleteUserPlanId);
+  }
+
  
 }

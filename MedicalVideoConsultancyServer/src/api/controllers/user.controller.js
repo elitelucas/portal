@@ -575,6 +575,32 @@ exports.deleteBlog = async (req, res, next) => {
 
 };
 
+exports.updatePlanId = async (req, res, next) => {
+  try {
+    console.log('req.body')
+    console.log(req.body)
+    const user = await User.findByIdAndUpdate(req.body.providerId,{planId:req.body.planId},{new:true});
+    res.status(httpStatus.OK).json(user);
+  } catch (error) {
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
+  }
+
+};
+
+exports.deletePlanId = async (req, res, next) => {
+  try {
+    console.log('req.params.providerId')
+    console.log(req.params.providerId)
+    const user = await User.findByIdAndUpdate(req.params.providerId,{planId:''},{new:true});
+    console.log('user')
+    console.log(user)
+    res.status(httpStatus.OK).json(user);
+  } catch (error) {
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
+  }
+
+};
+
 
 
 

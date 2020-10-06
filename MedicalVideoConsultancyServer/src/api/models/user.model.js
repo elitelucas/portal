@@ -135,6 +135,9 @@ const userSchema = new mongoose.Schema({
   subcriptionId: {
     type: String
   },
+  planId: {
+    type: String
+  },
   subcriptionStatus: {
     type: Boolean,
     default: false
@@ -170,7 +173,7 @@ userSchema.pre('save', async function save(next) {
 userSchema.method({
   transform() {
     const transformed = {};
-    const fields = ['id', 'firstName', 'lastName', 'email','phoneNumber','subcriptionId','subcriptionStatus', 'room', 'cmp', 'socketId', 'peerId', 'role','permission', 'status', 'state', 'image','connection','calling', 'createdAt'];
+    const fields = ['id', 'firstName', 'lastName', 'email','phoneNumber','planId', 'subcriptionId','subcriptionStatus', 'room', 'cmp', 'socketId', 'peerId', 'role','permission', 'status', 'state', 'image','connection','calling', 'createdAt'];
 
     fields.forEach((field) => {
       transformed[field] = this[field];

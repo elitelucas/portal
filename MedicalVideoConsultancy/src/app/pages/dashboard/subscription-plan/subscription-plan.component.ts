@@ -21,17 +21,17 @@ export class SubscriptionPlanComponent implements OnInit {
     this.providerData=JSON.parse(localStorage.getItem('currentUser'));
     console.log('this.providerData')
     console.log(this.providerData)
-    // if(this.providerData.subcriptionId){
-    //   this.router.navigateByUrl('/dashboard/subscription-old')
-    // }
-    // else{
+    if(this.providerData.planId){
+      this.router.navigateByUrl('/dashboard/subscription-old')
+    }
+    else{
     this.providerService.getPlans().subscribe(res=>{
       console.log('Res')
       console.log(res)
       this.planData=res;
       this.displayPlan=true;
     })
-    // }   
+    }   
   }
   Subscribe(planId){
     this.router.navigateByUrl('/dashboard/subscription-new/'+planId);
