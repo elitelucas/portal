@@ -877,6 +877,7 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     }    
   } catch (e) {
     console.log("error ", e)
+    e["message"] = e.user_message;
     error = new APIError(e);
     return next(error)
   }    
