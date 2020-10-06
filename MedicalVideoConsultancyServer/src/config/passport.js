@@ -3,6 +3,7 @@ const { ExtractJwt } = require('passport-jwt');
 const { jwtSecret } = require('./vars');
 const Admin = require('../api/models/admin.model');
 const User = require('../api/models/user.model');
+const Patient = require('../api/models/patient.model');
 
 const jwtOptions = {
   secretOrKey: jwtSecret,
@@ -12,7 +13,8 @@ const jwtOptions = {
 const jwt = async (payload, done) => {
   try {
     const userData = await User.findById(payload.sub);
-    const user = userData ? await User.findById(payload.sub): await Admin.findById(payload.sub);
+    let user = userData ? userData: await Admin.findById(payload.sub);
+    user = user ? user: await Patient.findById(payload.sub);
     if (user) return done(null, user);
     return done(null, false);
   } catch (error) {

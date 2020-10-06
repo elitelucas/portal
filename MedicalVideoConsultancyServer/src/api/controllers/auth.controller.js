@@ -121,6 +121,7 @@ exports.verifySMS = async (req, res, next) => {
 exports.join = async (req, res, next) => {
   try {
     const patientData = req.body;
+    patientData['role'] = "Patient";
     const patient = await new Patient(patientData).save();
     if (patient) {
       res.status(httpStatus.CREATED).json(patient);
@@ -167,6 +168,7 @@ exports.joinValidatePatient = async (req, res, next) => {
 exports.joinValidate = async (req, res, next) => {
   try {
     const patientData = req.body;
+    patientData['role'] = "Patient";
     const patient = await new Patient(patientData).save();
     if (patient) res.status(httpStatus.CREATED).json(patient);
 

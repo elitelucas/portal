@@ -23,7 +23,7 @@ router.route('/mediaUpload')
  * */
 
 router.route('/room/:userId')
-  .get(controller.getRoomData);
+  .get(authorize(),controller.getRoomData);
 
 /**
  * @api v1/provider/room/:userId
@@ -41,7 +41,7 @@ router.route('/room/:userID')
  * */
 
 router.route('/roomName/:room')
-  .get(controller.checkRoomExist);
+  .get(authorize(),controller.checkRoomExist);
 
 /**
  * @api v1/provider/patientByField
@@ -51,16 +51,16 @@ router.route('/roomName/:room')
 
 //I added 
 router.route('/allPatients')
-  .get(controller.getAllPatients);
+  .get(authorize(),controller.getAllPatients);
 
 router.route('/consult/:patientId/:startDate/:endDate')
-  .get(controller.getConsult);
+  .get(authorize(),controller.getConsult);
 
 router.route('/oneConsult')
-  .get(controller.getOneConsult);
+  .get(authorize(),controller.getOneConsult);
 
 router.route('/consultInChat')
-  .get(controller.getConsultInChat);
+  .get(authorize(),controller.getConsultInChat);
 
 router.route('/uploadFile')
   .post(controller.fileUpload);
@@ -80,7 +80,7 @@ router.route('/getSignature/:providerId')
 
 //I added end
 router.route('/patientByField')
-  .get(controller.getPatient);
+  .get(authorize(),controller.getPatient);
 
 /**
  * @api v1/provider/patient
@@ -88,7 +88,7 @@ router.route('/patientByField')
  * */
 
 router.route('/patient')
-  .put(controller.updatePatient)
+  .put(authorize(),controller.updatePatient)
 
 /**
  * @api v1/provider/patients-waiting/:room

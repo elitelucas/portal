@@ -101,7 +101,10 @@ const patientSchema = new Schema({
   },*/
   lastSeen: {
     type: Date,
-  }
+  },
+  role: {
+    type: String
+  },
 }, {
   timestamps:true
 });

@@ -13,7 +13,7 @@ const logger = require('../../config/logger')
 /**
 * User Roles
 */
-const roles = ['Admin', 'Dr', 'Mr', 'Mrs', 'Miss', 'Ms', 'Other', 'SuperAdmin'];
+const roles = ['Admin', 'Dr', 'Mr', 'Mrs', 'Miss', 'Ms', 'Other', 'SuperAdmin','Patient'];
 
 /**
  * User Schema
@@ -300,7 +300,9 @@ userSchema.statics = {
   async oAuthLogin({
     service, id, email, name, picture,
   }) {
+    console.log("id :" + id);
     const user = await this.findOne({ $or: [{ [`services.${service}`]: id }, { email }] });
+    console.log("oAuthLogin");
     if (user) {
       user.services[service] = id;
       if (!user.name) user.name = name;

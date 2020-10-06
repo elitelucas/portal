@@ -6,9 +6,15 @@ const logger = require('./../../config/logger');
 
 const ADMIN = 'SuperAdmin';
 
+exports.ADMIN = ADMIN;
+
+exports.authorize = (roles = User.roles) => (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, handleJWT(req, res, next, roles), )(req, res, next)
+};
+
 const handleJWT = (req, res, next, roles) => async (err, user, info) => {
   const error = err || info;
-  
+
   const logIn = Promise.promisify(req.logIn);
 
   const apiError = new APIError({
@@ -16,7 +22,6 @@ const handleJWT = (req, res, next, roles) => async (err, user, info) => {
     status: httpStatus.UNAUTHORIZED,
     stack: error ? error.stack : undefined,
   });
-
 
   try {
     if (error || !user) {
@@ -26,10 +31,12 @@ const handleJWT = (req, res, next, roles) => async (err, user, info) => {
     logger.info("logIn ok :", user["_id"])
     await logIn(user, { session: false });
   } catch (e) {
+    logger.error("apiError :" + apiError)
     return next(apiError);
   }
 
   if (!roles.includes(user.role)) {
+    logger.error("user.role :" + user.role)
     apiError.status = httpStatus.FORBIDDEN;
     apiError.message = 'Forbidden';
     return next(apiError);
@@ -41,11 +48,3 @@ const handleJWT = (req, res, next, roles) => async (err, user, info) => {
 
   return next();
 };
-
-exports.ADMIN = ADMIN;
-
-exports.authorize = (roles = User.roles) => (req, res, next) =>{
-  passport.authenticate(
-    'jwt', { session: false },
-    handleJWT(req, res, next, roles),
-  )(req, res, next)};
