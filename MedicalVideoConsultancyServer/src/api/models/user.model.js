@@ -132,6 +132,9 @@ const userSchema = new mongoose.Schema({
   customerId: {
     type: String
   },
+  planId: {
+    type: String
+  },
   subcriptionId: {
     type: String
   },

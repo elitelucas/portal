@@ -65,7 +65,7 @@ export class SignInPatientComponent implements OnInit {
 
     });
     
-    
+    console.log(this.domain+"testroom2");
     this.f.dni.setValue("12312323");
     this.f.room.setValue(this.domain+"testroom2");
 
@@ -112,7 +112,7 @@ export class SignInPatientComponent implements OnInit {
             const firstName=this.patientData.fullName.split(' ')[0];
             const lastName=this.patientData.fullName.split(' ')[1];
             this.f2.dni.setValue(this.patientData.dni);
-            this.f2.room.setValue(this.patientData.room);
+            this.f2.room.setValue(this.domain+this.patientData.room);
             this.f2.firstName.setValue(firstName)
             this.f2.lastName.setValue(lastName)
             this.f2.email.setValue(this.patientData.email)

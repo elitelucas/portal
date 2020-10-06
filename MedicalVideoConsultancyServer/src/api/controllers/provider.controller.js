@@ -807,12 +807,13 @@ exports.charge = async (req, res, next) => {
  * @params providerId(_id), card_number, cvv, expiration_month, expiration_year, email, amount, currency_code
  * */
 exports.subcriptionPlanWithCard = async (req, res, next) => {
-  console.log('req.body');
-  console.log(req.body);
+
   try {
     const providerId = req.body.providerId;
     const cardData = req.body.card;
     const cardExists = await Card.findOne({ card_number: cardData.card_number });
+    let provider = await User.findOne({ _id: providerId });
+
     const culqi = new Culqi({
       privateKey: culqiConfing.private_key,
       pciCompliant: true,
@@ -820,7 +821,6 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     });
 
     if (cardExists == undefined) {
-      let provider = await User.findOne({ _id: providerId });
       const token = await culqi.tokens.createToken({
         card_number: cardData.card_number,
         cvv: cardData.cvv,
@@ -859,17 +859,17 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     }
 
     const subcriptionData = req.body.subcription;
-    let userProvider = await User.find({ providerId: providerId });
 
-    if(userProvider != undefined){
+    if(provider != undefined){
       const planSubcription = await Plan.findById(subcriptionData.id);     
       let subscriptionCulqi = await culqi.subscriptions.createSubscription({
         card_id: cardExists.cardId,
         plan_id: planSubcription.planId
       });  
-      userProvider.subcriptionId = subscriptionCulqi.id;
-      userProvider.subcriptionStatus = true
-      userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});
+      provider.subcriptionId = subscriptionCulqi.id;
+      provider.subcriptionStatus = true
+      provider.planId = planSubcription._id;
+      provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
     
       res.status(httpStatus.OK).send()
     }else{      
@@ -877,6 +877,7 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     }    
   } catch (e) {
     console.log("error ", e)
+    e["message"] = e.user_message;
     error = new APIError(e);
     return next(error)
   }    
@@ -900,6 +901,7 @@ exports.unsubscribePlanWithCard = async (req, res, next) => {
       id: subcriptionId
     });
     userProvider.subcriptionId = null;
+    userProvider.planId = null;
     userProvider.subcriptionStatus = false;
     userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});
     res.status(httpStatus.OK).send();
