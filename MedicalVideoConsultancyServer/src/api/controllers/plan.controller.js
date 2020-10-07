@@ -38,31 +38,32 @@ exports.create = async (req, res, next) => {
       
       const planData = req.body;
 
-      // const culqi = new Culqi({
-      //   privateKey: culqiConfing.private_key,
-      //   pciCompliant: true,
-      //   publicKey: culqiConfing.private_key,
-      // });
+      const culqi = new Culqi({
+        privateKey: culqiConfing.private_key,
+        pciCompliant: true,
+        publicKey: culqiConfing.private_key,
+      });
 
 
-      // let planCulqi = await culqi.plans.createPlan({
-      //   name: planData.name,
-      //   amount: (planData.amount * 100),
-      //   currency_code: planData.currency_code,
-      //   interval: "meses",
-      //   interval_count: 1,
-      //   description: planData.description
-      // });
-      // console.log('planCulqi')
-      // console.log(planCulqi)
+      let planCulqi = await culqi.plans.createPlan({
+        name: planData.name,
+        amount: (planData.amount * 100),
+        //currency_code: planData.currency_code,
+        currency_code: "PEN",
+        interval: "meses",
+        interval_count: 1,
+        description: planData.description
+      });
+      console.log('planCulqi')
+      console.log(planCulqi)
 
-      // planData['interval'] = "meses";
-      // planData['interval_count'] = 1;
-      // planData['trial_days'] = 30;
-      // planData['createDate'] = new Date();
-      // planData['status'] = "active";
+      planData['interval'] = "meses";
+      planData['interval_count'] = 1;
+      planData['trial_days'] = 30;
+      planData['createDate'] = new Date();
+      planData['status'] = "active";
 
-      // planData['planId'] = planCulqi.id;
+      planData['planId'] = planCulqi.id;
 
       const plan = await new Plan(planData).save();
       console.log('plan')
@@ -71,6 +72,7 @@ exports.create = async (req, res, next) => {
       res.status(httpStatus.CREATED).json(plan);
     }
   } catch (error) {
+    console.log(error);
     return next(error);
   }
 };

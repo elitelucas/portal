@@ -811,8 +811,10 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
   try {
     const providerId = req.body.providerId;
     const cardData = req.body.card;
-    const cardExists = await Card.findOne({ card_number: cardData.card_number });
+    let cardExists = await Card.findOne({ card_number: cardData.card_number });
     let provider = await User.findOne({ _id: providerId });
+
+    console.log(cardExists);
 
     const culqi = new Culqi({
       privateKey: culqiConfing.private_key,
@@ -820,7 +822,7 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
       publicKey: culqiConfing.private_key,
     });
 
-    if (cardExists == undefined) {
+    if (cardExists == undefined || cardExists == null) {
       const token = await culqi.tokens.createToken({
         card_number: cardData.card_number,
         cvv: cardData.cvv,
@@ -830,7 +832,7 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
       });
 
       if(provider.customerId == undefined){
-        let customerCulqi = await culqi.customers.createCustomer({
+        const cus = {
           first_name: provider.firstName,
           last_name: provider.lastName,
           email: provider.email,
@@ -838,24 +840,27 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
           address_city: provider.address_city == undefined ? cardData.address_city : provider.address_city ,
           country_code: provider.country_code == undefined ? cardData.country_code : provider.country_code,
           phone_number: provider.phoneNumber == undefined ? cardData.phoneNumber : provider.phoneNumber,
-        });
+        };
+        console.log(cus);
+        let customerCulqi = await culqi.customers.createCustomer(cus);
+        console.log(customerCulqi);
         provider.customerId = customerCulqi.id;
         provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
 
-        let cardCulqi = await culqi.cards.createCard({
-          customer_id: provider.customerId,
-          token_id: token.id
-        });
-
-        cardExists = await new Card({
-          description: cardData.description,
-          cardId: cardCulqi.id,
-          card_number: cardData.card_number,
-          providerId: providerId,
-          createDate: new Date(),
-          status: "active",
-        }).save();
       }
+
+      let cardCulqi = await culqi.cards.createCard({
+        customer_id: provider.customerId,
+        token_id: token.id
+      });
+      cardExists = await new Card({
+        description: cardData.description,
+        cardId: cardCulqi.id,
+        card_number: cardData.card_number,
+        providerId: providerId,
+        createDate: new Date(),
+        status: "active",
+      }).save();
     }
 
     const subcriptionData = req.body.subcription;
