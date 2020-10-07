@@ -123,8 +123,14 @@ exports.getAdmins = (req, res, next) => {
 
 exports.createAdmin = async (req, res, next) => {
   try{
-    await new Admin(req.body).save();
-    res.status(httpStatus.OK).json('ok');
+    console.log('req.body')
+    console.log(req.body)
+    new Admin(req.body).save().then(result=>{
+      console.log('result')
+      console.log(result)
+      res.status(httpStatus.OK).json(result);
+
+    });
   }catch (error) {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
   }  
@@ -587,11 +593,11 @@ exports.updatePlanId = async (req, res, next) => {
 
 };
 
-exports.deletePlanId = async (req, res, next) => {
+exports.changeSubscriptionStatus = async (req, res, next) => {
   try {
-    console.log('req.params.providerId')
-    console.log(req.params.providerId)
-    const user = await User.findByIdAndUpdate(req.params.providerId,{planId:''},{new:true});
+    console.log('req.body.providerId')
+    console.log(req.body.providerId)
+    const user = await User.findByIdAndUpdate(req.body.providerId,{subcriptionStatus:false},{new:true});
     console.log('user')
     console.log(user)
     res.status(httpStatus.OK).json(user);

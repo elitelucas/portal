@@ -140,9 +140,9 @@ export class UserService {
     return this.http.put<any>(updatePlanId,data);
   }
 
-  deleteUserPlanId(providerId){
-    const deleteUserPlanId = baseUrl + '/deletePlanId/'+providerId;
-    return this.http.delete(deleteUserPlanId);
+  changeUserSubscriptionStatus(providerId){
+    const changeUserSubscriptionStatus = baseUrl + '/changeSubscriptionStatus/';
+    return this.http.put(changeUserSubscriptionStatus,{providerId});
   }
 
  

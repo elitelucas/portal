@@ -19,22 +19,21 @@ export class SubscriptionPlanComponent implements OnInit {
 
   ngOnInit(): void {
     this.providerData=JSON.parse(localStorage.getItem('currentUser'));
-    console.log('this.providerData')
-    console.log(this.providerData)
-    if(this.providerData.planId){
+
+    if(this.providerData.subcriptionStatus){
       this.router.navigateByUrl('/dashboard/subscription-old')
     }
     else{
     this.providerService.getPlans().subscribe(res=>{
-      console.log('Res')
-      console.log(res)
+
       this.planData=res;
       this.displayPlan=true;
     })
     }   
   }
   Subscribe(planId){
-    this.router.navigateByUrl('/dashboard/subscription-new/'+planId);
+    const sendData={key:'new',val:planId}
+    this.router.navigateByUrl('/dashboard/subscription-new/'+JSON.stringify(sendData));
   }
 
 }

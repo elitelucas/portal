@@ -67,7 +67,7 @@ export class SuperPlansComponent implements OnInit {
       this.kk = this.tmpKk;
   
       this.onReset();
-      this.Editor.editorInstance['newDescription'].setData('');
+      this.newDescription.editorInstance.setData('')
     })
   }
 

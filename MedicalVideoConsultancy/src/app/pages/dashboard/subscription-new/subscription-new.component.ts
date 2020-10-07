@@ -14,8 +14,11 @@ export class SubscriptionNewComponent implements OnInit {
   submitted = false;
   providerData: any;
   planId: any;
+  receiveData:any;
   displayPlan = false;
   planData: any;
+  cardData:any;
+  buttonText:string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -26,24 +29,49 @@ export class SubscriptionNewComponent implements OnInit {
     this.providerData = JSON.parse(localStorage.getItem('currentUser'));
 
     this.activatedRoute.params.subscribe(data => {
+      this.receiveData=JSON.parse(data.planId);
+      if(this.receiveData.key==='new'){
+        this.planId = this.receiveData.val;
+        this.buttonText='Subscribe';
+      }else{
+        this.planId = this.receiveData.val;
+        this.buttonText='Update';
+        this.providerService.getCard(this.providerData.id)
+        .subscribe(res => {
 
-      this.planId = data.planId;
+          this.cardData=res;
+          this.cardForm = this.formBuilder.group({
+            cardNumber: [this.cardData?this.cardData.card_number:'', Validators.required],
+            cvv: [this.cardData?this.cardData.cvv:'', Validators.required],
+            month: [this.cardData?this.cardData.month:'', [Validators.required, Validators.pattern('[0-9]*')]],
+            year: [this.cardData?this.cardData.year:'', [Validators.required, Validators.pattern('[0-9]*')]],
+            firstName: [this.providerData.firstName, Validators.required],
+            lastName: [this.providerData.lastName, Validators.required],
+            email: [this.providerData.email, [Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}$'), Validators.required]],
+            address: ['', Validators.required],
+            addressCity: ['', Validators.required],
+            country: [this.providerData.country, Validators.required],
+          });
+        })
+      }
+      
       this.providerService.getPlansById(this.planId)
         .subscribe(res => {
-          console.log('resasdasd')
-          console.log(res)
           this.planData = res;
+          console.log('this.planData')
+          console.log(this.planData)
           this.displayPlan = true;
         })
     })
   }
 
   ngOnInit(): void {
+
     this.cardForm = this.formBuilder.group({
-      cardNumber: ['', Validators.required],
-      cvv: ['', Validators.required],
-      month: ['', [Validators.required, Validators.pattern('[0-9]*')]],
-      year: ['', [Validators.required, Validators.pattern('[0-9]*')]],
+      cardNumber: [this.cardData?this.cardData.card_number:'', Validators.required],
+      cvv: [this.cardData?this.cardData.cvv:'', Validators.required],
+      month: [this.cardData?this.cardData.month:'', [Validators.required, Validators.pattern('[0-9]*')]],
+      year: [this.cardData?this.cardData.year:'', [Validators.required, Validators.pattern('[0-9]*')]],
       firstName: [this.providerData.firstName, Validators.required],
       lastName: [this.providerData.lastName, Validators.required],
       email: [this.providerData.email, [Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}$'), Validators.required]],
@@ -78,13 +106,19 @@ export class SubscriptionNewComponent implements OnInit {
         id: this.planId
       }
     }
+    console.log('sendData')
+    console.log(sendData)
     this.providerService.sendSubcriptionData(sendData).subscribe(res => {
       console.log('res')
       console.log(res)
     })
   }
   Cancel() {
+    if(this.cardData)
+    this.router.navigateByUrl('/dashboard/subscription-old');
+    else
     this.router.navigateByUrl('/dashboard/subscription-plan');
+
   }
 
 

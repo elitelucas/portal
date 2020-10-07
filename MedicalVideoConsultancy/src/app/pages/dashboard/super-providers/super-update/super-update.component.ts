@@ -12,7 +12,9 @@ import {MustMatch} from "../../../../_helpers/must-match.validator";
 export class SuperUpdateComponent implements OnInit {
   registerTitle:String;
   registerForm:FormGroup;
+  passwordForm:FormGroup;
   submitted=false;
+  passSubmitted=false;
   isDuplicatedRoom: boolean = false;
   isPending: boolean = false;
   isDuplicatedEmail:boolean = false;
@@ -49,19 +51,29 @@ export class SuperUpdateComponent implements OnInit {
       email: [this.formData? this.formData.email:'', [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}$'),Validators.maxLength(100)]],
       phoneNumber: [this.formData? this.formData.phoneNumber:'', Validators.required],
       speciality: [this.formData? this.formData.speciality:'', Validators.required],
-      password: [this.formData? this.formData.password:'', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: [this.formData? this.formData.password:'', Validators.required],
+    });
+
+    this.passwordForm = this.formBuilder.group({
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required],
     }, {
       validator: MustMatch('password', 'confirmPassword')
     });
   }
   get f() { return this.registerForm.controls; }
+  get f1() { return this.passwordForm.controls; }
 
   onSubmit(){
     this.submitted=true;
     this.isEmptyPhoneNumber = !this.registerForm.value.phoneNumber;
     // stop here if form is invalid
     if (this.registerForm.invalid || !this.isValidNumber || this.isEmptyPhoneNumber) {
+      return;
+    }
+  }
+  onPassSubmit(){
+    this.passSubmitted=true;
+    if (this.passwordForm.invalid) {
       return;
     }
   }

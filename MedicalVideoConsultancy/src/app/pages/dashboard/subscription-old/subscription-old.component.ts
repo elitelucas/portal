@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
 export class SubscriptionOldComponent implements OnInit {
   providerData: any;
   planData: any;
-  cardData = [];
+  cardData:any;
   currentPlan: any;
   otherPlan = [];
   newCardVal: any;
@@ -32,12 +32,6 @@ export class SubscriptionOldComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.providerData.planId)
-      // this.providerService.getPlansById(this.providerData.planId)
-      // .subscribe(res=>{
-      //   console.log('Res')
-      //   console.log(res)
-      //   this.planData=res;
-      // })
       this.providerService.getPlans()
         .subscribe(res => {
           this.planData = res;
@@ -50,20 +44,21 @@ export class SubscriptionOldComponent implements OnInit {
 
           this.providerService.getCard(this.providerData.id)
             .subscribe(res => {
-              this.cardData.push(res);
+              this.cardData=res;
             })
 
         })
 
   }
-  Delete(idx) {
-    if (this.cardData.length === 1)
-      return;
-    this.cardData.splice(idx, 1)
+  Delete() {
+   
   }
-  addCard(val) {
-
-    this.cardData.push({ card_number: val });
+  addCard() {
+    const sendData={
+      key:'update',
+      val:this.currentPlan._id
+    }
+    this.router.navigateByUrl('/dashboard/subscription-new/'+JSON.stringify(sendData));
   }
   Upgrade(item) {
     // this.newPlanVal=item;
@@ -113,11 +108,12 @@ export class SubscriptionOldComponent implements OnInit {
       confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.providerService.removeCard(this.cardData[0]._id)
+        this.providerService.removeCard(this.cardData._id)
         .subscribe(res=>{
           if(res){
-            this.userService.deleteUserPlanId(this.providerData.id).subscribe(res=>{
+            this.userService.changeUserSubscriptionStatus(this.providerData.id).subscribe(res2=>{
               Swal.fire('Deleted successfully');
+              localStorage.setItem('currentUser', JSON.stringify(res2));
               this.router.navigateByUrl('/dashboard/subscription-plan');
             })
            

@@ -11,13 +11,13 @@
         <div>
             <div class="row">
                 <div class="col-4">
-                    <div *ngFor="let item of cardData" class="mb-3">
-                        <span>Card:{{item.card_number}}</span>
+                    <div class="mb-3">
+                        <span>Card:{{cardData&&cardData.card_number}}</span>
                     </div>
                 </div>
                 <div class="col-4">
-                    <div *ngFor="let item of cardData;let i=index" class="mb-1">
-                        <button class="btn btn-danger" (click)="Delete(i)">Remove
+                    <div class="mb-1">
+                        <button class="btn btn-danger" (click)="Delete()">Remove
                         </button>
                     </div>
                 </div>
@@ -37,11 +37,7 @@
         </div>
 
         <div class="mb-3">
-            <input #cardInput type="number" class="mr-3">
-            <button class="btn btn-primary" (click)="addCard(cardInput.value)">Add Card</button>
-        </div>
-        <div class="text-center mb-3">
-            <button class="btn btn-primary" (click)="Save()">Save</button>
+            <button class="btn btn-primary" (click)="addCard()">Add Card</button>
         </div>
     </div>
 

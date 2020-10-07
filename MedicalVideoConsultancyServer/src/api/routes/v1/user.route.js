@@ -203,10 +203,10 @@ router
   .put(controller.updatePlanId);
 
  /**
-   * api/v1/users/deletePlanId
+   * api/v1/users/changeSubscriptionStatus
    * */
-  router.route('/deletePlanId/:providerId')
-  .delete(controller.deletePlanId);
+  router.route('/changeSubscriptionStatus')
+  .put(controller.changeSubscriptionStatus);
 
 
 module.exports = router;
