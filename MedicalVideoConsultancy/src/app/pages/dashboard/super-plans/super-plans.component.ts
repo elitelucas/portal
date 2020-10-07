@@ -1,5 +1,5 @@
 import { ProviderService } from './../../../_services/provider.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import  Swal  from 'sweetalert2';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
@@ -21,6 +21,9 @@ export class SuperPlansComponent implements OnInit {
 
   kk = [];
   tmpKk = [];
+
+  @ViewChild('newDescription') newDescription;
+  newDescriptionElement;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -62,7 +65,9 @@ export class SuperPlansComponent implements OnInit {
         this.tmpKk.push(true)
       })
       this.kk = this.tmpKk;
-      // this.onReset();
+  
+      this.onReset();
+      this.Editor.editorInstance['newDescription'].setData('');
     })
   }
 
