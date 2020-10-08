@@ -30,23 +30,32 @@ export class AdminUpdateComponent implements OnInit {
     private formBuilder: FormBuilder,
     private userService:UserService
     ) {
+      
     this.route.params.subscribe(data=>{
       if(data.data==='new'){
         this.registerTitle="New"
       }else{
         this.registerTitle="Update";
-        this.formData=JSON.parse(data.data);
-        this.userId=this.formData.userId;
-        console.log('this.formData')
-        console.log(this.formData)
+        this.userService.getAdminById(data.data).subscribe(res=>{
+          console.log('res')
+          console.log(res)
+          this.formData=res;
+          this.userId=this.formData._id;
+          this.registerForm = this.formBuilder.group({
+            firstName: [this.formData? this.formData.firstName:'', [Validators.required,Validators.pattern("[a-zA-Z ]*"), Validators.maxLength(100)]],
+            lastName: [this.formData? this.formData.lastName:'', [Validators.required,Validators.pattern("[a-zA-Z ]*"),Validators.maxLength(100)]],
+            email: [this.formData? this.formData.email:'', [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}$'),Validators.maxLength(100)]],
+            phoneNumber: [this.formData? this.formData.phoneNumber:'', Validators.required],
+          });
+        })
       }
     })
    }
 
   ngOnInit(): void {
     this.registerForm = this.formBuilder.group({
-      firstName: [this.formData? this.formData.name.split(' ')[0]:'', [Validators.required,Validators.pattern("[a-zA-Z ]*"), Validators.maxLength(100)]],
-      lastName: [this.formData? this.formData.name.split(' ')[1]:'', [Validators.required,Validators.pattern("[a-zA-Z ]*"),Validators.maxLength(100)]],
+      firstName: [this.formData? this.formData.firstName:'', [Validators.required,Validators.pattern("[a-zA-Z ]*"), Validators.maxLength(100)]],
+      lastName: [this.formData? this.formData.lastName:'', [Validators.required,Validators.pattern("[a-zA-Z ]*"),Validators.maxLength(100)]],
       email: [this.formData? this.formData.email:'', [Validators.required, Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}$'),Validators.maxLength(100)]],
       phoneNumber: [this.formData? this.formData.phoneNumber:'', Validators.required],
     });
@@ -71,24 +80,19 @@ export class AdminUpdateComponent implements OnInit {
     }
 
     if(this.formData){
-      console.log('this.registerForm.value')
-      console.log(this.registerForm.value)
-      console.log('this.formData.userId')
-      console.log(this.formData.userId)
-      this.userService.updateAdmin(this.registerForm.value,this.formData.userId).subscribe(res=>{
-        if(res==='ok'){
+      this.userService.updateProfile(this.registerForm.value,this.userId).subscribe(res=>{
+        if(res){
           Swal.fire('Updated Successfully!')
-          this.onReset();
+          this.submitted=false;
+                  
         }
       })
     }else{
-      console.log('this.registerForm.value')
-      console.log(this.registerForm.value)
       this.userService.createAdmin(this.registerForm.value).subscribe(res=>{
         if(res){
           this.userId=res._id;
           Swal.fire('Inserted Successfully!')
-          this.onReset();
+          this.submitted=false;
         }
       })
     }
@@ -100,10 +104,10 @@ export class AdminUpdateComponent implements OnInit {
       return;
     }
     if(this.userId){
-      this.userService.updateAdmin(this.passwordForm.value,this.userId).subscribe(res=>{
-        if(res==='ok'){
+      this.userService.updateProfile(this.passwordForm.value,this.userId).subscribe(res=>{
+        if(res){
           Swal.fire('Updated Successfully!')
-          this.onReset();
+          this.passSubmitted=false;
         }
       })
     }else{

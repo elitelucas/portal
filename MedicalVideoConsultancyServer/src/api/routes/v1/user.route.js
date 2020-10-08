@@ -92,6 +92,12 @@ router
   router.route('/super-providers')
   .get(controller.getProviders);
 
+  router.route('/getUserById/:userId')
+  .get(controller.getUserById);
+
+  router.route('/super-providers')
+  .post(controller.createUser);
+
   router.route('/filterProvider/:filterValue')
   .get(controller.getFilterProvider);
 
@@ -103,6 +109,9 @@ router
 
   router.route('/super-admins')
   .get(controller.getAdmins);
+
+  router.route('/super-admins/:adminId')
+  .get(controller.getAdminById);
 
   router.route('/super-admins')
   .post(controller.createAdmin);

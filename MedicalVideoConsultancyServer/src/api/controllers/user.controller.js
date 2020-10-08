@@ -63,14 +63,30 @@ exports.list = async (req, res, next) => {
   }
 };
 
+exports.getUserById=(req,res)=>{
+  User.findById(req.params.userId).then((user) => {
+    res.status(httpStatus.OK).json(user)
+  })
+  .catch(e => next(e));
+}
+
+exports.createUser = async (req, res, next) => {
+  try {
+    new User(req.body).save().then(result => {
+      res.status(httpStatus.OK).json(result);
+
+    });
+  } catch (error) {
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
+  }
+};
+
 /**
  * Delete user
  * @public
  */
 exports.remove = (req, res, next) => {
   const { user } = req.locals;
-  console.log('req.locals')
-  console.log(req.locals)
   user.remove()
     .then(() => res.status(httpStatus.NO_CONTENT).end())
     .catch(e => next(e));
@@ -80,22 +96,22 @@ exports.remove = (req, res, next) => {
 exports.getProviders = (req, res, next) => {
   User.find()
     .then((user) => {
-      res.status(httpStatus.OK).json(user)})
+      res.status(httpStatus.OK).json(user)
+    })
     .catch(e => next(e));
 };
 
 
 
 exports.getFilterProvider = (req, res, next) => {
-  const fullName=req.params.filterValue;
-  const firstName=fullName.split(' ')[0];
-  const lastName=fullName.split(' ')[1];
+  const fullName = req.params.filterValue;
+  const firstName = fullName.split(' ')[0];
+  const lastName = fullName.split(' ')[1];
 
-  User.find({firstName,lastName})
+  User.find({ firstName, lastName })
     .then((user) => {
-      console.log('user')
-      console.log(user)
-      res.status(httpStatus.OK).json(user)})
+      res.status(httpStatus.OK).json(user)
+    })
     .catch(e => next(e));
 };
 
@@ -103,60 +119,70 @@ exports.getFilterProvider = (req, res, next) => {
  * Delete provider of users collection
  * */
 
-exports.deleteProvider =async(req, res, next)=>{
-  try{
-    const providerId=req.params.providerId;
+exports.deleteProvider = async (req, res, next) => {
+  try {
+    const providerId = req.params.providerId;
     const user = await User.findByIdAndDelete(providerId);
     res.status(httpStatus.OK).send();
-  }catch (error) {
-   res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
- }
+  } catch (error) {
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
+  }
 
 }
 
 exports.getAdmins = (req, res, next) => {
   Admin.find()
     .then((admin) => {
-      res.status(httpStatus.OK).json(admin)})
+      res.status(httpStatus.OK).json(admin)
+    })
+    .catch(e => next(e));
+};
+
+exports.getAdminById = (req, res, next) => {
+  Admin.findById(req.params.adminId)
+    .then((admin) => {
+      res.status(httpStatus.OK).json(admin)
+    })
     .catch(e => next(e));
 };
 
 exports.createAdmin = async (req, res, next) => {
-  try{
+  try {
     console.log('req.body')
     console.log(req.body)
-    new Admin(req.body).save().then(result=>{
+    new Admin(req.body).save().then(result => {
       console.log('result')
       console.log(result)
       res.status(httpStatus.OK).json(result);
 
     });
-  }catch (error) {
+  } catch (error) {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
-  }  
+  }
 };
 
 exports.updateAdmin = async (req, res, next) => {
-  try{
+  try {
     console.log('req.body')
     console.log(req.body)
     console.log('req.params.adminId')
     console.log(req.params.adminId)
-    await Admin.findByIdAndUpdate(req.params.adminId,req.body);
+    await Admin.findByIdAndUpdate(req.params.adminId, req.body);
     res.status(httpStatus.OK).json('ok');
-  }catch (error) {
+  } catch (error) {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
-  }  
+  }
 };
 
 exports.getFilterAdmin = (req, res, next) => {
-  const fullName=req.params.filterValue;
-  const firstName=fullName.split(' ')[0];
-  const lastName=fullName.split(' ')[1];
+  const fullName = req.params.filterValue;
+  const firstName = fullName.split(' ')[0];
+  const lastName = fullName.split(' ')[1];
 
-  Admin.find({firstName,lastName})
+  Admin.find({ firstName, lastName })
     .then((admin) => {
-      res.status(httpStatus.OK).json(admin)})
+      res.status(httpStatus.OK).json(admin)
+    })
     .catch(e => next(e));
 };
 
@@ -164,14 +190,14 @@ exports.getFilterAdmin = (req, res, next) => {
  * Delete provider of users collection
  * */
 
-exports.deleteAdmin =async(req, res, next)=>{
-  try{
-    const providerId=req.params.providerId;
+exports.deleteAdmin = async (req, res, next) => {
+  try {
+    const providerId = req.params.providerId;
     const admin = await Admin.findByIdAndDelete(providerId);
     res.status(httpStatus.OK).send();
-  }catch (error) {
-   res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
- }
+  } catch (error) {
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
+  }
 
 }
 
@@ -326,26 +352,26 @@ exports.sigImgUpload = async (req, res) => {
   console.log(imagePath + fileName);
 */
 
-await Bucket.uploadFile("signature", fileName, file.data, {
-  ContentType: file.mimetype
-}, async (err, data) => {
-  if (err) {
-    logger.error("Bucket Error creating the file: ", err);
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).send();
-  } else {
-    logger.info("Bucket Successfully created a file on S3 : " + data.Location);
-    res.status(httpStatus.CREATED).json({ location: data.Location });
-  }
-});
-/*
-  file.mv(imagePath + fileName, function (error) {
-    if (error) {
-      console.log("signature image upload error", error)
+  await Bucket.uploadFile("signature", fileName, file.data, {
+    ContentType: file.mimetype
+  }, async (err, data) => {
+    if (err) {
+      logger.error("Bucket Error creating the file: ", err);
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).send();
     } else {
-      console.log(imagePath);
-      res.status(httpStatus.CREATED).json({ fileName: fileName });
+      logger.info("Bucket Successfully created a file on S3 : " + data.Location);
+      res.status(httpStatus.CREATED).json({ location: data.Location });
     }
-  });*/
+  });
+  /*
+    file.mv(imagePath + fileName, function (error) {
+      if (error) {
+        console.log("signature image upload error", error)
+      } else {
+        console.log(imagePath);
+        res.status(httpStatus.CREATED).json({ fileName: fileName });
+      }
+    });*/
 
 
 };
@@ -359,14 +385,17 @@ exports.updateProfile = async (req, res) => {
   const userModel = user ? User : Admin;
   const userOldData = req.locals.user;
   let userNewData = req.body.profile;
-  let password = userNewData.password === '' ? userOldData.password : userNewData.password;
-  if (userNewData.password !== '') {
-    const rounds = env === 'test' ? 1 : 10;
-    const hash = await bcrypt.hash(password, rounds);
-    userNewData.password = hash;
-  } else {
-    userNewData.password = password;
+  if (userNewData.password !== undefined) {
+    let password = userNewData.password === '' ? userOldData.password : userNewData.password;
+    if (userNewData.password !== '') {
+      const rounds = env === 'test' ? 1 : 10;
+      const hash = await bcrypt.hash(password, rounds);
+      userNewData.password = hash;
+    } else {
+      userNewData.password = password;
+    }
   }
+
   userModel.findOneAndUpdate({ _id: req.params.userId }, userNewData, { new: true }).then(result => {
     res.status(httpStatus.OK).json(result);
   }).catch(e => {
@@ -585,7 +614,7 @@ exports.updatePlanId = async (req, res, next) => {
   try {
     console.log('req.body')
     console.log(req.body)
-    const user = await User.findByIdAndUpdate(req.body.providerId,{planId:req.body.planId},{new:true});
+    const user = await User.findByIdAndUpdate(req.body.providerId, { planId: req.body.planId }, { new: true });
     res.status(httpStatus.OK).json(user);
   } catch (error) {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
@@ -597,7 +626,7 @@ exports.changeSubscriptionStatus = async (req, res, next) => {
   try {
     console.log('req.body.providerId')
     console.log(req.body.providerId)
-    const user = await User.findByIdAndUpdate(req.body.providerId,{subcriptionStatus:false},{new:true});
+    const user = await User.findByIdAndUpdate(req.body.providerId, { subcriptionStatus: false }, { new: true });
     console.log('user')
     console.log(user)
     res.status(httpStatus.OK).json(user);

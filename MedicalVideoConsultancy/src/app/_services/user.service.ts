@@ -14,6 +14,14 @@ export class UserService {
     return this.http.get<any>(baseUrl);
   }
 
+  getUserById(userId) {
+    return this.http.get<any>(baseUrl+'/getUserById/'+userId);
+  }
+  createUser(data){
+    let userUrl= baseUrl+"/super-providers";
+    return this.http.post<any>(userUrl,data);
+  }
+
 
   getProviders() {
     let providersUrl= baseUrl+"/super-providers";
@@ -34,6 +42,10 @@ export class UserService {
 
   getAdmins() {
     let adminsUrl= baseUrl+"/super-admins";
+    return this.http.get<any>(adminsUrl);
+  }
+  getAdminById(adminId) {
+    let adminsUrl= baseUrl+"/super-admins/"+adminId;
     return this.http.get<any>(adminsUrl);
   }
 

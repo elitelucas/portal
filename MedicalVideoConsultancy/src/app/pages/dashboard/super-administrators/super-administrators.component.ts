@@ -164,11 +164,10 @@ export class SuperAdministratorsComponent implements OnInit {
   }
 
   New(){
-    this.router.navigateByUrl('/dashboard/admin-update/new')
+    this.router.navigateByUrl('/dashboard/admin-update/new');
   }
-  Update(data){
-    const sendData=JSON.stringify(data);
-    this.router.navigateByUrl('/dashboard/admin-update/'+sendData);
+  Update(userId){
+    this.router.navigateByUrl('/dashboard/admin-update/'+userId);
   }
   Delete(providerId,idx){
   

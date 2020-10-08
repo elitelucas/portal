@@ -41,6 +41,7 @@ export class SuperProvidersComponent implements OnInit {
     private router: Router,
     private activatedRoute:ActivatedRoute
     ) {
+      console.log('sdddd')
   }
 
 
@@ -50,6 +51,8 @@ export class SuperProvidersComponent implements OnInit {
 
   initData() {
     this.userService.getProviders().subscribe(res=> {
+      console.log('redsfsds')
+      console.log(res)
       if(res) {
         console.log("user data s>>>>>>>>>>>>>", res)
        if(res.name) {
@@ -168,9 +171,8 @@ export class SuperProvidersComponent implements OnInit {
   New(){
     this.router.navigateByUrl('/dashboard/super-update/new')
   }
-  Update(data){
-    const sendData=JSON.stringify(data);
-    this.router.navigateByUrl('/dashboard/super-update/'+sendData);
+  Update(userId){
+    this.router.navigateByUrl('/dashboard/super-update/'+userId);
   }
   Delete(providerId,idx){
     console.log('idx')
