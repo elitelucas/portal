@@ -812,8 +812,10 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     const providerId = req.body.providerId;
     const cardData = req.body.card;
     let cardExists = await Card.findOne({ card_number: cardData.card_number });
+    console.log(providerId);
     let provider = await User.findOne({ _id: providerId });
 
+    console.log(provider);
     console.log(cardExists);
 
     const culqi = new Culqi({
@@ -908,6 +910,7 @@ exports.unsubscribePlanWithCard = async (req, res, next) => {
     userProvider.subcriptionId = null;
     userProvider.planId = null;
     userProvider.subcriptionStatus = false;
+    console.log(userProvider);
     userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});
     res.status(httpStatus.OK).send();
   } catch (e) {
