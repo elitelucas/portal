@@ -215,10 +215,10 @@ export class MeetRoomService {
   }
 
   //send confirm pay infomation  from patient to provider
-  public confirmPay(providerId) {
+  public confirmPay(providerId, payMethodSelect) {
     /*console.log('providerId')
     console.log(providerId)*/
-    this.socket.emit('confirmPay', providerId);
+    this.socket.emit('confirmPay', providerId, payMethodSelect);
   }
 
   //send confirm provider infomation  from provider to patient

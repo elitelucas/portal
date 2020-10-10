@@ -13,13 +13,13 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler) {
     let authReq = req;
     const token = this.authService.getToken();
-    console.log("intercept");
+    /*console.log("intercept");
     console.log("token");
-    console.log(token);
+    console.log(token);*/
     const now = new Date();
     const tokenExpiredTime = JSON.parse(localStorage.getItem('tokenExpiredTime'));
-    console.log("tokenExpiredTime");
-    console.log(tokenExpiredTime);
+    /*console.log("tokenExpiredTime");
+    console.log(tokenExpiredTime);*/
 
     /*console.log("authReq");
     console.log(authReq.url);*/
@@ -32,8 +32,8 @@ export class AuthInterceptor implements HttpInterceptor {
           this.handleExpiredToken();
         } else{
           authReq = req.clone({ headers: req.headers.set(TOKEN_HEADER_KEY, 'Bearer ' + token) });
-          console.log("authReq");
-          console.log(authReq);
+          /*console.log("authReq");
+          console.log(authReq);*/
         }
       }
     }

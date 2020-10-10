@@ -127,15 +127,51 @@
                 </div>
               </div>
 
-              <div class="form-row">
-                <label>Medical record</label>
-                <textarea formControlName="record" class="form-control" rows="5"
-                  placeholder="Please input your medical record"></textarea>
+              <!--Hidden field
+              <input type="hidden" formControlName="providerId">-->
+              
+              <div class="form-group col">
+                <label>Please input room name</label>
+                <input matInput class="form-control" formControlName="room" type="text"
+                  [ngClass]="{ 'is-invalid': submitted && f1.room.errors }">
+                <div *ngIf="submitted&&f.room.errors" class="invalid-feedback d-block font-20">
+                  <div *ngIf="f1.room.errors.minlength">
+                    Please type the url of doctor room
+                  </div>
+                  <div *ngIf="f1.room.errors.required">
+                    This field is required
+                  </div>
+                </div>
+                <div *ngIf="isInvalidDomain" class="invalid-feedback d-block font-20">
+                  Please input valid domain
+                </div>
+                <div *ngIf="!isValidRoom" class="invalid-feedback d-block font-20">
+                  No available Room Name
+                </div>
               </div>
 
-              <!--Hidden field-->
-              <input type="hidden" formControlName="providerId">
-              <input type="hidden" formControlName="room">
+              <div class="form-row ">
+                <div class="form-group col">
+                  <label>Reason</label>
+                  <textarea type="text" formControlName="reason" class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && f1.reason.errors }">
+                    </textarea>
+                  <div *ngIf="submitted && f.reason.errors" class="invalid-feedback">
+                    <div *ngIf="f1.reason.errors.required">Reason is required</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row ">
+                <div class="form-group col">
+                  <label>Type Attetion</label>
+                  <div>
+                    <input formControlName="typeAttetion" type="radio" name="typeAttetion" value=1>New Consult<br>
+                    <input formControlName="typeAttetion" type="radio" name="typeAttetion" value=2>Following<br></div>
+                  <div *ngIf="submitted && f1.typeAttetion.errors" class="invalid-feedback">
+                    <div *ngIf="f1.typeAttetion.errors.required">Type Attetion is required</div>
+                  </div>
+                </div>
+              </div>
 
               <div class="form-group form-check mt-3">
                 <input type="checkbox" formControlName="acceptTerms" id="acceptTerms" class="form-check-input cursor"

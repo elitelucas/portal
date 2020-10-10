@@ -7,6 +7,7 @@ import { ContentBlogService } from '../../_services/content-blog.service';
 import { MeetRoomService } from '../../_services/meet-room.service';
 import { ProviderService } from '../../_services/provider.service';
 import { UserService } from '../../_services/user.service';
+import { AuthPatientService } from '../../_services/auth.patient.service';
 
 @Component({
   selector: 'app-meet-patient',
@@ -34,12 +35,15 @@ export class MeetPatientComponent implements OnInit {
     private route: ActivatedRoute,
     private meetRoomService: MeetRoomService,
     private providerService: ProviderService,
+    private authPatientService: AuthPatientService,
     private _router: Router) {
+    this.patientData = this.authPatientService.getCurrentUser
+    //this.patientData = localStorage.getItem('patient');
     this.identify = localStorage.getItem('patient_auth');
-    this.patientData = JSON.parse(localStorage.getItem('patient'));
     this.providerData = JSON.parse(localStorage.getItem('provider'));
 
-    this.patientData['room'] = this.roomName;
+    this.patientData['providerId'] =  this.providerData._id;
+    this.patientData['room'] = this.providerData.room;
     this.patientData['providerId'] = this.providerData._id;
 
     this.providerService.updatePatient(this.patientData).subscribe((patientUpdated: Patient) => {
@@ -106,10 +110,10 @@ export class MeetPatientComponent implements OnInit {
     this.meetRoomService.receiveEndCall()
       .subscribe(async (text) => {
         if (text === 'endCall') {
+          this.meetRoomService.endCall(this.providerData.socketId, 'acceptEnd');
           this.meetRoomService.stopVideoAudio();
           this.step = this.step_feeback_page;
           localStorage.setItem('step_attetion', this.step.toString());
-          this.meetRoomService.endCall(this.providerData.socketId, 'acceptEnd');
         }
       });
   }

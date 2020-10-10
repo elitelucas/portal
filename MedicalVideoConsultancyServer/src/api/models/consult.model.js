@@ -5,6 +5,7 @@ const consultSchema = new Schema({
   patientId: String,
   birthDate: Date,
   providerId : String,
+  providerAttetionId : String,
   dni: {
     type: String,
     required: true,
@@ -12,6 +13,16 @@ const consultSchema = new Schema({
   allergy: {
     type:String,
     default:''
+  },
+  reason: {
+    type:String,
+    default:''
+  },
+  typeAttetion: {
+    type: Number
+  },
+  payAmount: {
+    type: Number
   },
   complain: {
     type:String,
@@ -47,7 +58,7 @@ const consultSchema = new Schema({
   },
   status: {
     type:String,
-    default:'temporaly'
+    default:'create'
   },
   typeAttetion: {
     type:String

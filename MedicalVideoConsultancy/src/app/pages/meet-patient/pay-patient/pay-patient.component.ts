@@ -8,6 +8,7 @@ import { MeetRoomService } from "../../../_services/meet-room.service";
 import { Patient } from '../../../_model/user';
 import { UserService } from "../../../_services/user.service";
 import { AuthService } from "../../../_services/auth.service";
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 
 export interface PayData {
@@ -44,12 +45,18 @@ export class PayPatientComponent implements OnInit {
   identify_patient = 'OK';
   no_identify_patient = 'NOK';
 
+  payForm: FormGroup;
+
   constructor(
-    public dialog: MatDialog,
+    private formBuilder: FormBuilder,
     private meetRoomService: MeetRoomService,
     private userService: UserService,
     private _route: Router
   ) {
+    
+    this.payForm = this.formBuilder.group({
+      paySelect: ['', [Validators.required]]
+    });
 
     this.QRimgKey[0] = false;
     this.QRimgKey[1] = false;
@@ -102,8 +109,13 @@ export class PayPatientComponent implements OnInit {
     });
   }
 
+  get f() { return this.payForm.controls; }
+
   confirmPay() {
-    this.meetRoomService.confirmPay(this.providerData._id);
+    if(this.payForm.invalid){
+      return;
+    }
+    this.meetRoomService.confirmPay(this.providerData._id, this.f.paySelect.value );
   }
 
   Cancel() {

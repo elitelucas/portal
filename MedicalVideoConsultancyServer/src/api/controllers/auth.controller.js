@@ -122,8 +122,14 @@ exports.join = async (req, res, next) => {
   try {
     const patientData = req.body;
     patientData['role'] = "Patient";
-    const patient = await new Patient(patientData).save();
+    let patient = await new Patient(patientData).save();
     if (patient) {
+
+      patient = await Patient.findOneAndUpdate({ _id: patient._id }, {
+        reason: patientData.reason,
+        typeAttetion: patientData.typeAttetion,
+      }, { new: false });
+
       res.status(httpStatus.CREATED).json(patient);
     } else {
       res.status(httpStatus.NOT_FOUND).send();
@@ -144,8 +150,19 @@ exports.join = async (req, res, next) => {
 exports.joinValidatePatient = async (req, res, next) => {
   try {
     const patientData = req.body;
-    const patient = await Patient.findOne({ dni: patientData.dni });
+    console.log("patientData");
+    console.log(patientData);
+    let patient = await Patient.findOne({ dni: patientData.dni });
+
+
     if (patient) {
+
+      patient = await Patient.findOneAndUpdate({ _id: patient._id }, {
+        reason: patientData.reason,
+        typeAttetion: patientData.typeAttetion,
+        //providerId: patientData.providerId,
+      }, { new: false });
+
       const { accessToken } = await Patient.findAndGenerateToken(patient);
       return res.json({ token: accessToken, patient: patient });
     } else {

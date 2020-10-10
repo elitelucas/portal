@@ -33,8 +33,10 @@ export class SignInPatientComponent implements OnInit {
   identify_patient = 'OK';
   no_identify_patient = 'NOK';
 
-  constructor(private formBuilder: FormBuilder, private authPatientService: AuthPatientService,
-    private router: Router, private providerService: ProviderService) { }
+  constructor(private formBuilder: FormBuilder,
+    private authPatientService: AuthPatientService,
+    private router: Router,
+    private providerService: ProviderService) { }
 
   ngOnInit(): void {
     this.initData();
@@ -63,9 +65,8 @@ export class SignInPatientComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       phoneNumber: ['', Validators.required],
       acceptTerms: [false, Validators.requiredTrue],
-      providerId: ['', Validators.required],
+      //providerId: ['', Validators.required],
       room: ['', Validators.required],
-      record: [''],
       reason: ['', [Validators.required, Validators.minLength(1)]],
       typeAttetion: ['', Validators.required]
     });
@@ -77,7 +78,7 @@ export class SignInPatientComponent implements OnInit {
   checkRoom() {
     localStorage.setItem('patient_auth', this.no_identify_patient);
     if (this.roomForm.valid) {
-      this.authPatientService.joinValidatePatient(this.roomForm.value).subscribe(resultPatient => {
+      this.authPatientService.joinValidatePatient(this.roomForm.value).subscribe((resultPatient) => {
         this.submitted = true;
         const room = this.f.room.value.substring(this.domain.length);
         const dniPatient = this.f.dni.value;
@@ -89,22 +90,23 @@ export class SignInPatientComponent implements OnInit {
               this.patientData = resultPatient.patient;
               this.providerData = result;
               this.directRoomUrl = '/' + this.providerData.room;
-              if (this.patientData) {
-                localStorage.setItem('patient', JSON.stringify(this.patientData));
-                localStorage.setItem('provider', JSON.stringify(this.providerData));
-                localStorage.setItem('patient_auth', this.identify_patient);
-                this.router.navigateByUrl(this.directRoomUrl);
-                return;
-              }
-              this.f1.room.setValue(this.providerData.room);
-              this.f1.dni.setValue(dniPatient);
-              this.f1.providerId.setValue(this.providerData._id);
+              localStorage.setItem('patient', JSON.stringify(this.patientData));
+              localStorage.setItem('provider', JSON.stringify(this.providerData));
+              localStorage.setItem('patient_auth', this.identify_patient);
+              this.router.navigateByUrl(this.directRoomUrl);
             }
             else {
               this.isValidRoom = false;
             }
           });
+      }, error => {
+        this.step = 2;
+        this.f1.room.setValue(this.f.room.value);
+        this.f1.dni.setValue(this.f.dni.value);
+        this.f1.reason.setValue(this.f.reason.value);
+        this.f1.typeAttetion.setValue(this.f.typeAttetion.value);
       });
+
     }
   }
 
@@ -128,13 +130,20 @@ export class SignInPatientComponent implements OnInit {
       .subscribe(result => {
         if (result) {
           this.authPatientService.joinValidatePatient(result).subscribe(resultPatient => {
-            this.patientData = resultPatient.patient;
-            localStorage.setItem('patient', this.patientData);
-            localStorage.setItem('patient_auth', this.identify_patient);
-            this.router.navigateByUrl(this.directRoomUrl);
-            this.step = 1
-            this.providerData = null;
-            this.directRoomUrl = null;
+            const room = this.f1.room.value.substring(this.domain.length);
+            this.providerService.checkRoomExist(room)
+              .subscribe(result => {
+                this.providerData = result;
+                this.directRoomUrl = '/' + this.providerData.room;
+                this.patientData = resultPatient.patient;
+                localStorage.setItem('patient', this.patientData);
+                localStorage.setItem('provider', JSON.stringify(this.providerData));
+                localStorage.setItem('patient_auth', this.identify_patient);
+                this.router.navigateByUrl(this.directRoomUrl);
+                this.step = 1
+                this.providerData = null;
+                this.directRoomUrl = null;
+              });
           });
         }
       }, error => {

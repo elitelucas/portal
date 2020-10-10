@@ -459,7 +459,7 @@ exports.updatePatient = async (req, res, next) => {
   try {
     const dni = req.body.dni;
     //console.log("updatePatient dni:",dni)
-    //console.log("updatePatient:",req.body)
+    console.log("updatePatient:", req.body)
     //req.body.avatar = new Buffer(req.body.avatar.split(",")[1], "base64");
     const patient = await Patient.findOneAndUpdate({ dni: dni }, req.body, { new: true });
     return res.status(httpStatus.OK).json(patient);
@@ -806,7 +806,7 @@ exports.changeSubscribePlan = async (req, res, next) => {
 
     let userProvider = await User.findById(providerId);
     const subcriptionId = userProvider.subcriptionId;
-    
+
     const culqi = new Culqi({
       privateKey: culqiConfing.private_key,
       pciCompliant: true,
@@ -967,8 +967,28 @@ exports.getChart = async (req, res, next) => {
  * */
 exports.createConsult = async (req, res, next) => {
   try {
-    const consultData = req.body;
+    let consultData = req.body;
+    consultData['providerAttetionId'] = consultData['providerId']
     const consult = await new Consult(consultData).save();
+    res.status(httpStatus.CREATED).json(consult);
+  } catch (e) {
+    return next(APIError(e))
+  }
+};
+
+/**
+ * @api v1/provider/consult
+ * @method patch
+ * @param req consult data(name, aga, phone number...)
+ * @param res
+ * @param next
+ * */
+exports.closeConsult = async (req, res, next) => {
+  try {
+    const consultId = req.params.consultId;
+    const consult = await Consult.findOneAndUpdate({ _id: consultId }, {
+      status: 'close'
+    }, { new: false });
     res.status(httpStatus.CREATED).json(consult);
   } catch (e) {
     return next(APIError(e))
@@ -1012,13 +1032,13 @@ exports.createFeedback = async (req, res, next) => {
     }).save();
 
     await new FeedbackApplication({
-     patientId: patientsData._id,
-     providerId: providerData._id,
-     raking: req.body.feeback.rakingApp,
-     comment: req.body.feeback.feedBackApp
-   }).save();
+      patientId: patientsData._id,
+      providerId: providerData._id,
+      raking: req.body.feeback.rakingApp,
+      comment: req.body.feeback.feedBackApp
+    }).save();
 
-   res.status(httpStatus.OK).send();
+    res.status(httpStatus.OK).send();
   } catch (e) {
     console.log("error ", e)
     error = new APIError(e);

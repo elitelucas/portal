@@ -316,6 +316,8 @@ userSchema.statics = {
   },
 };
 
+exports.roles = roles;
+
 /**
  * @typedef User
  */

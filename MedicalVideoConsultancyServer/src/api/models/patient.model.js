@@ -105,6 +105,14 @@ const patientSchema = new Schema({
   role: {
     type: String
   },
+  reason: {
+    type: String,
+    required: true,
+  },
+  typeAttetion: {
+    type: Number,
+    required: true,
+  },
 }, {
   timestamps:true
 });

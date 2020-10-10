@@ -411,11 +411,14 @@ io.on('connection', (socket) => {
   })
 
   //send pay confirm info from patient to provider
-  socket.on('confirmPay', async (providerId) => {
+  socket.on('confirmPay', async (providerId, payMethodSelect) => {
     if (providerId) {
       const provider = await User.findById(providerId);
       if (provider.socketId) {
-        socket.to(provider.socketId).emit('confirmPay', 'confirm');
+        socket.to(provider.socketId).emit('confirmPay', {
+          "type:":'confirm',
+          "payMethodSelect":payMethodSelect
+        });
       } else {
         logger.info('there is no such provider.socketId');
       }

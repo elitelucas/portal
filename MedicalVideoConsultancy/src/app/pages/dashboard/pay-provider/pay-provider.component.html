@@ -7,43 +7,83 @@
             <p>Amount to be paid by patient($):</p>
             <input #payAmount type="number">
         </div>
-
-    </div>
-    <div class="detail-pane  margin-div">
-       <div class="qr-code">
-           <h3>QR codes</h3>
-           <div>
-               <div class='row margin-div' *ngIf="QRimgKey[0]">
-                   <div class="col-4">
-                       {{payData.QRimg[0].description}}
-                   </div>
-                   <div class="col-8">
-                        <img class="qrImage" src="{{payData.QRimg[0].name}}">   
-                   </div>
-               </div>
-               <div class='row margin-div' *ngIf="QRimgKey[1]">
-                    <div class="col-4">
-                        {{payData.QRimg[1].description}}
-                    </div>
-                    <div class="col-8">
-                        <img class="qrImage" src="{{payData.QRimg[1].name}}">   
-                    </div>
-                </div> 
-           </div>
-       </div>
-       <div class="account margin-div"  *ngIf="accountKey">
-           <h3>Account Banks</h3>
-           <div class="add-account" *ngFor="let item of payData.account;">
-                {{item}}
+        <div>
+            <p>Reason: {{patientData.reason}}</p>
+        </div>
+        <div>
+            <p>Type Atettion:  </p>
+            <div *ngIf="patientData.typeAttetion == 1 " >
+                New
             </div>
-       </div>
-       <div class="link-pay margin-div"  *ngIf="urlKey">
-            <h3>Link Pay</h3>
-            <div class="add-account" *ngFor="let item of payData.url;">
-                {{item}}
+            <div *ngIf="patientData.typeAttetion == 2 " >
+                Follow up
             </div>
         </div>
+
+        <p>Patient select pay method : [<span *ngIf="patientPayMethodConfirm" type="number">{{patientPayMethodConfirm}}</span>]</p>
     </div>
+    
+
+    <div class="row" style="border-bottom: 1px solid;">
+        <div class="col-xl-8 point">
+            <div class="row  pt-5">
+                <div [class]="key.Consults? 'col-xl-3 left-border title-pos sub-menu':'col-xl-3 left-border title-pos'" (click)="changeBackground('Consults')">
+                    Consults
+                </div> 
+                <div [class]="key.payMethods? 'col-xl-4 left-border title-pos sub-menu':'col-xl-4 left-border title-pos'" (click)="changeBackground('payMethods')">
+                    Pay methods
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+
+        </div>
+    </div>
+
+
+    <div *ngIf="key.payMethods">
+        <div class="detail-pane  margin-div">
+            <div class="qr-code">
+                <h3>QR codes</h3>
+                <div>
+                    <div class='row margin-div' *ngIf="QRimgKey[0]">
+                        <div class="col-4">
+                            {{payData.QRimg[0].description}}
+                        </div>
+                        <div class="col-8">
+                             <img class="qrImage" src="{{payData.QRimg[0].name}}">   
+                        </div>
+                    </div>
+                    <div class='row margin-div' *ngIf="QRimgKey[1]">
+                         <div class="col-4">
+                             {{payData.QRimg[1].description}}
+                         </div>
+                         <div class="col-8">
+                             <img class="qrImage" src="{{payData.QRimg[1].name}}">   
+                         </div>
+                     </div> 
+                </div>
+            </div>
+            <div class="account margin-div"  *ngIf="accountKey">
+                <h3>Account Banks</h3>
+                <div class="add-account" *ngFor="let item of payData.account;">
+                     {{item}}
+                 </div>
+            </div>
+            <div class="link-pay margin-div"  *ngIf="urlKey">
+                 <h3>Link Pay</h3>
+                 <div class="add-account" *ngFor="let item of payData.url;">
+                     {{item}}
+                 </div>
+             </div>
+         </div>
+    </div>
+
+
+    <div *ngIf="key.Consults">
+
+    </div>
+
 
     <div class="row button-div">
         <div class="col-4">

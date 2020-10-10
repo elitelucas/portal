@@ -59,7 +59,7 @@ export class HealthRoomComponent implements OnInit {
     this.meetRoomService.startLocalMediaVideo();
     this.meetRoomService.connect().subscribe(peerId => {
       this.currentUser.peerId = peerId;
-      this.meetRoomService.preparateVideoCallFormProvider(this.currentUser,this.patient._id);
+      this.meetRoomService.preparateVideoCallFormProvider(this.currentUser, this.patient._id);
     });
 
     this.meetRoomService.patientConnected().subscribe(patient => {
@@ -76,7 +76,7 @@ export class HealthRoomComponent implements OnInit {
 
     this.meetRoomService.receiveEndCall()
       .subscribe(async (text) => {
-        console.log("receiveEndCall:" , text);
+        console.log("receiveEndCall:", text);
         if (text === 'acceptEnd') {
           this._router.navigateByUrl("/dashboard/health-provider")
         }
@@ -123,8 +123,10 @@ export class HealthRoomComponent implements OnInit {
   }
 
   public endCall() {
-    this.meetRoomService.stopVideoAudio();
-    this.meetRoomService.endCall(this.patient.socketId, 'endCall');
+    this.providerService.closeConsult(this.consultId).subscribe(res => {
+      this.meetRoomService.endCall(this.patient.socketId, 'endCall');
+      this.meetRoomService.stopVideoAudio();
+    });
   }
 
 }
