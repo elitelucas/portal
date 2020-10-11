@@ -5,6 +5,7 @@ const {
   login,
   register,
   join,
+  joinValidate,
 } = require('../../validations/auth.validation');
 
 const router = express.Router();
@@ -94,7 +95,14 @@ router.route('/verify-sms')
 router.route('/join')
   .post(validate(join), controller.join);
 
+
 router.route('/join/validate')
   .post(controller.joinValidate);
+
+/**
+ * api/v1/auth/join/token
+ * */
+router.route('/join/validate/patient')
+  .post(validate(joinValidate), controller.joinValidatePatient);
 
 module.exports = router;

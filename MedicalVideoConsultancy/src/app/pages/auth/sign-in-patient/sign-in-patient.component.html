@@ -14,18 +14,18 @@
                 <div class="form-group col">
                   <label>DNI</label>
                   <input type="text" formControlName="dni" class="form-control"
-                         [ngClass]="{ 'is-invalid': submitted && f1.dni.errors }"/>
-                  <div *ngIf="submitted && f1.dni.errors" class="invalid-feedback">
-                    <div *ngIf="f1.dni.errors.required">DNI is required</div>
+                    [ngClass]="{ 'is-invalid': submitted && f.dni.errors }" />
+                  <div *ngIf="submitted && f.dni.errors" class="invalid-feedback">
+                    <div *ngIf="f.dni.errors.required">DNI is required</div>
                   </div>
                   <div class="d-block invalid-feedback">
                     <div *ngIf="isDuplicatedDNI">DNI is already in use.</div>
                   </div>
                 </div>
                 <div class="form-group col">
-                    <label>Please input room name</label>
-                    <input matInput class="form-control" formControlName="room" type="text"
-                           value="http://localhost:4200/" [ngClass]="{ 'is-invalid': submitted && f.room.errors }">
+                  <label>Please input room name</label>
+                  <input matInput class="form-control" formControlName="room" type="text"
+                    [ngClass]="{ 'is-invalid': submitted && f.room.errors }">
                   <div *ngIf="submitted&&f.room.errors" class="invalid-feedback d-block font-20">
                     <div *ngIf="f.room.errors.minlength">
                       Please type the url of doctor room
@@ -40,9 +40,31 @@
                   <div *ngIf="!isValidRoom" class="invalid-feedback d-block font-20">
                     No available Room Name
                   </div>
-
                 </div>
               </div>
+              <div class="form-row ">
+                <div class="form-group col">
+                  <label>Reason</label>
+                  <textarea type="text" formControlName="reason" class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && f.reason.errors }">
+                    </textarea>
+                  <div *ngIf="submitted && f.reason.errors" class="invalid-feedback">
+                    <div *ngIf="f.reason.errors.required">Reason is required</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row ">
+                <div class="form-group col">
+                  <label>Type Attetion</label>
+                  <div>
+                    <input formControlName="typeAttetion" type="radio" name="typeAttetion" value=1>New Consult<br>
+                    <input formControlName="typeAttetion" type="radio" name="typeAttetion" value=2>Following<br></div>
+                  <div *ngIf="submitted && f.typeAttetion.errors" class="invalid-feedback">
+                    <div *ngIf="f.typeAttetion.errors.required">Type Attetion is required</div>
+                  </div>
+                </div>
+              </div>
+
               <div class="text-center">
                 <button type="submit" style="bottom: 0;" class=" mb-3 text-white font-bold color-check-in">Check in
                 </button>
@@ -65,7 +87,7 @@
                 <div class="form-group col">
                   <label>Full Name</label>
                   <input type="text" formControlName="fullName" class="form-control"
-                         [ngClass]="{ 'is-invalid': submitted && f1.fullName.errors }"/>
+                    [ngClass]="{ 'is-invalid': submitted && f1.fullName.errors }" />
                   <div *ngIf="submitted && f1.fullName.errors" class="invalid-feedback">
                     <div *ngIf="f1.fullName.errors.required">Full Name is required</div>
                   </div>
@@ -73,7 +95,7 @@
                 <div class="form-group col">
                   <label>DNI</label>
                   <input type="text" formControlName="dni" class="form-control"
-                         [ngClass]="{ 'is-invalid': submitted && f1.dni.errors }"/>
+                    [ngClass]="{ 'is-invalid': submitted && f1.dni.errors }" />
                   <div *ngIf="submitted && f1.dni.errors" class="invalid-feedback">
                     <div *ngIf="f1.dni.errors.required">DNI is required</div>
                   </div>
@@ -87,7 +109,7 @@
                 <div class="form-group col">
                   <label>Email</label>
                   <input type="email" formControlName="email" class="form-control"
-                         [ngClass]="{ 'is-invalid': submitted && f1.email.errors }"/>
+                    [ngClass]="{ 'is-invalid': submitted && f1.email.errors }" />
                   <div *ngIf="submitted && f1.email.errors" class="invalid-feedback">
                     <div *ngIf="f1.email.errors.required">Email address is required</div>
                     <div *ngIf="f1.email.errors.email">Email address is invalid</div>
@@ -97,28 +119,63 @@
                 <div class="form-group col text-black-50">
                   <label class="text-white">Phone Number</label>
                   <input type="text" ng2TelInput formControlName="phoneNumber" class="form-control  text-black-50"
-                         [ngClass]="{ 'is-invalid': submitted && f1.phoneNumber.errors }"
-                         (hasError)="hasError($event)"
-                         (ng2TelOutput)="getNumber($event)"/>
+                    [ngClass]="{ 'is-invalid': submitted && f1.phoneNumber.errors }" (hasError)="hasError($event)"
+                    (ng2TelOutput)="getNumber($event)" />
                   <div class="invalid-feedback d-block" *ngIf="isEmptyPhoneNumber">Phone Number is required</div>
                   <div class="invalid-feedback d-block" *ngIf="isDuplicatedPhone">Phone Number is already in use</div>
                   <div class="invalid-feedback d-block" *ngIf="!isValidNumber">Please type valid number</div>
                 </div>
               </div>
 
-              <div class="form-row">
-                <label>Medical record</label>
-                <textarea formControlName="record" class="form-control" rows="5"
-                          placeholder="Please input your medical record"></textarea>
+              <!--Hidden field
+              <input type="hidden" formControlName="providerId">-->
+              
+              <div class="form-group col">
+                <label>Please input room name</label>
+                <input matInput class="form-control" formControlName="room" type="text"
+                  [ngClass]="{ 'is-invalid': submitted && f1.room.errors }">
+                <div *ngIf="submitted&&f.room.errors" class="invalid-feedback d-block font-20">
+                  <div *ngIf="f1.room.errors.minlength">
+                    Please type the url of doctor room
+                  </div>
+                  <div *ngIf="f1.room.errors.required">
+                    This field is required
+                  </div>
+                </div>
+                <div *ngIf="isInvalidDomain" class="invalid-feedback d-block font-20">
+                  Please input valid domain
+                </div>
+                <div *ngIf="!isValidRoom" class="invalid-feedback d-block font-20">
+                  No available Room Name
+                </div>
               </div>
 
-              <!--Hidden field-->
-              <input type="hidden" formControlName="providerId">
-              <input type="hidden" formControlName="room">
+              <div class="form-row ">
+                <div class="form-group col">
+                  <label>Reason</label>
+                  <textarea type="text" formControlName="reason" class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && f1.reason.errors }">
+                    </textarea>
+                  <div *ngIf="submitted && f.reason.errors" class="invalid-feedback">
+                    <div *ngIf="f1.reason.errors.required">Reason is required</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row ">
+                <div class="form-group col">
+                  <label>Type Attetion</label>
+                  <div>
+                    <input formControlName="typeAttetion" type="radio" name="typeAttetion" value=1>New Consult<br>
+                    <input formControlName="typeAttetion" type="radio" name="typeAttetion" value=2>Following<br></div>
+                  <div *ngIf="submitted && f1.typeAttetion.errors" class="invalid-feedback">
+                    <div *ngIf="f1.typeAttetion.errors.required">Type Attetion is required</div>
+                  </div>
+                </div>
+              </div>
 
               <div class="form-group form-check mt-3">
                 <input type="checkbox" formControlName="acceptTerms" id="acceptTerms" class="form-check-input cursor"
-                       [ngClass]="{ 'is-invalid': submitted && f1.acceptTerms.errors }"/>
+                  [ngClass]="{ 'is-invalid': submitted && f1.acceptTerms.errors }" />
                 <label for="acceptTerms" class="form-check-label">Accept Terms & Conditions</label>
                 <div *ngIf="submitted && f1.acceptTerms.errors" class="invalid-feedback">Accept Ts & Cs is required
                 </div>
@@ -128,7 +185,8 @@
                 <button class="btn btn-primary mr-1">Join</button>
                 <button class="btn btn-secondary ml-3" type="reset" (click)="onReset()">Cancel</button>
                 <a class="ml-3" routerLink="/"> <i class="fa fa-arrow-circle-o-left"></i> Go home</a>
-                <a class="ml-3 text-white-50" routerLink="{{directRoomUrl}}"> <i class="fa fa-arrow-circle-o-right"></i>Already
+                <a class="ml-3 text-white-50" routerLink="{{directRoomUrl}}"> <i
+                    class="fa fa-arrow-circle-o-right"></i>Already
                   had account ?</a>
               </div>
             </form>

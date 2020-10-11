@@ -22,8 +22,10 @@
       <ng-container >
         <div class="pl-4 pt-3 pb-4 d-block">
           <div class="patients-queue">
-              <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnActive (click)="active()" *ngIf="btnActiveShow" >Active</button>
-              <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnDesactive (click)="desactive()" *ngIf="btnDesactiveShow" >Desactive</button>
+            <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnActive (click)="active()" *ngIf="btnActiveShow" >Active</button>
+            <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnDesactive (click)="desactive()" *ngIf="btnDesactiveShow" >Desactive</button>
+            <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnActive (click)="publicMe()" >Public</button>
+            <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnDesactive (click)="privateMe()" >Private</button>
           </div>
         </div>
       </ng-container>

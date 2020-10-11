@@ -1,10 +1,10 @@
-import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import {MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort} from "@angular/material";
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort } from "@angular/material";
 import { ProviderService } from './../../../_services/provider.service';
-import {Router} from "@angular/router";
+import { Router } from "@angular/router";
 
 export interface PatientData {
-  id:string;
+  id: string;
   dni: number;
   fullName: string;
   consultCnt: string;
@@ -20,15 +20,19 @@ export interface PatientData {
 
 export class PatientChartsComponent implements OnInit {
 
-  displayedColumns: string[] = ['dni', 'fullName', 'consultCnt', 'lastConsult','detail'];
+  displayedColumns: string[] = ['dni', 'fullName', 'consultCnt', 'lastConsult', 'detail'];
   noDataToDisplay: boolean = false;
   dataSource: any;
-  providerId:any;
+  providerId: any;
 
-  @ViewChild(MatTable)  table: MatTable<any>;
+  @ViewChild(MatTable) table: MatTable<any>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-  constructor(public dialog: MatDialog, private ProviderService: ProviderService, private router: Router) {
+  constructor(
+    public dialog: MatDialog, 
+    private ProviderService: ProviderService, 
+    private router: Router) {
+
   }
 
 
@@ -37,27 +41,35 @@ export class PatientChartsComponent implements OnInit {
   }
 
   initData() {
-    this.providerId=JSON.parse(localStorage.getItem('currentUser')).id;
-    this.ProviderService.getAllPatientsData(this.providerId,'id').subscribe(res=> {
-      if(res) {
-        console.log("patient data s>>>>>>>>>>>>>", res)
+    this.providerId = JSON.parse(localStorage.getItem('currentUser')).id;
+    this.refreshList();
+  }
+
+  refreshList() {
+    this.ProviderService.getAllPatientsData(this.providerId, 'id').subscribe(res => {
+      if (res) {
         this.initDataSource(res)
         this.noDataToDisplay = false;
-      } else{
+      } else {
         this.noDataToDisplay = true;
       }
     })
   }
 
+
   initDataSource(data) {
     const PatientData: PatientData[] = [];
-    data.forEach(function(item){
-      if(item) {
-        PatientData.push({ id: item.id, dni: item.dni, fullName: item.fullName, consultCnt: item.consultCnt, lastConsult: item.lastConsult});
+    data.forEach(function (item) {
+      if (item) {
+        PatientData.push({
+          id: item.id,
+          dni: item.dni,
+          fullName: item.fullName,
+          consultCnt: item.consultCnt,
+          lastConsult: item.lastConsult
+        });
       }
     });
-
-    console.log(PatientData)
     this.dataSource = new MatTableDataSource<PatientData>(PatientData);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
@@ -65,16 +77,14 @@ export class PatientChartsComponent implements OnInit {
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
-    console.log('filterValue')
-    console.log(filterValue)
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
   arrangeDataSource() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-  detail(param){
-    this.router.navigateByUrl('/dashboard/patient/'+param.id+'/'+param.dni+'/'+param.fullName);
+  detail(param) {
+    this.router.navigateByUrl('/dashboard/patient/' + param.id);
   }
 }
 

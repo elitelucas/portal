@@ -56,11 +56,15 @@ const routes:Routes = [{
       component: SuperComponent,
     },
     {
-      path: 'patient/:id/:dni/:fullName',
+      path: 'patient/:id',
       component: PatientComponent
     },
     {
       path: 'newConsult/:index/:id/:consultId',
+      component: NewConsultComponent
+    },
+    {
+      path: 'newConsult/new/:id',
       component: NewConsultComponent
     },
     {

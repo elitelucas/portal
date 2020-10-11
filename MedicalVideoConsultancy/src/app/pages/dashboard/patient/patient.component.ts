@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Patient } from '../../../_model/user';
+import { ProviderService } from '../../../_services/provider.service';
 
 @Component({
   selector: 'app-patient',
@@ -8,12 +10,17 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class PatientComponent implements OnInit {
 
-  data:any;
+  patientId = null;
+  data: Patient;
   constructor(
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private providerService: ProviderService,
   ) {
     this.activatedRoute.params.subscribe(data => {
-      this.data=data;
+      this.patientId = data.id;
+      this.providerService.getPatient(this.patientId, "id").subscribe((patient : Patient) => {
+        this.data = patient;
+      })
     })
   }
 

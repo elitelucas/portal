@@ -1,10 +1,10 @@
-import { Component, OnInit, ElementRef, ViewChild, NgZone, Renderer2 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, ElementRef, ViewChild, NgZone, Renderer2, OnDestroy, Input } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router, RouterEvent } from '@angular/router';
 import { ProviderService } from '../../../_services/provider.service';
 import { MeetRoomService } from '../../../_services/meet-room.service';
 import { Patient } from '../../../_model/user';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { timer, of } from 'rxjs';
+import { timer, of, Subject } from 'rxjs';
 import { HttpErrorResponse, HttpEventType } from "@angular/common/http";
 import { catchError, map } from "rxjs/operators";
 import { PatientService } from './../../../_services/patient.service';
@@ -17,35 +17,30 @@ import { saveAs } from 'file-saver'
   styleUrls: ['./meet-call.component.css']
 })
 export class MeetCallComponent implements OnInit {
-  roomChatForm: FormGroup;
-  fileName = [];
 
   @ViewChild("fileUpload", { static: false }) fileUpload: ElementRef; files = [];
   @ViewChild('localVideo') public localVideo: ElementRef;
   @ViewChild('remoteVideo') public remoteVideo: ElementRef;
   @ViewChild('chatText') public chatText: ElementRef;
 
-  dniPatient = null;
-  patientsEmail: any;
+  @Input() patientData: any;
+  @Input() providerData: any;
+  @Input() roomName: any;
+
+  roomChatForm: FormGroup;
+  fileName = [];
   downloadFileList = [];
   classKey = [];
   upClassKey = [];
   downloadFile: string;
 
-  public patient: Patient;
-  public roomName = null;
-  public providerSocketId = null;
-  public providerData = null;
-
-  constructor(private route: ActivatedRoute, private providerService: ProviderService,
-    private meetRoomService: MeetRoomService, private _ngZone: NgZone, private _router: Router,
-    private formBuilder: FormBuilder, private renderer: Renderer2, private fileUploadService: FileUploadService,
+  constructor(
+    private providerService: ProviderService,
+    private meetRoomService: MeetRoomService,
+    private formBuilder: FormBuilder,
+    private renderer: Renderer2, private fileUploadService: FileUploadService,
     private patientService: PatientService
   ) {
-    this.dniPatient = localStorage.getItem('patient_dni');
-    this.route.paramMap.subscribe(params => {
-      this.roomName = params.get('roomName');
-    });
     this.roomChatForm = this.formBuilder.group({
       text: ['', Validators.required]
     });
@@ -54,56 +49,30 @@ export class MeetCallComponent implements OnInit {
   get f() { return this.roomChatForm.controls; }
 
   async ngOnInit() {
-    this.providerService.checkRoomExist(this.roomName).subscribe(result => {
+    /*this.providerService.checkRoomExist(this.roomName).subscribe(result => {
       if (result) {
         this.providerData = result;
-        this.providerSocketId = this.providerData.socketId;
       }
-    });    
-
-    this.providerService.getPatient(this.dniPatient, 'dni').subscribe(async (patient: Patient) => {
-      if (patient) {
-        this.patient = patient;
-        this.meetRoomService.confirmConnectPatient(this.patient);
-      };
-    });
+    });*/
   }
 
   async ngAfterViewInit() {
+    this.meetRoomService.confirmConnectPatient(this.patientData);
     this.meetRoomService.setLocalElement(this.localVideo);
     this.meetRoomService.setRemoteElement(this.remoteVideo);
-    this.meetRoomService.startLocalMediaVideo();
-    await timer(2000).toPromise();
-    this.meetRoomService.connect().subscribe(peerId=>{
-      console.log("peerId");
-      console.log(peerId);
-      this.patient.peerId = peerId;
-      this.meetRoomService.preparateVideoCallFormPatient(this.providerData, this.patient);
-    });
-
-    /*this.meetRoomService.connect().subscribe(async (peerId) => {
-      console.log("peerId");
-      console.log(peerId);
-      this.meetRoomService.confirmConnectPatient(this.patient);
-      this.meetRoomService.waitCallComplete().subscribe(async (data) => {
-        console.log(data)
-        console.log("waitCallComplete",data)
-        console.log(data)
+    this.meetRoomService.startLocalMediaVideo();    
+    this.meetRoomService.preparateVideoCallFormProviderListener().subscribe(provider => {
+      this.providerData = provider;
+      this.meetRoomService.connect().subscribe(peerId => {
+        this.patientData.peerId = peerId;
+        this.meetRoomService.preparateVideoCallFormPatient(this.providerData, this.patientData);
       });
-    });*/
-
+    });
     this.meetRoomService.receiveUploadFile().subscribe(uploadFileName => {
       this.downloadFileList.push(uploadFileName);
-      /*console.log('uploadFileName')
-      console.log(uploadFileName)*/
-    })
-    this.meetRoomService.receiveEndCall()
-    .subscribe(text=>{
-      if(text==='endCall'){
-        this.meetRoomService.endCall(this.providerSocketId,'acceptEnd');
-        this._router.navigateByUrl("/home")
-      }
     });
+
+
     this.meetRoomService.recivetext().subscribe((text) => {
       const p = this.renderer.createElement('p');
       const d = this.renderer.createText(text);
@@ -112,11 +81,25 @@ export class MeetCallComponent implements OnInit {
     });
   }
 
-
   public sendText() {
     const text = this.f.text.value;
-    //console.log(text)
-    this.meetRoomService.sendtext(this.providerSocketId, "Patient: " + text);
+    this.meetRoomService.sendtext(this.providerData.socketId, "Patient: " + text);
+  }
+
+  public mute() {
+    this.meetRoomService.localMuteActive(true);
+  }
+
+  public desmute() {
+    this.meetRoomService.localMuteActive(false);
+  }
+
+  public videomute() {
+    this.meetRoomService.localVideoActive(true);
+  }
+
+  public videodesmute() {
+    this.meetRoomService.localVideoActive(false);
   }
 
   uploadFile(file) {
@@ -197,7 +180,7 @@ export class MeetCallComponent implements OnInit {
       this.upClassKey.push(false);
     })
   }
-  
+
   handleDownload() {
     if (this.downloadFile) {
       this.patientService.download('file-transfer/download/consult/' + this.downloadFile)
@@ -206,10 +189,7 @@ export class MeetCallComponent implements OnInit {
         })
     }
   }
-  /*trace(...arg) {
-    var now = (window.performance.now() / 1000).toFixed(3);
-    console.log(now + ': ', arg);
-  }*/
+
 }
 
 

@@ -85,4 +85,10 @@ module.exports = {
       record: Joi.string()
     }
   },
+  // POST api/v1/auth/join/validate/patient
+  joinValidate: {
+    body: {
+      dni: Joi.string().required()
+    }
+  },
 };

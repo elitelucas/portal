@@ -92,25 +92,25 @@ router
   api/v1/users/email-verification
   */
   router.route('/email-verification')
-    .post(controller.sendEmail);
+    .post(authorize(),controller.sendEmail);
 
   /**
    * api/v1/users/sms-verification
    * */
   router.route('/sms-verification')
-    .post(controller.sendSMS);
+    .post(authorize(),controller.sendSMS);
 
   /**
    * api/v1/users/images
    * */
   router.route('/images')
-    .post(controller.fileUpload);
+    .post(authorize(),controller.fileUpload);
 
   /**
    * api/v1/users/sigImages
    * */
   router.route('/sigImages')
-  .post(controller.sigImgUpload);
+  .post(authorize(),controller.sigImgUpload);
 
   /**
    * api/v1/users/update-profile/:userId
@@ -123,38 +123,38 @@ router
    * api/v1/users/updateSignature/:userId
    * */
   router.route('/updateSignature/:userId')
-  .put(controller.updateSignature);
+  .put(authorize(),controller.updateSignature);
 
     /**
    * api/v1/users/updatePayment/:userId
    * */
   router.route('/updatePayment/:userId')
-  .put(controller.updatePayment);
+  .put(authorize(),controller.updatePayment);
 
   /**
    * api/v1/users/payment/:userId
    * */
   router.route('/payment/:userId')
-  .get(controller.getPayData);
+  .get(authorize(),controller.getPayData);
 
 
    /**
    * api/v1/users/signature/:userId
    * */
   router.route('/signature/:userId')
-  .get(controller.getSignature);
+  .get(authorize(),controller.getSignature);
 
   /**
    * api/v1/users/getBlog/:userId
    * */
   router.route('/getBlog/:userId')
-  .get(controller.getBlog);
+  .get(authorize(),controller.getBlog);
 
     /**
    * api/v1/users/postBlog
    * */
   router.route('/postBlog')
-  .post(controller.postBlog);
+  .post(authorize(),controller.postBlog);
 
       /**
    * api/v1/users/updateBlog
