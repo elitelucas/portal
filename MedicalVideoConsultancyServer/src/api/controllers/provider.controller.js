@@ -244,76 +244,6 @@ exports.getConsultByPatient = async (req, res, next) => {
 };
 
 
-exports.getOneConsult = async (req, res, next) => {
-  try {
-    const patientId = req.query.patientId;
-    const consultId = req.query.consultId
-    patient = await Patient.findById(patientId).exec();
-    consult = await Consult.findById(consultId).exec();
-    consult.patient = patient;
-    res.status(httpStatus.OK).json(consult);
-  } catch (e) {
-    console.log("getConsult:", error);
-    return next(APIError(e));
-  }
-};
-
-exports.updateConsult = async (req, res, next) => {
-  try {
-    /*console.log('req.body')
-    console.log(req.body)*/
-    const consultId = req.body.consultId;
-    const updateData = req.body.updateData;
-    const symptom = [updateData.symptom0, updateData.symptom1, updateData.symptom2, updateData.symptom3];
-
-    const updatedConsult = await Consult.findByIdAndUpdate(
-      consultId,
-      {
-        "$set": {
-          allergy: updateData.allergy,
-          timeOfDisease: updateData.timeOfDisease,
-          wayOfStart: updateData.wayOfStart,
-          symptom: symptom,
-          history: updateData.history,
-          subjective: updateData.subjective,
-          objective: updateData.objective,
-          assessment: updateData.assessment,
-          plan: updateData.plan,
-          providerFiles: updateData.providerFiles,
-        }
-      },
-      { new: true });
-
-
-    const updatedPatient = await Patient.findOneAndUpdate(
-      { _id: req.body.patientId },
-      {
-        "$set": {
-          fullName: updateData.name,
-          age: updateData.age,
-          phoneNumber: updateData.phoneNumber,
-        }
-      },
-      { new: true });
-    return res.status(httpStatus.OK).json(updatedConsult);
-  } catch (e) {
-    return next(APIError(e))
-  }
-};
-
-
-exports.getConsultInChat = async (req, res, next) => {
-  try {
-    const patientId = req.query.patientId;
-    const providerId = req.query.providerId;
-    consult = await Consult.find({ patientId: patientId, providerId: providerId }).exec();
-    res.status(httpStatus.OK).json(consult);
-  } catch (e) {
-    console.log("getConsult:", error);
-    return next(APIError(e));
-  }
-};
-
 exports.fileUpload = async (req, res) => {
   const file = req.files.file;
   var fieldName = 'providerFiles';
@@ -485,6 +415,16 @@ exports.updatePatient = async (req, res, next) => {
     //console.log("updatePatient dni:",dni)
     console.log("updatePatient:", req.body)
     //req.body.avatar = new Buffer(req.body.avatar.split(",")[1], "base64");
+    const patient = await Patient.findOneAndUpdate({ dni: dni }, req.body, { new: true });
+    return res.status(httpStatus.OK).json(patient);
+  } catch (e) {
+    return next(APIError(e))
+  }
+};
+
+exports.updatePatientOnChart = async (req, res, next) => {
+  try {
+    const dni = req.body.dni;
     const patient = await Patient.findOneAndUpdate({ dni: dni }, req.body, { new: true });
     return res.status(httpStatus.OK).json(patient);
   } catch (e) {
@@ -993,6 +933,7 @@ exports.createConsult = async (req, res, next) => {
   try {
     let consultData = req.body;
     consultData['providerAttetionId'] = consultData['providerId']
+    consultData['date'] = new date()
     const consult = await new Consult(consultData).save();
     res.status(httpStatus.CREATED).json(consult);
   } catch (e) {
@@ -1016,6 +957,76 @@ exports.closeConsult = async (req, res, next) => {
     res.status(httpStatus.CREATED).json(consult);
   } catch (e) {
     return next(APIError(e))
+  }
+};
+
+
+exports.getOneConsult = async (req, res, next) => {
+  try {
+    const patientId = req.query.patientId;
+    const consultId = req.query.consultId
+    patient = await Patient.findById(patientId).exec();
+    consult = await Consult.findById(consultId).exec();
+    consult.patient = patient;
+    res.status(httpStatus.OK).json(consult);
+  } catch (e) {
+    console.log("getConsult:", error);
+    return next(APIError(e));
+  }
+};
+
+exports.updateConsult = async (req, res, next) => {
+  try {
+    /*console.log('req.body')
+    console.log(req.body)*/
+    const consultId = req.body.consultId;
+    const updateData = req.body.updateData;
+    const symptom = [updateData.symptom0, updateData.symptom1, updateData.symptom2, updateData.symptom3];
+
+    const updatedConsult = await Consult.findByIdAndUpdate(
+      consultId,
+      {
+        "$set": {
+          timeOfDisease: updateData.timeOfDisease,
+          wayOfStart: updateData.wayOfStart,
+          symptom: symptom,
+          history: updateData.history,
+          subjective: updateData.subjective,
+          objective: updateData.objective,
+          assessment: updateData.assessment,
+          plan: updateData.plan,
+          providerFiles: updateData.providerFiles,
+        }
+      },
+      { new: true });
+
+
+    const updatedPatient = await Patient.findOneAndUpdate(
+      { _id: req.body.patientId },
+      {
+        "$set": {
+          fullName: updateData.name,
+          age: updateData.age,
+          phoneNumber: updateData.phoneNumber,
+        }
+      },
+      { new: true });
+    return res.status(httpStatus.OK).json(updatedConsult);
+  } catch (e) {
+    return next(APIError(e))
+  }
+};
+
+
+exports.getConsultInChat = async (req, res, next) => {
+  try {
+    const patientId = req.query.patientId;
+    const providerId = req.query.providerId;
+    consult = await Consult.find({ patientId: patientId, providerId: providerId }).exec();
+    res.status(httpStatus.OK).json(consult);
+  } catch (e) {
+    console.log("getConsult:", error);
+    return next(APIError(e));
   }
 };
 

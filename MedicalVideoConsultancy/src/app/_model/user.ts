@@ -37,6 +37,7 @@ export class Provider {
 export class Patient {
   connection: boolean;
   dni: string;
+  birthdate: string;
   email: string;
   phoneNumber: string;
   providerId: string;

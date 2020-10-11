@@ -1,13 +1,13 @@
 import { PatientService } from './../../../_services/patient.service';
 import { ActivatedRoute } from '@angular/router';
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {FileUploadService} from "../../../_services/file-upload.service";
-import {HttpErrorResponse, HttpEventType} from "@angular/common/http";
-import {catchError, map} from "rxjs/operators";
-import {of} from "rxjs";
-import {AuthService} from "../../../_services/auth.service";
-import {ProviderService} from "../../../_services/provider.service";
-import {Consult, Patient} from "../../../_model/user";
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FileUploadService } from "../../../_services/file-upload.service";
+import { HttpErrorResponse, HttpEventType } from "@angular/common/http";
+import { catchError, map } from "rxjs/operators";
+import { of } from "rxjs";
+import { AuthService } from "../../../_services/auth.service";
+import { ProviderService } from "../../../_services/provider.service";
+import { Consult, Patient } from "../../../_model/user";
 import Swal from 'sweetalert2';
 import { saveAs } from 'file-saver';
 
@@ -19,58 +19,71 @@ import { saveAs } from 'file-saver';
   styleUrls: ['./new-consult.component.css']
 })
 export class NewConsultComponent implements OnInit {
+  haveAlergy: boolean = false;
   currentUser: any;
-  data:any;
-  iteralData:Consult;
-  dataDisplay:boolean=false;
-  fileName=[];
-  classKey=[];
-  upClassKey=[];
-  downloadFile:String;
-  @ViewChild("fileUpload", {static: false}) fileUpload: ElementRef; files = [] ;
+  data: any;
+  iteralData: Consult;
+  dataDisplay: boolean = false;
+  fileName = [];
+  classKey = [];
+  upClassKey = [];
+  downloadFile: String;
+
+  symptons = [];
+
+  @ViewChild("fileUpload", { static: false }) fileUpload: ElementRef; files = [];
 
   constructor(
-    private activatedroute: ActivatedRoute, 
+    private activatedroute: ActivatedRoute,
     private fileUploadService: FileUploadService,
-    private authService:AuthService,
-    private providerService:ProviderService,
-    private patientService:PatientService
+    private authService: AuthService,
+    private providerService: ProviderService,
+    private patientService: PatientService
   ) {
     this.currentUser = this.authService.getCurrentUser;
     this.activatedroute.params.subscribe(data => {
-      this.data=data;
-      
+      this.data = data;
     })
   }
 
   ngOnInit(): void {
-    console.log("this.data");
-    console.log(this.data);
-    console.log(this.data.id);
-    console.log(this.data.consultId);
-    if(this.data.consultId){
+    if (this.data.consultId) {
       this.providerService.getOneConsult(this.data.id, this.data.consultId)
-      .subscribe(res=>{
-        this.iteralData=res;
-        this.fileName=this.iteralData.providerFiles;
-        this.dataDisplay=true;
-      })
-    }else{
-      this.iteralData = new Consult(); 
-      this.providerService.getPatient(this.data.id, "id").subscribe((patient : Patient) => {
+        .subscribe(res => {
+          this.iteralData = res;
+          this.fileName = this.iteralData.providerFiles;
+          this.dataDisplay = true;
+          this.getChart(this.iteralData.patient);
+        })
+    } else {
+      this.iteralData = new Consult();
+      this.providerService.getPatient(this.data.id, "id").subscribe((patient: Patient) => {
         this.iteralData.patient = patient;
-        this.dataDisplay=true;
+        this.dataDisplay = true;
+        this.getChart(patient);
       });
     }
   }
-  
+
+  getChart(patient): void {
+    this.providerService.getChart(patient['dni']).subscribe(res => {
+      if (res) {
+        if (res.alergies) {
+          if (res.alergies.length > 0) {
+            this.haveAlergy = true
+          }
+        }
+      }
+    });
+  }
+
   uploadFile(file) {
     const formData = new FormData();
     formData.append('file', file.data);
     formData.append('_id', this.data.id);
     formData.append('key', 'newConsult');
     file.inProgress = true;
-    const fileType=file.data.type.split('/')[0];
+    const fileType = file.data.type.split('/')[0];
     this.fileUploadService.uploadFile(formData).pipe(
       map(event => {
         switch (event.type) {
@@ -85,15 +98,15 @@ export class NewConsultComponent implements OnInit {
         file.inProgress = false;
         return of(`${file.data.name} upload failed.`);
       })).subscribe((event: any) => {
-      if (typeof (event) === 'object') {
-        setTimeout(() => {
-          file.inProgress = false;
-          file.progress = 0;
-          this.files = [];
-        }, 1000);
-        this.fileName.push(event.body)
-      }
-    });
+        if (typeof (event) === 'object') {
+          setTimeout(() => {
+            file.inProgress = false;
+            file.progress = 0;
+            this.files = [];
+          }, 1000);
+          this.fileName.push(event.body)
+        }
+      });
   }
 
   private uploadFiles() {
@@ -108,50 +121,50 @@ export class NewConsultComponent implements OnInit {
     fileUpload.onchange = () => {
       for (const f of fileUpload.files) {
         const file = f;
-        this.files.push({ data: file, inProgress: false, progress: 0});
+        this.files.push({ data: file, inProgress: false, progress: 0 });
       }
       this.uploadFiles();
     };
     fileUpload.click();
   }
 
-  changeClass(idx,key){
-    if(key==='down'){
+  changeClass(idx, key) {
+    if (key === 'down') {
       this.initClass();
-      this.classKey[idx]=true;
-      this.downloadFile=this.iteralData.patientFiles[idx];
-      }else{
-        this.initClass();
-        this.upClassKey[idx]=true;
-        this.downloadFile=this.fileName[idx];
-      }
+      this.classKey[idx] = true;
+      this.downloadFile = this.iteralData.patientFiles[idx];
+    } else {
+      this.initClass();
+      this.upClassKey[idx] = true;
+      this.downloadFile = this.fileName[idx];
     }
-    initClass(){
-      this.classKey=[];
-      this.upClassKey=[];
-      this.iteralData.patientFiles.forEach((item)=>{
-        this.classKey.push(false);
-      })
-      this.fileName.forEach((item)=>{
-        this.upClassKey.push(false);
-      })
-    }
-   
-  handleDownload(){
-    console.log('this.downloadFile')
-    console.log(this.downloadFile)
-    if(this.downloadFile){
-      this.patientService.download('file-transfer/download/consult/'+this.downloadFile)
-      .subscribe(blob =>{
-        saveAs(blob, this.downloadFile)} )
-    }  
   }
-  saveData(updateConsult){
-    updateConsult.providerFiles=this.fileName;
-    const updateData={
-      patientId:this.data.id,
-      consultId:this.data.consultId,
-      updateData:updateConsult
+  initClass() {
+    this.classKey = [];
+    this.upClassKey = [];
+    this.iteralData.patientFiles.forEach((item) => {
+      this.classKey.push(false);
+    })
+    this.fileName.forEach((item) => {
+      this.upClassKey.push(false);
+    })
+  }
+
+  handleDownload() {
+    if (this.downloadFile) {
+      this.patientService.download('file-transfer/download/consult/' + this.downloadFile)
+        .subscribe(blob => {
+          saveAs(blob, this.downloadFile)
+        })
+    }
+  }
+  saveData(updateConsult) {
+    updateConsult.providerFiles = this.fileName;
+    updateConsult.symptons = this.symptons;
+    const updateData = {
+      patientId: this.data.id,
+      consultId: this.data.consultId,
+      updateData: updateConsult
     }
     Swal.fire({
       title: 'Are you sure?',
@@ -164,13 +177,24 @@ export class NewConsultComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.providerService.updateConsult(updateData)
-        .subscribe(res=>{
-          if(res)
-          Swal.fire('Updated successfully');
-        })
+          .subscribe(res => {
+            if (res)
+              Swal.fire('Updated successfully');
+          })
       }
     })
-   
+  }
+
+  addItem(Item: string, key: string) {
+    if (Item) {
+      if (key === 'symptons')
+        this.symptons.push(Item);
+    }
+  }
+  deleteItem(idx, key) {
+    if (key === 'symptons')
+      this.symptons.splice(idx, 1);
+
   }
 
 }

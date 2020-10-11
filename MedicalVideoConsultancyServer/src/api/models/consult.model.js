@@ -3,16 +3,12 @@ const Schema = mongoose.Schema;
 
 const consultSchema = new Schema({
   patientId: String,
-  birthDate: Date,
+  createDate: Date,
   providerId : String,
   providerAttetionId : String,
   dni: {
     type: String,
     required: true,
-  },
-  allergy: {
-    type:String,
-    default:''
   },
   reason: {
     type:String,

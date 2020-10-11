@@ -2,16 +2,16 @@
     <div class="head-bar">
         <div class="row">
             <div class="col-xl-3 col-md-6 col-sm-6">
-                Name:<input #name type='text' [value]="iteralData.patient.fullName">
+                Name:<input #name type='text' [value]="iteralData.patient.fullName" disabled>
             </div>
             <div class="col-xl-3 col-md-6 col-sm-6">
-                Age:<input #age type='number' [value]="iteralData.patient.age">
+                Birthdate:<input #age [value]="iteralData.patient.birthdate" disabled>
             </div>
             <div class="col-xl-3 col-md-6 col-sm-6">
-                Phone number:<input #phoneNumber type="number" [value]="iteralData.patient.phoneNumber">
+                Phone number:<input #phoneNumber type="number" [value]="iteralData.patient.phoneNumber" disabled>
             </div>
             <div class="col-xl-3 col-md-6 col-sm-6">
-                Allergies:<input #allergy type="text" [value]="iteralData.allergy">
+                Allergies:<input #allergy type="text" [value]="(haveAlergy) ? 'S' : 'N'" disabled>
             </div>
         </div>
     </div>
@@ -38,7 +38,7 @@
             </div>
         </div>
         <div class="content">
-            <div>Signs of symptons</div>
+            <!--
             <div class="main-pad">
                 <div class="input-style min-pad">
                     1.<input #symptom0 type=text [value]="iteralData.symptom[0]===undefined?'':iteralData.symptom[0]">
@@ -53,6 +53,26 @@
                 </div>
                 <div>
                     4.<input #symptom3 type=text [value]="iteralData.symptom[3]===undefined?'':iteralData.symptom[3]">
+                </div>
+            </div> -->
+            <div>Signs of symptons</div>
+            <div>
+                <div class="containerDiv">
+                    <input type="text" #symptonsItem class="inp-margin second-input-wid"
+                        (keyup.enter)="addItem(symptonsItem.value,'symptons'); symptonsItem.value=''">
+                    <button class="btn btn-primary"
+                        (click)="addItem(symptonsItem.value,'symptons'); symptonsItem.value=''">Add</button>
+                </div>
+                <div class="containerDiv add-div">
+                    <div class="row literal-div" *ngFor="let pre of symptons; let i=index;">
+                        <div class="col-9 add-div-font">
+                            {{i+1}}.-{{pre}}
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-danger  add-div-font pull-right"
+                                (click)="deleteItem(i,'symptons')">Remove</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -101,50 +121,49 @@
             <div>
                 <p><b>Uploaded By Patient</b></p>
                 <div *ngFor="let name of iteralData.patientFiles;let i=index"
-                [class]="classKey[i]?'list p-bckground':'list'" 
-                (click)="changeClass(i,'down')">
+                    [class]="classKey[i]?'list p-bckground':'list'" (click)="changeClass(i,'down')">
                     {{i+1}}.{{name}}
                 </div>
             </div>
             <div>
                 <p><b>Uploaded By Provider</b></p>
-                <div *ngFor="let name of fileName;let i=index"
-                [class]="upClassKey[i]?'list p-bckground':'list'" 
-                (click)="changeClass(i,'up')">
+                <div *ngFor="let name of fileName;let i=index" [class]="upClassKey[i]?'list p-bckground':'list'"
+                    (click)="changeClass(i,'up')">
                     {{i+1}}.{{name}}
                 </div>
             </div>
-         
-            
+
+
             <div>
                 <ng-container *ngFor="let file of files">
                     <mat-progress-bar [value]="file.progress"></mat-progress-bar>
-                  </ng-container>
+                </ng-container>
                 <div class="button-div">
                     <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleDownload()">
                         <mat-icon>file_download</mat-icon>
                         Download
-                      </button>
+                    </button>
                 </div>
                 <div class="form-file-upload">
-                   
+
                     <div class="upload-btn">
-                      <input type="file" #fileUpload id="fileUpload" name="fileUpload" multiple="multiple" accept="*" style="display:none;" />
-                      <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40" (click)="handleUpload()">
-                        <mat-icon>file_upload</mat-icon>
-                        Upload
-                      </button>
+                        <input type="file" #fileUpload id="fileUpload" name="fileUpload" multiple="multiple" accept="*"
+                            style="display:none;" />
+                        <button type="button" mat-button color="primary" class="mt-5 p-2 h-p-40"
+                            (click)="handleUpload()">
+                            <mat-icon>file_upload</mat-icon>
+                            Upload
+                        </button>
                     </div>
-                  </div>
+                </div>
             </div>
         </div>
 
-       
+
 
     </div>
     <div class="main-div pull-right">
-        <button class="btn btn-primary" 
-        (click)="saveData({
+        <button class="btn btn-primary" (click)="saveData({
             name:name.value,
             age:age.value,
             phoneNumber:phoneNumber.value,
@@ -166,4 +185,3 @@
     </div>
 
 </div>
-

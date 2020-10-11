@@ -98,7 +98,10 @@ router.route('/patientByField')
  * */
 
 router.route('/patient')
-  .put(authorize(), controller.updatePatient)
+.put(authorize(), controller.updatePatient)
+
+router.route('/patient/chart')
+  .put(authorize(), controller.updatePatientOnChart)
 
 /**
  * @api v1/provider/patients-waiting/:room

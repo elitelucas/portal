@@ -29,12 +29,13 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { PayProviderComponent } from './pay-provider/pay-provider.component';
 import { PayMethodComponent } from './profile/pay-method/pay-method.component';
 import { ConsultDialogueComponent } from './health-room/consult-dialogue/consult-dialogue.component';
+import { AddPatientComponent } from './patient-charts/add-patient/add-patient.component';
 
 
 @NgModule({
   declarations: [AdminComponent, SuperComponent, HealthProviderComponent, 
     DialogBoxComponent, ProfileComponent, InviteBySms, EditRoomComponent, HealthRoomComponent, 
-    SignatureComponent,DrawingComponent,PatientChartsComponent, PatientComponent, ConsultListComponent, FreeTextComponent, NewConsultComponent, PrescriptionComponent, ConsultsComponent, FilesComponent, ChartsComponent, PayProviderComponent, PayMethodComponent, ConsultDialogueComponent],
+    SignatureComponent,DrawingComponent,PatientChartsComponent, PatientComponent, ConsultListComponent, FreeTextComponent, NewConsultComponent, PrescriptionComponent, ConsultsComponent, FilesComponent, ChartsComponent, PayProviderComponent, PayMethodComponent, ConsultDialogueComponent, AddPatientComponent],
   imports: [
     SharedModule,
     ReactiveFormsModule,

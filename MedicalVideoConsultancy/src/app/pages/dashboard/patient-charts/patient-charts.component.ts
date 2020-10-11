@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort } from "@angular/material";
 import { ProviderService } from './../../../_services/provider.service';
 import { Router } from "@angular/router";
+import { AddPatientComponent } from './add-patient/add-patient.component';
 
 export interface PatientData {
   id: string;
@@ -29,8 +30,8 @@ export class PatientChartsComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   constructor(
-    public dialog: MatDialog, 
-    private ProviderService: ProviderService, 
+    public dialog: MatDialog,
+    private ProviderService: ProviderService,
     private router: Router) {
 
   }
@@ -56,6 +57,21 @@ export class PatientChartsComponent implements OnInit {
     })
   }
 
+  newPatient() {
+    const dialogRef = this.dialog.open(AddPatientComponent, {
+      width: '75%',
+      height: '70%',
+      data: {}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      let param = {
+        id : result.resultPatient.patient._id
+      }
+      this.refreshList();
+      this.detail(param)
+    })
+
+  }
 
   initDataSource(data) {
     const PatientData: PatientData[] = [];
@@ -83,8 +99,10 @@ export class PatientChartsComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
+
   detail(param) {
     this.router.navigateByUrl('/dashboard/patient/' + param.id);
   }
+
 }
 
