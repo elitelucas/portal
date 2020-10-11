@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, ViewChild } from '@angular/core';
 import { ProviderService } from './../../../../_services/provider.service';
 import { Chart, Patient } from './../../../../_model/user';
 import { AuthService } from './../../../../_services/auth.service';
@@ -12,16 +12,22 @@ import Swal from 'sweetalert2';
 })
 export class FreeTextComponent implements OnInit {
 
+  @ViewChild('birthdate') birthdate: ElementRef;
+  @ViewChild('phoneNumber') phoneNumber: ElementRef;
+
   @Input() patient: Patient;
+  haveAlergy: boolean = false;
   dataToDisplay: boolean = false;
   chartData: Chart;
   currentUser: any;
 
   diseaseArr = [];
   medicationArr = [];
+  alergiesArr = [];
   surgeryArr = [];
   familyArr = [];
   toxicArr = [];
+
   constructor(
     private providerService: ProviderService,
     //private authService:AuthService
@@ -45,6 +51,12 @@ export class FreeTextComponent implements OnInit {
           this.familyArr = res.family;
         if (res.toxic)
           this.toxicArr = res.toxic;
+        if (res.alergies) {
+          this.alergiesArr = res.alergies;
+          if (this.alergiesArr.length > 0) {
+            this.haveAlergy = true
+          }
+        }
       }
     })
   }
@@ -57,8 +69,15 @@ export class FreeTextComponent implements OnInit {
         this.medicationArr.push(Item);
       else if (key === 'surgery')
         this.surgeryArr.push(Item);
+      else if (key === 'alergies')
+        this.alergiesArr.push(Item);
       else
         this.familyArr.push(Item);
+
+      if (this.alergiesArr.length > 0) {
+        this.haveAlergy = true
+      }
+
     }
   }
   DeleteItem(idx, key) {
@@ -68,25 +87,44 @@ export class FreeTextComponent implements OnInit {
       this.medicationArr.splice(idx, 1);
     else if (key === 'surgery')
       this.surgeryArr.splice(idx, 1);
+    else if (key === 'alergies')
+      this.alergiesArr.splice(idx, 1);
     else
       this.familyArr.splice(idx, 1);
 
+    if (this.alergiesArr.length == 0) {
+      this.haveAlergy = false
+    }
+
   }
+
   saveAll(toxic0, toxic1, toxic2) {
     this.toxicArr = [toxic0, toxic1, toxic2];
     const sendData = {
       dni: this.patient.dni,
       disease: this.diseaseArr,
       medication: this.medicationArr,
+      alergies: this.alergiesArr,
       surgery: this.surgeryArr,
       family: this.familyArr,
       toxic: this.toxicArr
     }
+
+    const birthdateValue = this.birthdate.nativeElement.value;
+    const phoneNumberValue = this.phoneNumber.nativeElement.value;
+    this.patient.birthdate = birthdateValue;
+    this.patient.phoneNumber = phoneNumberValue;
+
+    this.providerService.updatePatientOnChart(this.patient).subscribe((patientUpdated: Patient) => {
+
+    });
+
     this.providerService.editChart(sendData)
       .subscribe(res => {
         Swal.fire('Saved successfully')
       })
   }
+
   Cancel() {
     this.initData();
   }

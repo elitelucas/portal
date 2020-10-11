@@ -20,8 +20,8 @@ const patientSchema = new Schema({
     type: String,
     required: true
   },
-  age:{
-    type:Number
+  birthdate:{
+    type:String
   },
   dni: {
     type: String,

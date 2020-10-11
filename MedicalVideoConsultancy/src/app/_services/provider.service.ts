@@ -133,6 +133,12 @@ export class ProviderService {
     return this.http.put(patientUrl, patientData)
   }
 
+  updatePatientOnChart(patientData) {
+    const patientUrl = baseUrl + 'provider/patient/chart';
+    this.trace("patientUrl:", patientUrl, patientData);
+    return this.http.put(patientUrl, patientData)
+  }
+
   getWaitingPatientsData(room) {
     const waitingPatientUrl = baseUrl + 'provider/patients-waiting/' + room;
     this.trace("getWaitingPatientsData:", waitingPatientUrl);

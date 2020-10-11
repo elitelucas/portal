@@ -6,6 +6,7 @@
   </mat-form-field>
   <div>
     <button class="text-white font-bold   copy-invite-url" (click) = "refreshList()">Refresh</button>
+    <button class="text-white font-bold   copy-invite-url" (click) = "newPatient()">New Patient</button>
   </div>
   <br>
   <table mat-table [dataSource]="dataSource" matSort #mytable class="admin-table mat-elevation-z8 w-100">

@@ -128,6 +128,7 @@ exports.join = async (req, res, next) => {
       patient = await Patient.findOneAndUpdate({ _id: patient._id }, {
         reason: patientData.reason,
         typeAttetion: patientData.typeAttetion,
+        providerId: patientData.providerId,
       }, { new: false });
 
       res.status(httpStatus.CREATED).json(patient);
@@ -160,7 +161,7 @@ exports.joinValidatePatient = async (req, res, next) => {
       patient = await Patient.findOneAndUpdate({ _id: patient._id }, {
         reason: patientData.reason,
         typeAttetion: patientData.typeAttetion,
-        //providerId: patientData.providerId,
+        providerId: patientData.providerId,
       }, { new: false });
 
       const { accessToken } = await Patient.findAndGenerateToken(patient);
