@@ -18,11 +18,12 @@ const FeedbackApplication = require('../models/feedbackApplication.model');
 
 const { date } = require('joi');
 const { env, emailConfig } = require('../../config/vars');
-var mime = require('mime');
-var fs = require('fs');
+const mime = require('mime');
+const fs = require('fs');
 
-var nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 const Culqi = require('culqi-node');
+const logger = require('../../config/logger')
 
 
 /**
@@ -169,56 +170,79 @@ exports.checkRoomExist = (req, res, next) => {
 
 exports.getAllPatients = async (req, res, next) => {
   try {
-    const key = req.query.key;
     const value = req.query.value;
     let sendArr = [];
-    patient = await Patient.find({ providerId: value }).exec();
-
-    consult = await Consult.find().exec();
-    consultCntArr = [];
-    for (let i = 0; i < patient.length; i++) {
-      let cnt = 0;
-      for (let j = 0; j < consult.length; j++) {
-        if (patient[i].dni === consult[j].dni) {
-          cnt++;
-        }
-      }
-      consultCntArr.push(cnt);
-    }
-    for (let i = 0; i < patient.length; i++) {
+    const patients = await Patient.find({ providerId: value }).sort({ fullName: -1, createdAt: -1 });
+    await Promise.all(patients.map(async (p) => {
+      let consult = await Consult.findOne({ patientId: p._id }).sort({ createdAt: -1 });
+      let consultCount = await Consult.count({ patientId: p._id });
       sendArr.push(
         {
-          id: patient[i]._id,
-          dni: patient[i].dni,
-          fullName: patient[i].fullName,
-          consultCnt: consultCntArr[i],
-          lastConsult: patient[i].lastSeen
+          id: p._id,
+          dni: p.dni,
+          fullName: p.fullName,
+          consultCnt: (undefined == consultCount) ? null : consultCount,
+          lastConsult: (undefined == consult) ? null : consult.createdAt
         }
-      )
-    }
-    /*console.log('sendArr')
-    console.log(sendArr)*/
-
+      );
+    }));
+    sendArr.sort((a, b) => {
+      if (null != a.lastConsult) return -1;
+      if (null != b.lastConsult) return 1;
+      if (b.lastConsult > a.lastConsult) return -1;
+      return 0;
+    });
     res.status(httpStatus.OK).json(sendArr);
   } catch (e) {
-    console.log("getAllPatients:", error);
-    return next(APIError(e));
+    console.log("getAllPatients:", e);
+    return next(new APIError(e));
   }
 };
 
-exports.getConsult = async (req, res, next) => {
+exports.getConsultByProvider = async (req, res, next) => {
   try {
-    const patientId = req.params.patientId;
-    const startDate = req.params.startDate;
-    const endDate = req.params.endDate;
-    consult = await Consult.find({ patientId, createdAt: { "$gte": new Date(startDate), "$lt": new Date(endDate) } })
-      .sort({ createdAt: -1 }).exec();
+    const providerId = req.params.providerId;
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+    logger.info("getConsultByProvider providerId :" + providerId + " - startDate:" + startDate + " - endDate:" + endDate);
+    let consult = null;
+    if (startDate == undefined && startDate == undefined) {
+      consult = await Consult.find({ providerId }).limit(10).sort({ createdAt: -1 }).exec();
+    } else {
+      consult = await Consult.find({ providerId, createdAt: { "$gte": new Date(startDate + "T00:00:00"), "$lt": new Date(endDate + "T23:59:59") } })
+        .sort({ createdAt: -1 }).exec();
+    }
+    await Promise.all(consult.map(async (c) => {
+      const patient = await Patient.findById(c.patientId);
+      c.patient = patient;
+    }));
     res.status(httpStatus.OK).json(consult);
   } catch (e) {
-    console.log("getConsult:", error);
-    return next(APIError(e));
+    console.log("getConsult:", e);
+    return next(new APIError(e));
   }
 };
+
+exports.getConsultByPatient = async (req, res, next) => {
+  try {
+    const patientId = req.params.patientId;
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+    logger.info("getConsultByPatient patientId :" + patientId + " - startDate:" + startDate + " - endDate:" + endDate);
+    let consult = null;
+    if (startDate == undefined && startDate == undefined) {
+      consult = await Consult.find({ patientId }).limit(10).sort({ createdAt: -1 }).exec();
+    } else {
+      consult = await Consult.find({ patientId, createdAt: { "$gte": new Date(startDate + "T00:00:00"), "$lt": new Date(endDate + "T23:59:59") } })
+        .sort({ createdAt: -1 }).exec();
+    }
+    res.status(httpStatus.OK).json(consult);
+  } catch (e) {
+    console.log("getConsult:", e);
+    return next(new APIError(e));
+  }
+};
+
 
 exports.getOneConsult = async (req, res, next) => {
   try {
@@ -414,7 +438,7 @@ exports.getPatient = async (req, res, next) => {
   try {
     const key = req.query.key;
     const value = req.query.value;
-    //console.log("getPatient key:",key," - value:",value)
+    logger.info("getPatient key:" + key + " - value:" + value)
     let patient;
     if (key == "id") {
       patient = await Patient.findById(value).exec();
@@ -445,8 +469,8 @@ exports.getPatient = async (req, res, next) => {
     }
 
   } catch (e) {
-    console.log("getPatient:", error);
-    return next(APIError(e));
+    console.log("getPatient:", e);
+    return next(new APIError(e));
   }
 };
 

@@ -51,6 +51,8 @@ export class Patient {
 
 export class Consult {  
   patientId: String;
+  payment: String;
+  payAmount: Number;
   providerId : String;
   dni: String;
   birthDate: number;

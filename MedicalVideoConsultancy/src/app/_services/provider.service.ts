@@ -55,9 +55,13 @@ export class ProviderService {
   }
 
   getConsult(id, startDate, endDate) {
-    const patientUrl = baseUrl + 'provider/consult/' + id + '/' + startDate + '/' + endDate;
-    this.trace("getConsult:", patientUrl);
-    return this.http.get<any>(patientUrl);
+    const patientUrl = baseUrl + 'provider/consult/patient/' + id;
+    let params = new HttpParams();
+    if (undefined != startDate && endDate != undefined) {
+      params = params.set("startDate", startDate).set("endDate", endDate);
+    }
+    this.trace("getConsult:", patientUrl, params);
+    return this.http.get<any>(patientUrl, { params });
   }
 
   getConsultInChat(patientId, providerId) {
@@ -142,14 +146,14 @@ export class ProviderService {
   }
 
   closeConsult(consultId) {
-    let createConsultUrl = baseUrl + "provider/consult/" + consultId+"/close";
+    let createConsultUrl = baseUrl + "provider/consult/" + consultId + "/close";
     this.trace("createConsultUrl:", createConsultUrl);
     return this.http.patch(createConsultUrl, null);
   }
 
-  getLastAttetionsPatientsData(userId) {
-    const lastAttetionsPatientsUrl = baseUrl + 'provider/consult/' + userId;
-    this.trace("getLastAttetionsPatientsData:", lastAttetionsPatientsUrl);
+  getLastAttetionsPatientsDataProvider(userId) {
+    const lastAttetionsPatientsUrl = baseUrl + 'provider/consult/provider/' + userId;
+    this.trace("getLastAttetionsPatientsDataProvider:", lastAttetionsPatientsUrl);
     return this.http.get<any>(lastAttetionsPatientsUrl).pipe(map((result: Consult[]) => {
       if (result) {
         return result;
@@ -157,9 +161,20 @@ export class ProviderService {
     }));
   }
 
+  getLastAttetionsPatientsDataPatient(patientId) {
+    const lastAttetionsPatientsUrl = baseUrl + 'provider/consult/patient/' + patientId;
+    this.trace("getLastAttetionsPatientsDataPatient:", lastAttetionsPatientsUrl);
+    return this.http.get<any>(lastAttetionsPatientsUrl).pipe(map((result: Consult[]) => {
+      if (result) {
+        console.log(result);
+        return result;
+      }
+    }));
+  }
+
   trace(...arg) {
     var now = (window.performance.now() / 1000).toFixed(3);
-    console.log(now + ': ', arg);
+    //console.log(now + ': ', arg);
   }
 
 }

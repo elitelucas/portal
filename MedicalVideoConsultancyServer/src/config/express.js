@@ -21,11 +21,11 @@ const app = express();
 //app.use(morgan(logs));
 
 // parse body params and attache them to req.body
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // update file and attach them to req.files
-app.use(fileUpload({creatParentPath: true}));
+app.use(fileUpload({ creatParentPath: true }));
 
 // gzip compression
 app.use(compress());
@@ -38,9 +38,9 @@ app.use(methodOverride());
 app.use(helmet());
 
 // enable CORS - Cross Origin Resource Sharing
-app.use(cors({credentials: false, origin: true}));
+app.use(cors({ credentials: false, origin: true }));
 
-	app.use(express.static('dist'));
+app.use(express.static('dist'));
 // enable authentication
 app.use(passport.initialize());
 passport.use('jwt', strategies.jwt);

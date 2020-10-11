@@ -43,6 +43,13 @@ router.route('/text/:userID')
 router.route('/roomName/:room')
   .get(authorize(), controller.checkRoomExist);
 
+
+
+/*
+router.route('/patient/:patientId')
+  .get(authorize(), controller.getPatient);*/
+
+
 /**
  * @api v1/provider/patientByField
  * @params field: value
@@ -53,8 +60,11 @@ router.route('/roomName/:room')
 router.route('/allPatients')
   .get(authorize(), controller.getAllPatients);
 
-router.route('/consult/:patientId/:startDate/:endDate')
-  .get(authorize(), controller.getConsult);
+router.route('/consult/provider/:providerId')
+  .get(authorize(), controller.getConsultByProvider);
+
+router.route('/consult/patient/:patientId')
+  .get(authorize(), controller.getConsultByPatient);
 
 router.route('/oneConsult')
   .get(authorize(), controller.getOneConsult);

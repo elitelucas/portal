@@ -7,7 +7,7 @@ import {catchError, map} from "rxjs/operators";
 import {of} from "rxjs";
 import {AuthService} from "../../../_services/auth.service";
 import {ProviderService} from "../../../_services/provider.service";
-import {Consult} from "../../../_model/user";
+import {Consult, Patient} from "../../../_model/user";
 import Swal from 'sweetalert2';
 import { saveAs } from 'file-saver';
 
@@ -39,16 +39,29 @@ export class NewConsultComponent implements OnInit {
     this.currentUser = this.authService.getCurrentUser;
     this.activatedroute.params.subscribe(data => {
       this.data=data;
+      
     })
   }
 
   ngOnInit(): void {
-    this.providerService.getOneConsult(this.data.id, this.data.consultId)
-    .subscribe(res=>{
-      this.iteralData=res;
-      this.fileName=this.iteralData.providerFiles;
-      this.dataDisplay=true;
-    })
+    console.log("this.data");
+    console.log(this.data);
+    console.log(this.data.id);
+    console.log(this.data.consultId);
+    if(this.data.consultId){
+      this.providerService.getOneConsult(this.data.id, this.data.consultId)
+      .subscribe(res=>{
+        this.iteralData=res;
+        this.fileName=this.iteralData.providerFiles;
+        this.dataDisplay=true;
+      })
+    }else{
+      this.iteralData = new Consult(); 
+      this.providerService.getPatient(this.data.id, "id").subscribe((patient : Patient) => {
+        this.iteralData.patient = patient;
+        this.dataDisplay=true;
+      });
+    }
   }
   
   uploadFile(file) {

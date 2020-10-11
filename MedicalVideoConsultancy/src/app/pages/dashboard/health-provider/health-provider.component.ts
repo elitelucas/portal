@@ -26,7 +26,7 @@ export class HealthProviderComponent implements OnInit {
   private webCamError = [];
 
 
-  displayedColumns: string[] = ['dni', 'fullName', 'paymentType', 'detail'];
+  displayedColumns: string[] = ['dni', 'fullName', 'payment', 'payAmount', 'detail'];
   noDataToDisplay: boolean = false;
   dataSource: any;
 
@@ -34,9 +34,13 @@ export class HealthProviderComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private authService: AuthService, private providerService: ProviderService,
-    public dialog: MatDialog, private router: Router,
-    private meetRoomService: MeetRoomService, private _ngZone: NgZone) {
+  constructor(
+    private authService: AuthService,
+    private providerService: ProviderService,
+    public dialog: MatDialog,
+    private router: Router,
+    //private meetRoomService: MeetRoomService,
+    private _ngZone: NgZone) {
     this.currentUser = this.authService.getCurrentUser;
   }
 
@@ -57,13 +61,12 @@ export class HealthProviderComponent implements OnInit {
   }
 
   loadLastAttetions() {
-    this.providerService.getLastAttetionsPatientsData(this.currentUser.id)
+    this.providerService.getLastAttetionsPatientsDataProvider(this.currentUser.id)
       .subscribe(result => {
-        //console.log("loadLastAttetions", result)
-
         const patientData: Consult[] = [];
         result.forEach(function (item) {
           if (item) {
+            console.log(item);
             patientData.push(item);
           }
         });
@@ -81,8 +84,8 @@ export class HealthProviderComponent implements OnInit {
 
   getWaitingPatientsData() {
     this.providerService.getWaitingPatientsData(this.currentUser.room)
-      .subscribe(result => { 
-        this.patientsData = result; 
+      .subscribe(result => {
+        this.patientsData = result;
         //console.log("waiting room patients", result) 
       });
   }
@@ -151,7 +154,7 @@ export class HealthProviderComponent implements OnInit {
     console.log('camera error', this.webCamError)
   }
   detail(param) {
-    this.router.navigateByUrl('/dashboard/patient/' + param.id + '/' + param.dni + '/' + param.fullName);
+    this.router.navigateByUrl('/dashboard/patient/' + param.id );
   }
 
 
