@@ -20,14 +20,13 @@ export class SignInPatientComponent implements OnInit {
   submitted = false;
   entered=false;
   domain = environment.domain;
-  //dniData: any;
-  patientData: any;
   providerData: any;
   isInvalidDomain: boolean = false;
   isValidRoom: boolean = true;
   verifyKey=false;
   roomName;
   dniPatient;
+  patientData:any;
 
   isDuplicatedEmail: boolean = false;
   isEmptyPhoneNumber: boolean = false;
@@ -143,7 +142,7 @@ export class SignInPatientComponent implements OnInit {
                 this.providerData = result;
                 this.directRoomUrl = '/' + this.providerData.room;
                 this.patientData = resultPatient.patient;
-                localStorage.setItem('patient', this.patientData);
+                localStorage.setItem('patient', JSON.stringify(this.patientData));
                 localStorage.setItem('provider', JSON.stringify(this.providerData));
                 localStorage.setItem('patient_auth', this.identify_patient);
                 this.router.navigateByUrl(this.directRoomUrl);

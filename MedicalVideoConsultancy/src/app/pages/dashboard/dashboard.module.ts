@@ -29,6 +29,8 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { PayProviderComponent } from './pay-provider/pay-provider.component';
 import { PayMethodComponent } from './profile/pay-method/pay-method.component';
 import { ConsultDialogueComponent } from './health-room/consult-dialogue/consult-dialogue.component';
+import { AddPatientComponent } from './patient-charts/add-patient/add-patient.component';
+import { AddConsultComponent } from './patient/consult-list/add-consult/add-consult.component';
 import { SuperProvidersComponent } from './super-providers/super-providers.component';
 import { SuperAdministratorsComponent } from './super-administrators/super-administrators.component';
 import { SuperFeedbacksComponent } from './super-feedbacks/super-feedbacks.component';
@@ -38,15 +40,33 @@ import { SubscriptionOldComponent } from './subscription-old/subscription-old.co
 import { SubscriptionNewComponent } from './subscription-new/subscription-new.component';
 import { SuperUpdateComponent } from './super-providers/super-update/super-update.component';
 import { AdminUpdateComponent } from './super-administrators/admin-update/admin-update.component';
-import { AddPatientComponent } from './patient-charts/add-patient/add-patient.component';
-import { AddConsultComponent } from './patient/consult-list/add-consult/add-consult.component';
 
 
 @NgModule({
-  declarations: [AdminComponent, SuperComponent, HealthProviderComponent, 
-    DialogBoxComponent, ProfileComponent, InviteBySms, EditRoomComponent, HealthRoomComponent, 
-    SignatureComponent,DrawingComponent,PatientChartsComponent, PatientComponent, ConsultListComponent, FreeTextComponent, NewConsultComponent, PrescriptionComponent, ConsultsComponent, FilesComponent, ChartsComponent, PayProviderComponent, PayMethodComponent, ConsultDialogueComponent, 
-    SuperProvidersComponent, SuperAdministratorsComponent, SuperFeedbacksComponent, SuperPlansComponent, SubscriptionPlanComponent, SubscriptionOldComponent, SubscriptionNewComponent, SuperUpdateComponent, AdminUpdateComponent, AddPatientComponent, AddConsultComponent],
+  declarations: [
+    AdminComponent, 
+    SuperComponent, 
+    HealthProviderComponent,
+    DialogBoxComponent, 
+    ProfileComponent, 
+    InviteBySms, 
+    EditRoomComponent, 
+    HealthRoomComponent,
+    SignatureComponent, 
+    DrawingComponent, 
+    PatientChartsComponent, 
+    PatientComponent, FreeTextComponent, NewConsultComponent, 
+    PrescriptionComponent, 
+    ConsultsComponent, 
+    FilesComponent, 
+    ChartsComponent, 
+    PayProviderComponent, 
+    PayMethodComponent, 
+    ConsultDialogueComponent, AddPatientComponent, AddConsultComponent,
+    ConsultListComponent,              
+    SuperProvidersComponent, SuperAdministratorsComponent, SuperFeedbacksComponent, 
+    SuperPlansComponent, SubscriptionPlanComponent, SubscriptionOldComponent, 
+    SubscriptionNewComponent, SuperUpdateComponent, AdminUpdateComponent],
   imports: [
     SharedModule,
     ReactiveFormsModule,

@@ -1,12 +1,21 @@
 <!-- patient-charts.component.html -->
 <div class="container-fluid text-center mt-5  justify-content-center p-20 mat-table-container">
-  <mat-form-field>
+  <br>
+  <form [formGroup]="searchForm" (ngSubmit)="applyFilter()">
     <mat-label>Please search(DNI or FullName) ...</mat-label>
-    <input matInput (keyup)="applyFilter($event)" placeholder="Jone Doe">
-  </mat-form-field>
+    <input formControlName="matInput" class="input-stl" style="width:34%"
+      [ngClass]="{ 'is-invalid': submitted && f.matInput.errors }" placeholder="Jone Doe" />
+    <button type="submit" class="btn btn-primary ml-3">Search</button>
+    <div *ngIf="submitted && f.matInput.errors" class="invalid-feedback">
+      <div *ngIf="f.matInput.errors.required">Full Name or dni is required</div>
+      <div *ngIf="f.matInput.errors.pattern">Input correctly.</div>
+    </div>
+
+  </form>
+  <br>
   <div>
-    <button class="text-white font-bold   copy-invite-url" (click) = "refreshList()">Refresh</button>
-    <button class="text-white font-bold   copy-invite-url" (click) = "newPatient()">New Patient</button>
+    <button class="text-white font-bold   copy-invite-url" (click)="refreshList()">Refresh</button>
+    <button class="text-white font-bold   copy-invite-url" (click)="newPatient()">New Patient</button>
   </div>
   <br>
   <table mat-table [dataSource]="dataSource" matSort #mytable class="admin-table mat-elevation-z8 w-100">

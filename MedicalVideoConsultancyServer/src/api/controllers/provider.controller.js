@@ -162,6 +162,43 @@ exports.checkRoomExist = (req, res, next) => {
 
 
 /**
+ * @api v1/provider/patients-all
+ * */
+
+exports.getAllPatients = async (req, res, next) => {
+  try {
+    const value = req.query.value;
+    let sendArr = [];
+    const patients = await Patient.find({ providerId: value }).sort({ fullName: -1, createdAt: -1 });
+    await Promise.all(patients.map(async (p) => {
+      let consult = await Consult.findOne({ patientId: p._id }).sort({ createdAt: -1 });
+      let consultCount = await Consult.count({ patientId: p._id });
+      sendArr.push(
+        {
+          id: p._id,
+          dni: p.dni,
+          fullName: p.fullName,
+          consultCnt: (undefined == consultCount) ? null : consultCount,
+          lastConsult: (undefined == consult) ? null : consult.createdAt
+        }
+      );
+    }));
+    sendArr.sort((a, b) => {
+      if (null != a.lastConsult) return -1;
+      if (null != b.lastConsult) return 1;
+      if (b.lastConsult > a.lastConsult) return -1;
+      return 0;
+    });
+    res.status(httpStatus.OK).json(sendArr);
+  } catch (e) {
+    console.log("getAllPatients:", e);
+    return next(new APIError(e));
+  }
+};
+
+
+
+/**
  * @api v1/provider/patientByField
  * @update patient's last seen
  * */
@@ -199,6 +236,72 @@ exports.getInitPatients = async (req, res, next) => {
   }
 };
 
+exports.getFilterPatients = async (req, res, next) => {
+  {
+    const providerId = req.params.providerId;
+    const filterValue = req.params.filterValue;
+    const key = req.params.key;
+
+    if (key === 'dni')
+      patient = await Patient.findOne({ dni: filterValue }).exec();
+    else
+      patient = await Patient.findOne({ fullName: filterValue }).exec();
+    if (patient) {
+      consultCnt = await Consult.countDocuments({ dni: patient.dni }).exec();
+
+      var sendObj = {
+        id: patient._id,
+        dni: patient.dni,
+        fullName: patient.fullName,
+        consultCnt: consultCnt,
+        lastConsult: patient.lastSeen
+      }
+      res.status(httpStatus.OK).json([sendObj]);
+    } else {
+      res.status(httpStatus.OK).json('fail');
+    }
+
+  }
+};
+
+exports.getInitConsult = async (req, res, next) => {
+  try {
+    const patientId = req.params.patientId;
+    console.log('patientId')
+    console.log(patientId)
+    consult = await Consult.find({ patientId })
+      .sort({ createdAt: -1 }).limit(10).exec();
+    res.status(httpStatus.OK).json(consult);
+  } catch (e) {
+    console.log("getConsult:", error);
+    return next(APIError(e));
+  }
+};
+
+exports.getConsult = async (req, res, next) => {
+  try {
+    const providerId = req.params.providerId;
+    const startDate = req.query.startDate;
+    const endDate = req.query.endDate;
+    logger.info("getConsultByProvider providerId :" + providerId + " - startDate:" + startDate + " - endDate:" + endDate);
+    let consult = null;
+    if (startDate == undefined && startDate == undefined) {
+      consult = await Consult.find({ providerId }).limit(10).sort({ createdAt: -1 }).exec();
+    } else {
+      consult = await Consult.find({ providerId, createdAt: { "$gte": new Date(startDate + "T00:00:00"), "$lt": new Date(endDate + "T23:59:59") } })
+        .sort({ createdAt: -1 }).exec();
+    }
+    await Promise.all(consult.map(async (c) => {
+      const patient = await Patient.findById(c.patientId);
+      c.patient = patient;
+    }));
+    res.status(httpStatus.OK).json(consult);
+  } catch (e) {
+    console.log("getConsult:", e);
+    return next(new APIError(e));
+  }
+};
+
 exports.getConsultByProvider = async (req, res, next) => {
   try {
     const providerId = req.params.providerId;
@@ -222,6 +325,8 @@ exports.getConsultByProvider = async (req, res, next) => {
     return next(new APIError(e));
   }
 };
+
+
 
 exports.getConsultByPatient = async (req, res, next) => {
   try {
@@ -411,14 +516,14 @@ exports.getPatient = async (req, res, next) => {
 exports.checkPatient = async (req, res, next) => {
   try {
     const dni = req.params.dni;
-   
-      const patient = await Patient.findOne({dni}).exec();
-      if(patient){
-        res.status(httpStatus.OK).json(patient);
-      }else{
-        res.status(httpStatus.OK).json('fail');
-      }
-   
+
+    const patient = await Patient.findOne({ dni }).exec();
+    if (patient) {
+      res.status(httpStatus.OK).json(patient);
+    } else {
+      res.status(httpStatus.OK).json('fail');
+    }
+
   } catch (e) {
     console.log("getPatient:", error);
     return next(APIError(e));
@@ -430,46 +535,48 @@ exports.postPatient = async (req, res, next) => {
     console.log('req.body')
     console.log(req.body)
     const dni = req.body.data.dni;
-    const room=req.body.data.room;
-    const newConsult=req.body.data.newConsult==='newConsult'?true:false;
-    const reason=req.body.data.reason;
-    const firstName=req.body.data.firstName;
-    const lastName=req.body.data.lastName;
-    const email=req.body.data.email;
-    const phoneNumber=req.body.data.phoneNumber;
+    const room = req.body.data.room;
+    const newConsult = req.body.data.newConsult === 'newConsult' ? true : false;
+    const reason = req.body.data.reason;
+    const firstName = req.body.data.firstName;
+    const lastName = req.body.data.lastName;
+    const email = req.body.data.email;
+    const phoneNumber = req.body.data.phoneNumber;
 
-    const patient=await Patient.findOne({dni});
-    if(patient){
+    const patient = await Patient.findOne({ dni });
+    if (patient) {
       const updatePatient = await Patient.findOneAndUpdate(
-        {dni},
-        {"$set":{
-          room,
-          newConsult,
-          reason,
-          fullName:firstName+' '+lastName,
-          email,
-          phoneNumber
-        }},
-        {new:true}
-        ).exec();
+        { dni },
+        {
+          "$set": {
+            room,
+            newConsult,
+            reason,
+            fullName: firstName + ' ' + lastName,
+            email,
+            phoneNumber
+          }
+        },
+        { new: true }
+      ).exec();
 
-        res.status(httpStatus.OK).json(updatePatient);
-    }else{
-      const newPatient=await new Patient({
+      res.status(httpStatus.OK).json(updatePatient);
+    } else {
+      const newPatient = await new Patient({
         dni,
         room,
         newConsult,
         reason,
-        fullName:firstName+' '+lastName,
+        fullName: firstName + ' ' + lastName,
         email,
         phoneNumber
-      }).save();      
+      }).save();
       res.status(httpStatus.OK).json(newPatient);
     }
-   
-      
-     
-      
+
+
+
+
 
   } catch (e) {
     console.log("getPatient:", error);
@@ -821,6 +928,8 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
 exports.unsubscribePlanWithCard = async (req, res, next) => {
   try {
     const providerId = req.params.providerid;
+    console.log('providerId') 
+    console.log(providerId) 
     let userProvider = await User.findById(providerId);
     const subcriptionId = userProvider.subcriptionId;
     const culqi = new Culqi({
@@ -828,9 +937,9 @@ exports.unsubscribePlanWithCard = async (req, res, next) => {
       pciCompliant: true,
       publicKey: culqiConfing.private_key,
     });
-    await culqi.subscriptions.deleteSubscription({
-      id: subcriptionId
-    });
+    // await culqi.subscriptions.deleteSubscription({
+    //   id: subcriptionId
+    // });
     userProvider.subcriptionId = null;
     userProvider.planId = null;
     userProvider.subcriptionStatus = false;
@@ -844,25 +953,25 @@ exports.unsubscribePlanWithCard = async (req, res, next) => {
   }
 };
 
-exports.getCard=async (req, res, next)=>{
-  try{
-    const providerId=req.params.providerId;
-    const card=await Card.findOne({providerId:providerId});
+exports.getCard = async (req, res, next) => {
+  try {
+    const providerId = req.params.providerId;
+    const card = await Card.findOne({ providerId: providerId });
     res.status(httpStatus.OK).json(card);
-  }catch(e){
+  } catch (e) {
     console.log("error ", e)
     error = new APIError(e);
     return next(error)
   }
 }
 
-exports.updateCard=async (req, res, next)=>{
-  try{
+exports.updateCard = async (req, res, next) => {
+  try {
 
-    const providerId=req.body.providerId;
-    const card=await Card.findOneAndUpdate({providerId:providerId},{card_number:req.body.card_number},{new:true});
+    const providerId = req.body.providerId;
+    const card = await Card.findOneAndUpdate({ providerId: providerId }, { card_number: req.body.card_number }, { new: true });
     res.status(httpStatus.OK).json(card);
-  }catch(e){
+  } catch (e) {
     console.log("error ", e)
     error = new APIError(e);
     return next(error)
@@ -947,14 +1056,14 @@ exports.removeCard = async (req, res, next) => {
     if (cardExists == undefined) {
       res.status(httpStatus.NOT_FOUND).send();
     } else {
-      const culqi = new Culqi({
-        privateKey: culqiConfing.private_key,
-        pciCompliant: true,
-        publicKey: culqiConfing.private_key,
-      });
-      await culqi.cards.deleteCard({
-        id: cardExists.cardId
-      });
+      // const culqi = new Culqi({
+      //   privateKey: culqiConfing.private_key,
+      //   pciCompliant: true,
+      //   publicKey: culqiConfing.private_key,
+      // });
+      // await culqi.cards.deleteCard({
+      //   id: cardExists.cardId
+      // });
       await cardExists.remove();
       res.status(httpStatus.OK).json('ok')
     }

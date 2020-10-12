@@ -16,6 +16,8 @@
                     [ngClass]="{ 'is-invalid': submitted && f.dni.errors }" />
                   <div *ngIf="submitted && f.dni.errors" class="invalid-feedback">
                     <div *ngIf="f.dni.errors.required">DNI is required</div>
+                    <div *ngIf="f.dni.errors.pattern">DNI is a number</div>
+                    <div *ngIf="f.dni.errors.minlength">DNI must be longer than 8 characters.</div>
                   </div>
                   <div class="d-block invalid-feedback">
                     <div *ngIf="isDuplicatedDNI">DNI is already in use.</div>

@@ -56,7 +56,19 @@ router.route('/patient/:patientId')
  * */
 
 
+//I added 
+router.route('/allPatients')
+  .get(authorize(), controller.getAllPatients);
 
+router.route('/initPatients')
+  .get(authorize(), controller.getInitPatients);
+
+router.route('/filterPatients/:providerId/:filterValue/:key')
+  .get(authorize(), controller.getFilterPatients);
+
+
+router.route('/consult/:patientId')
+  .get(authorize(), controller.getInitConsult);
 
 router.route('/consult/provider/:providerId')
   .get(authorize(), controller.getConsultByProvider);
@@ -75,7 +87,7 @@ router.route('/uploadFile')
 
 
 router.route('/download/:receiver/:fileName')
-  .get(controller.download);
+  .get(authorize(), controller.download);
 
 router.route('/mail')
   .post(authorize(), controller.mail);
@@ -95,11 +107,11 @@ router.route('/patientByField')
   .get(authorize(), controller.getPatient);
 
 router.route('/checkPatient/:dni')
-  .get(controller.checkPatient);
+  .get(authorize(), controller.checkPatient);
 
 router.route('/postPatient')
-  .put(controller.postPatient);
-  
+  .put(authorize(), controller.postPatient);
+
 /**
  * @api v1/provider/patient
  * @param patientData
@@ -170,17 +182,17 @@ router.route('/sendMail')
    * @api v1/provider/subcription
    * */
 router.route('/subcription/:providerid')
-    .delete(controller.unsubscribePlanWithCard);
+  .delete(authorize(), controller.unsubscribePlanWithCard);
 
 router.route('/card/:providerId')
-    .get(controller.getCard)
+  .get(authorize(), controller.getCard)
 
 router.route('/card')
-    .put(controller.updateCard)
+  .put(authorize(), controller.updateCard)
 
 router.route('/card/:cardId')
-    .delete(controller.removeCard)
-  
+  .delete(authorize(), controller.removeCard)
+
 /**
  * @api v1/provider/notify
  * */
@@ -236,11 +248,5 @@ router.route('/feedback')
 router.route('/feedback/:providerId')
 .get(controller.getFeedBacks);
 
-/**
- * @api v1/provider/consult
- * @method post
- * */
-// router.route('/consult')
-//   .get(controller.getConsult);
 
 module.exports = router;

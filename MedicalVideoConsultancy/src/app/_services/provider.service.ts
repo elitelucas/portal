@@ -43,24 +43,29 @@ export class ProviderService {
     return this.http.get<any>(checkRoomUrl)
   }
 
-  checkPatient(dni){
-    const checkPatientUrl = baseUrl + 'provider/checkPatient/'+dni;
+  checkPatient(dni) {
+    const checkPatientUrl = baseUrl + 'provider/checkPatient/' + dni;
     this.trace("checkPatientUrl:", dni);
 
     return this.http.get<any>(checkPatientUrl)
   }
-  postPatient(data){
+  postPatient(data) {
     const postPatientUrl = baseUrl + 'provider/postPatient';
     this.trace("postPatientUrl:", postPatientUrl);
-    return this.http.put(postPatientUrl,{data});
+    return this.http.put(postPatientUrl, { data });
   }
 
   //I added new func to get all patients data.
 
   getAllPatientsData(value, field) {
-    /*console.log('value')
-    console.log(value)*/
     const patientUrl = baseUrl + 'provider/allPatients';
+    let params = new HttpParams().set("key", field).set("value", value);
+    this.trace("getAllPatientsData:", patientUrl, params);
+    return this.http.get<any>(patientUrl, { params });
+  }
+
+  getInitPatientsData(value, field) {
+    const patientUrl = baseUrl + 'provider/initPatients';
     let params = new HttpParams().set("key", field).set("value", value);
     this.trace("getAllPatientsData:", patientUrl, params);
     return this.http.get<any>(patientUrl, { params });
@@ -74,6 +79,19 @@ export class ProviderService {
     }
     this.trace("getConsult:", patientUrl, params);
     return this.http.get<any>(patientUrl, { params });
+
+  }
+  getFilterPatientsData(providerId,filterValue,key){
+
+    const patientUrl = baseUrl + 'provider/filterPatients/'+providerId+'/'+filterValue+'/'+key;
+    this.trace("getFilterPatientsData:", patientUrl);
+    return this.http.get<any>(patientUrl);
+  }
+
+  getInitConsult(id){
+    const patientUrl = baseUrl + 'provider/consult/'+id;
+    this.trace("getConsult:", patientUrl);
+    return this.http.get<any>(patientUrl);
   }
 
   getConsultInChat(patientId, providerId) {
@@ -190,13 +208,13 @@ export class ProviderService {
     }));
   }
 
-  getPlans(){
-    const getPlansUrl= baseUrl + 'plans';
+  getPlans() {
+    const getPlansUrl = baseUrl + 'plans';
     return this.http.get<any>(getPlansUrl);
   }
-  sendSubcriptionData(data){
-    const subcriptionUrl=baseUrl + 'provider/subcription';
-    return this.http.post(subcriptionUrl,data);
+  sendSubcriptionData(data) {
+    const subcriptionUrl = baseUrl + 'provider/subcription';
+    return this.http.post(subcriptionUrl, data);
 
   }
   sendMailForSubscription(data){
@@ -208,35 +226,35 @@ export class ProviderService {
     const getPlansUrl= baseUrl + 'plans/'+planId;
     return this.http.get<any>(getPlansUrl);
   }
-  getCard(providerId){
-    const getCardUrl= baseUrl + 'provider/card/'+providerId;
+  getCard(providerId) {
+    const getCardUrl = baseUrl + 'provider/card/' + providerId;
     return this.http.get<any>(getCardUrl);
   }
 
-  updateCard(data){
+  updateCard(data) {
     const updateCardUrl = baseUrl + 'provider/card';
     this.trace("updateCardUrl:", updateCardUrl);
-    return this.http.put(updateCardUrl,data);
+    return this.http.put(updateCardUrl, data);
   }
 
-  removeCard(cardId){
-    const deleteCardUrl = baseUrl + 'provider/card/'+cardId;
+  removeCard(cardId) {
+    const deleteCardUrl = baseUrl + 'provider/card/' + cardId;
     this.trace("deletePlansUrl:", deleteCardUrl);
     return this.http.delete(deleteCardUrl);
   }
-  createPlan(data){
+  createPlan(data) {
 
-    const createPlanUrl=baseUrl + 'plans';
-    return this.http.post(createPlanUrl,data);
+    const createPlanUrl = baseUrl + 'plans';
+    return this.http.post(createPlanUrl, data);
 
   }
-  updatePlans(data){
+  updatePlans(data) {
     const updatePlansUrl = baseUrl + 'plans/update';
     this.trace("updatePlansUrl:", updatePlansUrl);
-    return this.http.put(updatePlansUrl,data);
+    return this.http.put(updatePlansUrl, data);
   }
-  deletePlans(planId){
-    const deletePlansUrl = baseUrl + 'plans/'+planId;
+  deletePlans(planId) {
+    const deletePlansUrl = baseUrl + 'plans/' + planId;
     this.trace("deletePlansUrl:", deletePlansUrl);
     return this.http.delete(deletePlansUrl);
   }
