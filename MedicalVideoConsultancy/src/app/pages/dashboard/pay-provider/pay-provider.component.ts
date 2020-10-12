@@ -20,6 +20,7 @@ export interface PayData {
   styleUrls: ['./pay-provider.component.css']
 })
 export class PayProviderComponent implements OnInit {
+
   publicUrl = environment.baseUrl + "public/image/";
   data: any;
   patientData: any = {};
@@ -143,6 +144,8 @@ export class PayProviderComponent implements OnInit {
   }
 
   changeBackground(kk) {
+    console.log("this.patientData");
+    console.log(this.patientData);
     this.key.payMethods = false;
     this.key.Consults = false;
     this.key[kk] = true;

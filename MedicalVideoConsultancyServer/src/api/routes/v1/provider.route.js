@@ -75,6 +75,10 @@ router.route('/consultInChat')
 router.route('/uploadFile')
   .post(authorize(), controller.fileUpload);
 
+
+router.route('/download/:receiver/:fileName')
+  .get(controller.download);
+
 router.route('/mail')
   .post(authorize(), controller.mail);
 
@@ -98,7 +102,7 @@ router.route('/patientByField')
  * */
 
 router.route('/patient')
-.put(authorize(), controller.updatePatient)
+  .put(authorize(), controller.updatePatient)
 
 router.route('/patient/chart')
   .put(authorize(), controller.updatePatientOnChart)

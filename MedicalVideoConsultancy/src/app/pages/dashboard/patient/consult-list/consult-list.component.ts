@@ -4,13 +4,7 @@ import { ProviderService } from './../../../../_services/provider.service';
 import { Router } from "@angular/router";
 import Swal from 'sweetalert2';
 import { Patient } from '../../../../_model/user';
-
-/*
-export interface patient {
-  _id: string;
-  dni: string;
-  fullName: string;
-}*/
+import { AddConsultComponent } from './add-consult/add-consult.component';
 
 export interface PatientData {
   index: number;
@@ -32,10 +26,12 @@ export class ConsultListComponent implements OnInit {
   noDataToDisplay: boolean = false;
   dataSource: any;
   tmpData = [];
+
   @Input() patient: Patient;
   @ViewChild(MatTable) table: MatTable<any>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+
   constructor(public dialog: MatDialog, private ProviderService: ProviderService, private router: Router) {
 
   }
@@ -67,9 +63,11 @@ export class ConsultListComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
+
   detail(data) {
     this.router.navigateByUrl('/dashboard/newConsult/' + data.index + '/' + data.id + '/' + data.consultId);
   }
+
   search(startDate, endDate) {
     if (startDate === '' || endDate === '' || endDate > startDate == false) {
       Swal.fire('Input the date correctly.')
@@ -79,14 +77,22 @@ export class ConsultListComponent implements OnInit {
   }
 
   newConsult() {
-    this.router.navigateByUrl('/dashboard/newConsult/new/' + this.patient._id);
+    localStorage.removeItem("newConsult");
+    const dialogRef = this.dialog.open(AddConsultComponent, {
+      width: '75%',
+      height: '70%',
+      data: this.patient
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      localStorage.setItem("newConsult",JSON.stringify(result));
+      this.router.navigateByUrl('/dashboard/newConsult/new/' + this.patient._id);
+    })
   }
 
   private list(startDate, endDate) {
     this.ProviderService.getConsult(this.patient._id, startDate, endDate)
       .subscribe(res => {
         if (res) {
-          console.log("consult data s>>>>>>>>>>>>>", res)
           this.tmpData = res;
           this.initDataSource(res)
           this.noDataToDisplay = false;

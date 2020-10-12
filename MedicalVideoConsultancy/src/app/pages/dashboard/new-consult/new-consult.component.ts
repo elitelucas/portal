@@ -1,5 +1,5 @@
 import { PatientService } from './../../../_services/patient.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FileUploadService } from "../../../_services/file-upload.service";
 import { HttpErrorResponse, HttpEventType } from "@angular/common/http";
@@ -33,14 +33,19 @@ export class NewConsultComponent implements OnInit {
 
   @ViewChild("fileUpload", { static: false }) fileUpload: ElementRef; files = [];
 
+  newConsult = null;
+
   constructor(
     private activatedroute: ActivatedRoute,
     private fileUploadService: FileUploadService,
     private authService: AuthService,
     private providerService: ProviderService,
-    private patientService: PatientService
+    private patientService: PatientService,
+    private router: Router
   ) {
     this.currentUser = this.authService.getCurrentUser;
+    this.newConsult = localStorage.getItem("newConsult");
+    this.newConsult = JSON.parse(this.newConsult);
     this.activatedroute.params.subscribe(data => {
       this.data = data;
     })
@@ -59,6 +64,12 @@ export class NewConsultComponent implements OnInit {
       this.iteralData = new Consult();
       this.providerService.getPatient(this.data.id, "id").subscribe((patient: Patient) => {
         this.iteralData.patient = patient;
+        this.iteralData.timeOfDisease = '';
+        this.iteralData.wayOfStart = '';
+        this.iteralData.typeAttetion = this.newConsult.typeAttetion;
+        this.iteralData.reason = this.newConsult.reason;
+        this.iteralData.payment = this.newConsult.paySelect;
+        this.iteralData.payAmount = this.newConsult.amount;
         this.dataDisplay = true;
         this.getChart(patient);
       });
@@ -152,7 +163,7 @@ export class NewConsultComponent implements OnInit {
 
   handleDownload() {
     if (this.downloadFile) {
-      this.patientService.download('file-transfer/download/consult/' + this.downloadFile)
+      this.patientService.download('provider/download/consult/' + this.downloadFile)
         .subscribe(blob => {
           saveAs(blob, this.downloadFile)
         })
@@ -161,11 +172,24 @@ export class NewConsultComponent implements OnInit {
   saveData(updateConsult) {
     updateConsult.providerFiles = this.fileName;
     updateConsult.symptons = this.symptons;
+    updateConsult.payAmount = this.newConsult.amount;
+    updateConsult.reason = this.newConsult.reason;
+    updateConsult.typeAttetion = this.newConsult.typeAttetion;
+    updateConsult.payment = this.newConsult.paySelect;
     const updateData = {
       patientId: this.data.id,
       consultId: this.data.consultId,
+      providerId: this.currentUser.id,
       updateData: updateConsult
     }
+
+    let msg = "Yes, save it!";
+    let msgResult = "Created successfully";
+    if (this.data.consultId) {
+      msg = "Yes, update it!";
+      msgResult = "Updated successfully";
+    }
+
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -173,16 +197,22 @@ export class NewConsultComponent implements OnInit {
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, update it!'
+      confirmButtonText: msg
     }).then((result) => {
       if (result.isConfirmed) {
         this.providerService.updateConsult(updateData)
           .subscribe(res => {
-            if (res)
-              Swal.fire('Updated successfully');
+            if (res) {
+              Swal.fire(msgResult);
+              localStorage.removeItem("newConsult");
+            }
           })
       }
-    })
+    });
+  }
+
+  cancel() {
+    this.router.navigateByUrl('/dashboard/patient/' + this.data.id);
   }
 
   addItem(Item: string, key: string) {

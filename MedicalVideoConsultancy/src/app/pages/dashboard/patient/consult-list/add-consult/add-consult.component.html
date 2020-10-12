@@ -1,0 +1,80 @@
+<div class="container total">
+    <div class="header">
+        <div>
+            <h3>Select Pay method</h3>
+        </div>
+    </div>
+    <form [formGroup]="payForm" (ngSubmit)="confirmPay()">
+        <div class="detail-pane  margin-div">
+
+            <div class="form-row ">
+                <div class="form-group col">
+                    <label>Amount</label>
+                    <input type="text" formControlName="amount" class="form-control"/>
+                </div>
+            </div>
+            <div class="form-row ">
+                <div class="form-group col">
+                    <label>Reason</label>
+                    <textarea type="text" formControlName="reason" class="form-control">
+              </textarea>
+                </div>
+            </div>
+            <div class="form-row ">
+                <div class="form-group col">
+                    <label>Type Attetion</label>
+                    <div>
+                        <input formControlName="typeAttetion" type="radio" name="typeAttetion" value=1>New
+                        Consult<br>
+                        <input formControlName="typeAttetion" type="radio" name="typeAttetion" value=2>Following<br>
+                    </div>
+                </div>
+            </div>
+
+            <div class="qr-code">
+                <h3>QR codes</h3>
+                <div>
+                    <div class='row margin-div' *ngIf="QRimgKey[0]">
+                        <div class="col-4">
+                            <input formControlName="paySelect" type="radio" name="paySelect"
+                                value="{{payData.QRimg[0].description}}" />{{payData.QRimg[0].description}}<br>
+                        </div>
+                        <div class="col-8">
+                            <img class="qrImage" src="{{payData.QRimg[0].name}}">
+                        </div>
+                    </div>
+                    <div class='row margin-div' *ngIf="QRimgKey[1]">
+                        <div class="col-4">
+                            <input formControlName="paySelect" type="radio" name="paySelect"
+                                value="{{payData.QRimg[1].description}}" />{{payData.QRimg[1].description}}<br>
+                        </div>
+                        <div class="col-8">
+                            <img class="qrImage" src="{{payData.QRimg[1].name}}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="account margin-div" *ngIf="accountKey">
+                <h3>Account Banks</h3>
+                <div class="add-account" *ngFor="let item of payData.account;">
+                    <input formControlName="paySelect" type="radio" name="paySelect" value="{{item}}" />{{item}}<br>
+                </div>
+            </div>
+            <div class="link-pay margin-div" *ngIf="urlKey">
+                <h3>Link Pay</h3>
+                <div class="add-account" *ngFor="let item of payData.url;">
+                    <input formControlName="paySelect" type="radio" name="paySelect" value="{{item}}" />{{item}}<br>
+                </div>
+            </div>
+        </div>
+        <div class="row button-div">
+            <div class="col-6">
+                <button class="btn btn-primary" type="submit">Confirm Pay</button>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-danger" (click)="cancel()">Cancel</button>
+            </div>
+        </div>
+    </form>
+
+</div>
