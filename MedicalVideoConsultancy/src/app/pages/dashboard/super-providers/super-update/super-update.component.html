@@ -1,0 +1,141 @@
+<div class="w-50 mx-auto">
+    <div class="mb-5">
+        <div>
+            <h3>{{registerTitle}} provider</h3>
+        </div>
+        <div>
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <input class="form-control" formControlName="firstName" placeholder="First Name"
+                                [ngClass]="{ 'is-invalid': submitted && f.firstName.errors }">
+                            <div *ngIf="submitted && f.firstName.errors" class="invalid-feedback">
+                                <div *ngIf="f.firstName.errors.required">First Name is required</div>
+                                <div *ngIf="f.firstName.errors.pattern">First Name must be alphabetic</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <input class="form-control" formControlName="lastName" placeholder="Last Name"
+                                [ngClass]="{ 'is-invalid': submitted && f.lastName.errors }">
+                            <div *ngIf="submitted && f.lastName.errors" class="invalid-feedback">
+                                <div *ngIf="f.lastName.errors.required">Last Name is required</div>
+                                <div *ngIf="f.lastName.errors.pattern">Last Name must be alphabetic</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <input class="form-control" formControlName="email" placeholder="Email Address"
+                                [ngClass]="{ 'is-invalid': submitted && f.email.errors }">
+                            <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+                                <div *ngIf="f.email.errors.required">Email address is required</div>
+                                <div *ngIf="f.email.errors.pattern">Email address is invalid</div>
+                                <div *ngIf="f.email.errors.maxlength">Email address must be less than 100 characters</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <input type="text" ng2TelInput formControlName="phoneNumber" class="form-control  text-black-50"
+                                placeholder="PhoneNumber"
+                                [ngClass]="{ 'is-invalid': submitted && f.phoneNumber.errors }"
+                                (hasError)="hasError($event)" (ng2TelOutput)="getNumber($event)"
+                                (intlTelInputObject)="telInputObject($event)" (countryChange)="onCountryChange($event)" />
+                            <div class="invalid-feedback d-block" *ngIf="isEmptyPhoneNumber">Phone Number is required</div>
+                            <div class="invalid-feedback d-block" *ngIf="isDuplicatedPhone">Phone Number is already in use
+                            </div>
+                            <div class="invalid-feedback d-block" *ngIf="!isValidNumber">Please type valid number</div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <input type="text" formControlName="cmp" class="form-control"
+                                placeholder="CMP"
+                                [ngClass]="{ 'is-invalid': submitted && f.cmp.errors }" />
+                            <div *ngIf="submitted && f.cmp.errors" class="invalid-feedback">
+                                <div *ngIf="f.cmp.errors.required">CMP is required</div>
+                                <div *ngIf="f.cmp.errors.pattern">CMP is number</div>
+                                <div *ngIf="f.cmp.errors.minlength">CMP must be larger than 4 characters</div>
+                                <div *ngIf="f.cmp.errors.maxlength">CMP must be less than 8 caracters</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <input class="form-control" formControlName="speciality" placeholder="Speciality"
+                                [ngClass]="{ 'is-invalid': submitted && f.speciality.errors }">
+                            <div *ngIf="submitted && f.speciality.errors" class="invalid-feedback">
+                                <div *ngIf="f.speciality.errors.required">Speciality is required</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="form-group">
+                    <input type="text" formControlName="room" class="form-control"
+                        placeholder="Room"
+                        [ngClass]="{ 'is-invalid': submitted && f.room.errors }" />
+                    <div *ngIf="submitted && f.room.errors" class="invalid-feedback">
+                        <div *ngIf="f.room.errors.required">Room name is required</div>
+                        <div *ngIf="f.room.errors.pattern">Room name is alphabetic</div>
+                        <div *ngIf="f.room.errors.maxlength">Room must be less than 40 characters</div>
+                    </div>
+                    <div class="invalid-feedback d-block" *ngIf="isDuplicatedRoom">This room name is already in use</div>
+                </div>
+                
+                <div class="text-center">
+                    <button class="btn btn-primary">Register</button>
+                </div>
+    
+            </form>
+        </div>
+    </div>
+
+
+    <div class="mb-5">
+        <form [formGroup]="passwordForm" (ngSubmit)="onPassSubmit()">
+        <div class="form-group">
+            <input type="password" formControlName="password" class="form-control"
+                placeholder="Password"
+                [ngClass]="{ 'is-invalid': passSubmitted && f1.password.errors }" />
+            <div *ngIf="passSubmitted && f1.password.errors" class="invalid-feedback">
+                <div *ngIf="f1.password.errors.required">Password is required</div>
+                <div *ngIf="f1.password.errors.minlength">Password must be at least 8 characters</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="password" formControlName="confirmPassword" class="form-control"
+                placeholder="ConfirmPassword"
+                [ngClass]="{ 'is-invalid': passSubmitted && f1.confirmPassword.errors }" />
+            <div *ngIf="passSubmitted && f1.confirmPassword.errors" class="invalid-feedback">
+                <div *ngIf="f1.confirmPassword.errors.required">Confirm Password is required</div>
+                <div *ngIf="f1.confirmPassword.errors.mustMatch">Confirm Password must match</div>
+            </div>
+        </div>
+        <div class="text-center">
+            <button class="btn btn-primary">Save</button>
+        </div>
+        </form>
+    </div>
+
+
+    <div>
+        <div>
+            <h3>Payments</h3>
+        </div>
+        <div>
+            
+        </div>
+    </div>
+    
+
+</div>

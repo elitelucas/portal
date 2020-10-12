@@ -1,9 +1,11 @@
+import { Patient } from './../../../_model/user';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { environment } from "../../../../environments/environment";
 import { ProviderService } from "../../../_services/provider.service";
 import { AuthPatientService } from '../../../_services/auth.patient.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-sign-in-patient',
@@ -13,14 +15,18 @@ import { AuthPatientService } from '../../../_services/auth.patient.service';
 export class SignInPatientComponent implements OnInit {
   step = 1;
   roomForm: FormGroup;
+  enterForm: FormGroup;
   joinForm: FormGroup;
   submitted = false;
+  entered=false;
   domain = environment.domain;
-  //dniData: any;
-  patientData: any;
   providerData: any;
   isInvalidDomain: boolean = false;
   isValidRoom: boolean = true;
+  verifyKey=false;
+  patientData:Patient;
+  roomName;
+  dniPatient;
 
   isDuplicatedEmail: boolean = false;
   isEmptyPhoneNumber: boolean = false;
@@ -136,7 +142,7 @@ export class SignInPatientComponent implements OnInit {
                 this.providerData = result;
                 this.directRoomUrl = '/' + this.providerData.room;
                 this.patientData = resultPatient.patient;
-                localStorage.setItem('patient', this.patientData);
+                localStorage.setItem('patient', JSON.stringify(this.patientData));
                 localStorage.setItem('provider', JSON.stringify(this.providerData));
                 localStorage.setItem('patient_auth', this.identify_patient);
                 this.router.navigateByUrl(this.directRoomUrl);

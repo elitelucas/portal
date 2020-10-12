@@ -22,14 +22,15 @@
     </div>
     <div class="bottom-mgn">
         <form [formGroup]="prescriptionForm" (ngSubmit)="sendPrescription()">
-            <input type="email" formControlName="email" class="input-stl" 
+            <input type="email" formControlName="email" class="input-stl"
+            [ngClass]="{ 'is-invalid': submitted && f.email.errors }" 
             placeholder="Patients email by defaults or it can be edited" />
+            <button type="submit" class="btn btn-primary">Send Prescription</button>
             <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
                 <div *ngIf="f.email.errors.required">Email address is required</div>
                 <div *ngIf="f.email.errors.email">Email address is invalid</div>
                 <div *ngIf="f.email.errors.maxlength">Email address must be less than 100 characters</div>
             </div>
-            <button type="submit" class="btn btn-primary">Send Prescription</button>
 
         </form>
     </div>

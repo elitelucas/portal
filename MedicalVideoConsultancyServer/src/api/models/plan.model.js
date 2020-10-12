@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-
 const Schema = mongoose.Schema;
 const planSchema = new Schema({
   planId: String,
   name: String,
+  description: String,
   amount: Number,
   currency_code: String,
   interval: String,

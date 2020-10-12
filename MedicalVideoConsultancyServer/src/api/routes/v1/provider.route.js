@@ -60,6 +60,16 @@ router.route('/patient/:patientId')
 router.route('/allPatients')
   .get(authorize(), controller.getAllPatients);
 
+router.route('/initPatients')
+  .get(authorize(), controller.getInitPatients);
+
+router.route('/filterPatients/:providerId/:filterValue/:key')
+  .get(authorize(), controller.getFilterPatients);
+
+
+router.route('/consult/:patientId')
+  .get(authorize(), controller.getInitConsult);
+
 router.route('/consult/provider/:providerId')
   .get(authorize(), controller.getConsultByProvider);
 
@@ -77,7 +87,7 @@ router.route('/uploadFile')
 
 
 router.route('/download/:receiver/:fileName')
-  .get(controller.download);
+  .get(authorize(), controller.download);
 
 router.route('/mail')
   .post(authorize(), controller.mail);
@@ -95,6 +105,12 @@ router.route('/getSignature/:providerId')
 //I added end
 router.route('/patientByField')
   .get(authorize(), controller.getPatient);
+
+router.route('/checkPatient/:dni')
+  .get(authorize(), controller.checkPatient);
+
+router.route('/postPatient')
+  .put(authorize(), controller.postPatient);
 
 /**
  * @api v1/provider/patient
@@ -162,6 +178,15 @@ router.route('/subcription')
 router.route('/subcription/:providerid')
   .delete(authorize(), controller.unsubscribePlanWithCard);
 
+router.route('/card/:providerId')
+  .get(authorize(), controller.getCard)
+
+router.route('/card')
+  .put(authorize(), controller.updateCard)
+
+router.route('/card/:cardId')
+  .delete(authorize(), controller.removeCard)
+
 /**
  * @api v1/provider/notify
  * */
@@ -209,6 +234,12 @@ router.route('/consult/:consultId/close')
  * */
 router.route('/feedback')
   .post(authorize(), controller.createFeedback);
+/**
+ * @api v1/provider/consult
+ * @method post
+ * */
+router.route('/consult/:userId')
+  .get(authorize(), controller.getLastAttetions);
 
 /**
  * @api v1/provider/consult
