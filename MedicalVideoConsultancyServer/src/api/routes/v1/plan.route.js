@@ -1,7 +1,7 @@
 const express = require('express');
 const validate = require('express-validation');
 const controller = require('../../controllers/plan.controller');
-const { authorize, ADMIN } = require('../../middlewares/auth');
+const { authorize, SUPER_ADMIN, ADMIN, PROVIDER } = require('../../middlewares/auth');
 const router = express.Router();
 
 router
@@ -27,7 +27,7 @@ router
    *
    * @apiError (Unauthorized 401)  Unauthorized  Only authenticated users can access the data
    */
-  .get(/*authorize(ADMIN),*/ controller.list)
+  .get(authorize(PROVIDER), controller.list)
   /**
    * @api {post} v1/plans create plan
    */
@@ -36,7 +36,7 @@ router
 router
   .route('/:planId')
   //** */
-  .get(/*authorize(ADMIN),*/  controller.get)
+  .get(authorize(PROVIDER),  controller.get)
   /**
    * @api {patch} v1/users/:id Delete User
    * @apiDescription Delete a user
@@ -53,7 +53,7 @@ router
    * @apiError (Forbidden 403)    Forbidden     Only user with same id or admins can delete the data
    * @apiError (Not Found 404)    NotFound      User does not exist
    */
-  .delete(/*authorize(ADMIN),*/ controller.remove);
+  .delete(authorize(SUPER_ADMIN), controller.remove);
 
   router
   .route('/update')

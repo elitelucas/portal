@@ -1,6 +1,6 @@
 import { baseUrl } from './patient.service';
 import { Injectable } from '@angular/core';
-import{Observable} from 'rxjs'
+import { Observable } from 'rxjs'
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../../environments/environment";
 import { map } from "rxjs/operators";
@@ -57,57 +57,49 @@ export class ProviderService {
 
   //I added new func to get all patients data.
 
-  getInitPatientsData(value, field){
-
-    const patientUrl = baseUrl + 'provider/initPatients';
+  getAllPatientsData(value, field) {
+    /*console.log('value')
+    console.log(value)*/
+    const patientUrl = baseUrl + 'provider/allPatients';
     let params = new HttpParams().set("key", field).set("value", value);
-    this.trace("getAllPatientsData:", patientUrl,params);
-    return this.http.get<any>(patientUrl,{params});
+    this.trace("getAllPatientsData:", patientUrl, params);
+    return this.http.get<any>(patientUrl, { params });
   }
 
-  getFilterPatientsData(providerId,filterValue,key){
-
-    const patientUrl = baseUrl + 'provider/filterPatients/'+providerId+'/'+filterValue+'/'+key;
-    this.trace("getFilterPatientsData:", patientUrl);
-    return this.http.get<any>(patientUrl);
+  getConsult(id, startDate, endDate) {
+    const patientUrl = baseUrl + 'provider/consult/patient/' + id;
+    let params = new HttpParams();
+    if (undefined != startDate && endDate != undefined) {
+      params = params.set("startDate", startDate).set("endDate", endDate);
+    }
+    this.trace("getConsult:", patientUrl, params);
+    return this.http.get<any>(patientUrl, { params });
   }
 
-  getInitConsult(id){
-    const patientUrl = baseUrl + 'provider/consult/'+id;
-    this.trace("getConsult:", patientUrl);
-    return this.http.get<any>(patientUrl);
-  }
-
-  getConsult(id,startDate,endDate){
-    const patientUrl = baseUrl + 'provider/consult/'+id+'/'+startDate+'/'+endDate;
-    this.trace("getConsult:", patientUrl);
-    return this.http.get<any>(patientUrl);
-  }
-
-  getConsultInChat(patientId, providerId){
+  getConsultInChat(patientId, providerId) {
     const patientUrl = baseUrl + 'provider/consultInChat';
     let params = new HttpParams().set("patientId", patientId).set("providerId", providerId);
-    this.trace("getConsultInChat:", patientUrl,params);
-    return this.http.get<any>(patientUrl,{params});
+    this.trace("getConsultInChat:", patientUrl, params);
+    return this.http.get<any>(patientUrl, { params });
   }
-  
-  sendMail(from,email,subject,html){
+
+  sendMail(from, email, subject, html) {
     //console.log('sdfsdfsdf')
     const mailUrl = baseUrl + 'provider/mail';
     this.trace("getConsultInChat:", mailUrl);
-    return this.http.post(mailUrl,{
-      from:from,
-      email:email,
-      subject:subject,
-      html:html
+    return this.http.post(mailUrl, {
+      from: from,
+      email: email,
+      subject: subject,
+      html: html
     });
   }
 
-  getOneConsult(patientId, consultId){
+  getOneConsult(patientId, consultId) {
     const patientUrl = baseUrl + 'provider/oneConsult';
     let params = new HttpParams().set("patientId", patientId).set("consultId", consultId);
-    this.trace("getOneConsult:", patientUrl,params);
-    return this.http.get<any>(patientUrl,{params});
+    this.trace("getOneConsult:", patientUrl, params);
+    return this.http.get<any>(patientUrl, { params });
   }
 
   updateConsult(updateData) {
@@ -116,9 +108,9 @@ export class ProviderService {
     return this.http.put(updateUrl, updateData)
   }
 
-  getChart(patientDni){
-    const chartUrl = baseUrl + 'provider/getChart/'+patientDni;
-    this.trace("getChart:", chartUrl,patientDni);
+  getChart(patientDni) {
+    const chartUrl = baseUrl + 'provider/getChart/' + patientDni;
+    this.trace("getChart:", chartUrl, patientDni);
     return this.http.get<any>(chartUrl);
   }
 
@@ -131,7 +123,7 @@ export class ProviderService {
   getSignature(providerId: string): Observable<Blob> {
     /*console.log('providerId')
     console.log(providerId)*/
-    const sigUrl = baseUrl + 'provider/getSignature/'+providerId;
+    const sigUrl = baseUrl + 'provider/getSignature/' + providerId;
     return this.http.get<any>(sigUrl)
   }
 
@@ -141,13 +133,21 @@ export class ProviderService {
   getPatient(value, field) {
     const patientUrl = baseUrl + 'provider/patientByField';
     let params = new HttpParams().set("key", field).set("value", value);
-    this.trace("getPatient:", patientUrl, params);
+    /*console.log(patientUrl);
+    console.log(params);*/
+    //this.trace("getPatient:", patientUrl, params);
     return this.http.get(patientUrl, { params });
   }
 
   updatePatient(patientData) {
     const patientUrl = baseUrl + 'provider/patient';
-    this.trace("patientUrl:", patientUrl);
+    this.trace("patientUrl:", patientUrl, patientData);
+    return this.http.put(patientUrl, patientData)
+  }
+
+  updatePatientOnChart(patientData) {
+    const patientUrl = baseUrl + 'provider/patient/chart';
+    this.trace("patientUrl:", patientUrl, patientData);
     return this.http.put(patientUrl, patientData)
   }
 
@@ -163,11 +163,28 @@ export class ProviderService {
     return this.http.post(createConsultUrl, consult);
   }
 
-  getLastAttetionsPatientsData(userId) {
-    const lastAttetionsPatientsUrl = baseUrl + 'provider/consult/' + userId;
-    this.trace("getLastAttetionsPatientsData:", lastAttetionsPatientsUrl);
+  closeConsult(consultId) {
+    let createConsultUrl = baseUrl + "provider/consult/" + consultId + "/close";
+    this.trace("createConsultUrl:", createConsultUrl);
+    return this.http.patch(createConsultUrl, null);
+  }
+
+  getLastAttetionsPatientsDataProvider(userId) {
+    const lastAttetionsPatientsUrl = baseUrl + 'provider/consult/provider/' + userId;
+    this.trace("getLastAttetionsPatientsDataProvider:", lastAttetionsPatientsUrl);
     return this.http.get<any>(lastAttetionsPatientsUrl).pipe(map((result: Consult[]) => {
       if (result) {
+        return result;
+      }
+    }));
+  }
+
+  getLastAttetionsPatientsDataPatient(patientId) {
+    const lastAttetionsPatientsUrl = baseUrl + 'provider/consult/patient/' + patientId;
+    this.trace("getLastAttetionsPatientsDataPatient:", lastAttetionsPatientsUrl);
+    return this.http.get<any>(lastAttetionsPatientsUrl).pipe(map((result: Consult[]) => {
+      if (result) {
+        console.log(result);
         return result;
       }
     }));
@@ -223,10 +240,7 @@ export class ProviderService {
     this.trace("deletePlansUrl:", deletePlansUrl);
     return this.http.delete(deletePlansUrl);
   }
-  getFeedbacks(providerId){
-    const feedbackUrl= baseUrl + 'provider/feedback/'+providerId;
-    return this.http.get<any>(feedbackUrl);
-  }
+  
 
 
   trace(...arg) {

@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 const APIError = require('../utils/APIError');
 const httpStatus = require('http-status');
+const bcrypt = require('bcryptjs');
+const moment = require('moment-timezone');
+const jwt = require('jwt-simple');
+const uuidv4 = require('uuid/v4');
+const { env, jwtSecret, jwtExpirationInterval } = require('../../config/vars');
+const logger = require('../../config/logger')
 /**
  * Patient Schema
  * @Private
@@ -14,8 +20,8 @@ const patientSchema = new Schema({
     type: String,
     required: true
   },
-  age: {
-    type: Number
+  birthdate:{
+    type:String
   },
   dni: {
     type: String,
@@ -23,6 +29,9 @@ const patientSchema = new Schema({
     unique: true,
     trim: true,
     minlength: 8
+  },
+  key: {
+    type: String
   },
   email: {
     type: String,
@@ -87,11 +96,23 @@ const patientSchema = new Schema({
   peerId: {
     type: String
   },
+  /*token: {
+    type: String
+  },*/
   lastSeen: {
     type: Date,
   },
-  newConsult: Boolean,
-  reason: String,
+  role: {
+    type: String
+  },
+  reason: {
+    type: String,
+    required: false
+  },
+  typeAttetion: {
+    type: Number,
+    required: false
+  },
 }, {
   timestamps: true
 });
@@ -117,8 +138,66 @@ patientSchema.statics = {
       });
     }
     return error;
-  }
+  },
+  /**
+   * Find user by email and tries to generate a JWT token
+   *
+   * @param {ObjectId} id - The objectId of user.
+   * @returns {Promise<User, APIError>}
+   */
+  async findAndGenerateToken(options) {
+    const { email, dni } = options;
+    if (!email && !dni ) throw new APIError({ message: 'An email is required to generate a token' });
+    const patient = await this.findOne({ dni: dni }).exec();
+    const err = {
+      status: httpStatus.UNAUTHORIZED,
+      isPublic: true,
+    };
+    if (dni) {
+      if (patient && await patient.passwordMatches(dni)) {
+        const token = patient.token();
+        logger.info("generate token patient: " + patient._id + " - "+ token );
+        return { accessToken: token };
+      }
+    } else {
+      err.message = 'Incorrect email or password';
+    }
+    throw new APIError(err);
+  },
 };
+
+
+/**
+ * Methods
+ */
+patientSchema.method({
+  transform() {
+    const transformed = {};
+    const fields = ['id', 'fullName', 'email', 'dni'];
+
+    fields.forEach((field) => {
+      transformed[field] = this[field];
+    });
+
+    return transformed;
+  },
+
+  token() {
+    const playload = {
+      exp: moment().add(jwtExpirationInterval, 'minutes').unix(),
+      iat: moment().unix(),
+      sub: this._id,
+    };
+    return jwt.encode(playload, jwtSecret);
+  },
+
+  async passwordMatches(dni) {
+    /*console.log("passwordMatches")
+    console.log(dni)
+    console.log(this.dni)*/
+    return dni == this.dni;
+  },
+});
 
 /**
  * @typedef Patient

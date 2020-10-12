@@ -8,11 +8,12 @@ const uuidv4 = require('uuid/v4');
 const APIError = require('../utils/APIError');
 const { env, jwtSecret, jwtExpirationInterval } = require('../../config/vars');
 const { string } = require('joi');
+const logger = require('../../config/logger')
 
 /**
 * User Roles
 */
-const roles = ['Admin', 'Dr', 'Mr', 'Mrs', 'Miss', 'Ms', 'Other', 'SuperAdmin'];
+const roles = ['Admin', 'Dr', 'Mr', 'Mrs', 'Miss', 'Ms', 'Other', 'SuperAdmin','Patient'];
 
 /**
  * User Schema
@@ -109,15 +110,15 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  sigImgSrc:{
-    type:String,
-    default:''
+  sigImgSrc: {
+    type: String,
+    default: ''
   },
-  payMethod:{
-    type:Object
+  payMethod: {
+    type: Object
   },
-  blog:{
-    type:Array
+  blog: {
+    type: Array
   },
   address: {
     type: String
@@ -141,6 +142,10 @@ const userSchema = new mongoose.Schema({
     type: String
   },
   subcriptionStatus: {
+    type: Boolean,
+    default: false
+  },
+  providerPublic: {
     type: Boolean,
     default: false
   },
@@ -175,7 +180,7 @@ userSchema.pre('save', async function save(next) {
 userSchema.method({
   transform() {
     const transformed = {};
-    const fields = ['id', 'firstName', 'lastName', 'email','phoneNumber','planId', 'subcriptionId','subcriptionStatus', 'room', 'cmp', 'socketId', 'peerId', 'role','permission', 'status', 'state', 'image','connection','calling', 'createdAt'];
+    const fields = ['id', 'firstName', 'lastName', 'email', 'phoneNumber','planId', 'subcriptionId', 'subcriptionStatus', 'providerPublic', 'room', 'cmp', 'socketId', 'peerId', 'role', 'permission', 'status', 'state', 'image', 'connection', 'calling', 'createdAt'];
 
     fields.forEach((field) => {
       transformed[field] = this[field];
@@ -194,9 +199,9 @@ userSchema.method({
   },
 
   async passwordMatches(password) {
-    console.log("passwordMatches")
+    /*console.log("passwordMatches")
     console.log(password)
-    console.log(this.password)
+    console.log(this.password)*/
 
     return bcrypt.compare(password, this.password);
   },
@@ -218,11 +223,11 @@ userSchema.statics = {
   async findAndGenerateToken(options) {
     const { email, password, refreshObject } = options;
     if (!email) throw new APIError({ message: 'An email is required to generate a token' });
-    console.log("findAndGenerateToken")
+    /*console.log("findAndGenerateToken")
     console.log("email")
     console.log(email)
     console.log("password")
-    console.log(password)
+    console.log(password)*/
 
     const user = await this.findOne({ email }).exec();
     const err = {
@@ -231,14 +236,18 @@ userSchema.statics = {
     };
     if (password) {
       if (user && await user.passwordMatches(password)) {
-        return { user, accessToken: user.token() };
+        const token = user.token();
+        logger.info("generate user :" + user._id + " | " +token  )
+        return { user, accessToken: token };
       }
       err.message = 'Incorrect email or password';
     } else if (refreshObject && refreshObject.userEmail === email) {
       if (moment(refreshObject.expires).isBefore()) {
         err.message = 'Invalid refresh token.';
       } else {
-        return { user, accessToken: user.token() };
+        const token = user.token();
+        logger.info("generate user :" + user._id + " | " +token  )
+        return { user, accessToken: token };
       }
     } else {
       err.message = 'Incorrect email or refreshToken';
@@ -254,15 +263,15 @@ userSchema.statics = {
    * @returns {Promise<User[]>}
    */
   list({
-    page = 1, perPage = 30, id, firstName, lastName, room, cmp, socketId, peerId, email, role,permission, status, state, date, subcriptionId  ,subcriptionStatus
+    page = 1, perPage = 30, id, firstName, lastName, room, cmp, socketId, peerId, email, role, permission, status, state, providerPublic, date, subcriptionId, subcriptionStatus
   }) {
-    const options = omitBy({ id, firstName, lastName, room, cmp, socketId, peerId, email, role,permission, status, state, date, subcriptionId  ,subcriptionStatus}, isNil);
+    const options = omitBy({ id, firstName, lastName, room, cmp, socketId, peerId, email, role, permission, status, state, providerPublic, date, subcriptionId, subcriptionStatus }, isNil);
 
     return this.find(options)
-    .sort({ createdAt: -1 })
-    .skip(perPage * (page - 1))
-    .limit(perPage)
-    .exec();
+      .sort({ createdAt: -1 })
+      .skip(perPage * (page - 1))
+      .limit(perPage)
+      .exec();
   },
 
   /**
@@ -274,7 +283,7 @@ userSchema.statics = {
    */
   checkDuplicateField(error) {
     let field = '';
-    for(let key in error.keyValue) {
+    for (let key in error.keyValue) {
       field = key;
     }
     if (error.name === 'MongoError' && error.code === 11000) {
@@ -283,7 +292,7 @@ userSchema.statics = {
         errors: [{
           field: field,
           location: 'body',
-          messages: [field +' already exists'],
+          messages: [field + ' already exists'],
         }],
         status: httpStatus.CONFLICT,
         isPublic: true,
@@ -296,7 +305,9 @@ userSchema.statics = {
   async oAuthLogin({
     service, id, email, name, picture,
   }) {
+    console.log("id :" + id);
     const user = await this.findOne({ $or: [{ [`services.${service}`]: id }, { email }] });
+    console.log("oAuthLogin");
     if (user) {
       user.services[service] = id;
       if (!user.name) user.name = name;
@@ -309,6 +320,8 @@ userSchema.statics = {
     });
   },
 };
+
+exports.roles = roles;
 
 /**
  * @typedef User

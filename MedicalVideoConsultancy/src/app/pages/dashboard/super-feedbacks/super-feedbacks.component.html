@@ -1,1 +1,16 @@
-<p>super-feedbacks works!</p>
+<div class="p-3">
+    <div class="row mb-3" *ngFor="let item of iteralData">
+        <div class="col-4" *ngFor="let subItem of item">
+            <div>
+                <p>Patient DNI {{subItem.patient.dni}}-FullName {{subItem.patient.fullName}}</p>
+            </div>
+            <div>
+                Rank {{subItem.ranking}}
+            </div>
+            <div class="border" style="height:200px;overflow: auto;">
+                {{subItem.comment}} 
+            </div>
+        </div>
+
+    </div>
+</div>

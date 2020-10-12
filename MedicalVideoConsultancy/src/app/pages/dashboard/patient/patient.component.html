@@ -1,11 +1,4 @@
-
-<div class="head-bar">
-    <div class="row">
-        <div class="col-xl-3 col-md-6 col-sm-6">Name:</div>
-        <div class="col-xl-3 col-md-6 col-sm-6">Age:</div>
-        <div class="col-xl-3 col-md-6 col-sm-6">Phone number:</div>
-        <div class="col-xl-3 col-md-6 col-sm-6">Alergies:</div>
-    </div>
+<div *ngIf="data != null">
+    <app-free-text [patient]="data"></app-free-text>
+    <app-consult-list [patient]="data"></app-consult-list>
 </div>
-<app-free-text [idName]="data"></app-free-text>
-<app-consult-list [idName]="data"></app-consult-list>

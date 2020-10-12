@@ -37,6 +37,7 @@ export class Provider {
 export class Patient {
   connection: boolean;
   dni: string;
+  birthdate: string;
   email: string;
   phoneNumber: string;
   providerId: string;
@@ -64,9 +65,15 @@ export class Consult {
   objective: String;
   assessment: String;
   plan: String;
+  status: String;
+  typeAttetion: String;
+  reason: String;
+  payment: String;
+  payAmount: Number;
   providerFiles: Array<string>;
   patientFiles: Array<string>;
   patient: Object;
+  createdAt: Date;
   _id: String;
 }
 

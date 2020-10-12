@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../../controllers/provider.controller');
-const {authorize} = require('../../middlewares/auth');
+const { authorize } = require('../../middlewares/auth');
 /**
  * @api v1/provider/invite-by-sms.
  * @param userData
@@ -23,7 +23,7 @@ router.route('/mediaUpload')
  * */
 
 router.route('/room/:userId')
-  .get(controller.getRoomData);
+  .get(authorize(), controller.getRoomData);
 
 /**
  * @api v1/provider/room/:userId
@@ -33,7 +33,7 @@ router.route('/room/:userId')
 router.route('/room/:userID')
   .patch(authorize(), controller.changeRoomField)
 
-  router.route('/text/:userID')
+router.route('/text/:userID')
   .patch(authorize(), controller.changeRoomField)
 /**
  * @api v1/provider/roomName/: roomName
@@ -41,7 +41,14 @@ router.route('/room/:userID')
  * */
 
 router.route('/roomName/:room')
-  .get(controller.checkRoomExist);
+  .get(authorize(), controller.checkRoomExist);
+
+
+
+/*
+router.route('/patient/:patientId')
+  .get(authorize(), controller.getPatient);*/
+
 
 /**
  * @api v1/provider/patientByField
@@ -49,45 +56,43 @@ router.route('/roomName/:room')
  * */
 
 
-//I added 
-router.route('/initPatients')
-  .get(controller.getInitPatients);
 
-router.route('/filterPatients/:providerId/:filterValue/:key')
-  .get(controller.getFilterPatients);
 
-  
-router.route('/consult/:patientId')
-  .get(controller.getInitConsult);
+router.route('/consult/provider/:providerId')
+  .get(authorize(), controller.getConsultByProvider);
 
-router.route('/consult/:patientId/:startDate/:endDate')
-  .get(controller.getConsult);
+router.route('/consult/patient/:patientId')
+  .get(authorize(), controller.getConsultByPatient);
 
 router.route('/oneConsult')
-  .get(controller.getOneConsult);
+  .get(authorize(), controller.getOneConsult);
 
 router.route('/consultInChat')
-  .get(controller.getConsultInChat);
+  .get(authorize(), controller.getConsultInChat);
 
 router.route('/uploadFile')
-  .post(controller.fileUpload);
+  .post(authorize(), controller.fileUpload);
+
+
+router.route('/download/:receiver/:fileName')
+  .get(controller.download);
 
 router.route('/mail')
-  .post(controller.mail);  
+  .post(authorize(), controller.mail);
 
 
 router.route('/updateConsult')
-  .put(controller.updateConsult)
+  .put(authorize(), controller.updateConsult)
 
 router.route('/ckImage')
-  .post(controller.uploadCkImage)
+  .post(authorize(), controller.uploadCkImage)
 
 router.route('/getSignature/:providerId')
-  .get(controller.getSignature)
+  .get(authorize(), controller.getSignature)
 
 //I added end
 router.route('/patientByField')
-  .get(controller.getPatient);
+  .get(authorize(), controller.getPatient);
 
 router.route('/checkPatient/:dni')
   .get(controller.checkPatient);
@@ -101,7 +106,10 @@ router.route('/postPatient')
  * */
 
 router.route('/patient')
-  .put(controller.updatePatient)
+  .put(authorize(), controller.updatePatient)
+
+router.route('/patient/chart')
+  .put(authorize(), controller.updatePatientOnChart)
 
 /**
  * @api v1/provider/patients-waiting/:room
@@ -109,48 +117,48 @@ router.route('/patient')
  * */
 
 router.route('/patients-waiting/:room')
-  .get(controller.getWaitingPatientsData);
+  .get(authorize(), controller.getWaitingPatientsData);
 
 /**
  * @api v1/provider/patients-recent
  * */
 
 router.route('/patients-recent')
-  .get(controller.getRecentPatientsData);
+  .get(authorize(), controller.getRecentPatientsData);
 
 /**
  * @api v1/provider/patients-all/:room
  * @param id
  * */
 router.route('/patients-all/:room')
-  .get(controller.getAllPatientsData);
+  .get(authorize(), controller.getAllPatientsData);
 /**
  * @api v1/provider/resetState
  * @params model, field 'to reset'
  * */
 
 router.route('/resetState')
-  .patch(controller.resetState);
+  .patch(authorize(), controller.resetState);
 
 
 /**
  * @api v1/provider/checkout
  * */
 router.route('/checkout')
-  .post(controller.checkout);
+  .post(authorize(), controller.checkout);
 
-  
+
 /**
  * @api v1/provider/checkout
  * */
 router.route('/charge')
-  .post(controller.charge);
+  .post(authorize(), controller.charge);
 
 /**
  * @api v1/provider/subcription
  * */
 router.route('/subcription')
-  .post(controller.subcriptionPlanWithCard);
+  .post(authorize(), controller.subcriptionPlanWithCard);
 
 /**
  * @api v1/provider/sendMail
@@ -177,39 +185,53 @@ router.route('/card/:cardId')
  * @api v1/provider/notify
  * */
 router.route('/notify')
-  .post(controller.notify)
+  .post(authorize(), controller.notify)
 
 /**
  * @api v1/provider/chart
  * @method put
  * */
 router.route('/chart')
-  .put(controller.editChart);
+  .put(authorize(), controller.editChart);
 
 /**
  * @api v1/provider/chart/:dni
  * @method get
  * */
 router.route('/getChart/:patientDni')
-  .get(controller.getChart);
+  .get(authorize(), controller.getChart);
 
 /**
  * @api v1/provider/consult
  * @method post
  * */
 router.route('/consult')
-  .post(controller.createConsult);
+  .post(authorize(), controller.createConsult);
+/**
+ * @api v1/provider/consult
+ * @method post
+ * */
+router.route('/consult/:userId')
+  .get(authorize(), controller.getLastAttetions);
 
 /**
-   * @api v1/provider/consult
-   * @method post
-   * */
-router.route('/consult/:userId')
-    .get(controller.getLastAttetions);
+ * @api v1/provider/consult
+ * @method post
+ * */
+router.route('/consult/:consultId/close')
+  .patch(authorize(), controller.closeConsult);
+
+
+/**
+ * @api v1/provider/consult
+ * @method post
+ * */
+router.route('/feedback')
+  .post(authorize(), controller.createFeedback);
 
 /**
    * @api v1/provider/feedback
-   * @method post
+   * @method get
    * */
 router.route('/feedback/:providerId')
 .get(controller.getFeedBacks);

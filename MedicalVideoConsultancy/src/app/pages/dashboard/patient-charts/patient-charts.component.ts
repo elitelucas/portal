@@ -1,13 +1,12 @@
-import { FormGroup, FormBuilder,Validators } from '@angular/forms';
-import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import {MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort} from "@angular/material";
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort } from "@angular/material";
 import { ProviderService } from './../../../_services/provider.service';
-import {Router} from "@angular/router";
-import Swal from 'sweetalert2';
-
+import { Router } from "@angular/router";
+import { AddPatientComponent } from './add-patient/add-patient.component';
+import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 
 export interface PatientData {
-  id:string;
+  id: string;
   dni: number;
   fullName: string;
   consultCnt: string;
@@ -23,22 +22,20 @@ export interface PatientData {
 
 export class PatientChartsComponent implements OnInit {
 
-  displayedColumns: string[] = ['dni', 'fullName', 'consultCnt', 'lastConsult','detail'];
+  displayedColumns: string[] = ['dni', 'fullName', 'consultCnt', 'lastConsult', 'detail'];
   noDataToDisplay: boolean = false;
   dataSource: any;
-  providerId:any;
+  providerId: any;
   searchForm:FormGroup;
-  submitted:boolean=false;
 
-  @ViewChild(MatTable)  table: MatTable<any>;
+  @ViewChild(MatTable) table: MatTable<any>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   constructor(
-    public dialog: MatDialog, 
-    private providerService: ProviderService, 
+    public dialog: MatDialog,
+    private ProviderService: ProviderService,
     private router: Router,
-    private formBuilder:FormBuilder
-    ) {
+    private formBuilder:FormBuilder) {
 
   }
 
@@ -51,27 +48,50 @@ export class PatientChartsComponent implements OnInit {
   }
 
   initData() {
-    this.providerId=JSON.parse(localStorage.getItem('currentUser')).id;
-    this.providerService.getInitPatientsData(this.providerId,'id').subscribe(res=> {
-      if(res) {
-        console.log("patient data s>>>>>>>>>>>>>", res)
+    this.providerId = JSON.parse(localStorage.getItem('currentUser')).id;
+    this.refreshList();
+  }
+
+  refreshList() {
+    this.ProviderService.getAllPatientsData(this.providerId, 'id').subscribe(res => {
+      if (res) {
         this.initDataSource(res)
         this.noDataToDisplay = false;
-      } else{
+      } else {
         this.noDataToDisplay = true;
       }
     })
   }
 
+  newPatient() {
+    const dialogRef = this.dialog.open(AddPatientComponent, {
+      width: '75%',
+      height: '70%',
+      data: {}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      let param = {
+        id : result.resultPatient.patient._id
+      }
+      this.refreshList();
+      this.detail(param)
+    })
+
+  }
+
   initDataSource(data) {
     const PatientData: PatientData[] = [];
-    data.forEach(function(item){
-      if(item) {
-        PatientData.push({ id: item.id, dni: item.dni, fullName: item.fullName, consultCnt: item.consultCnt, lastConsult: item.lastConsult});
+    data.forEach(function (item) {
+      if (item) {
+        PatientData.push({
+          id: item.id,
+          dni: item.dni,
+          fullName: item.fullName,
+          consultCnt: item.consultCnt,
+          lastConsult: item.lastConsult
+        });
       }
     });
-
-    console.log(PatientData)
     this.dataSource = new MatTableDataSource<PatientData>(PatientData);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
@@ -79,54 +99,18 @@ export class PatientChartsComponent implements OnInit {
   get f() { return this.searchForm.controls; }
 
 
-  applyFilter() {
-    this.submitted=true;
-    const filterValue = this.f.matInput.value;
-  
-    if(filterValue){
-      console.log('filterValue')
-      console.log(filterValue)
-    }
-      
-      if (this.searchForm.invalid) {
-        return;
-      }
-
-    const validateDni=/^\d*$/.test(filterValue);
-    const validateName=/^[a-zA-Z ]*$/.test(filterValue);
-    if(validateDni || validateName){
-      var key='';
-      console.log('sdf')
-      if(validateDni){
-        key='dni';
-      }else{
-        key='name';
-      }
-        this.providerService.getFilterPatientsData(this.providerId,filterValue,key).subscribe(res=> {
-          if(res!=='fail') {
-            console.log("patient data s>>>>>>>>>>>>>", res)
-            this.initDataSource(res)
-            this.noDataToDisplay = false;
-          } else{
-            Swal.fire('There is no such dni or fullName.')
-            this.noDataToDisplay = true;
-          }
-        })      
-    }else{
-      Swal.fire('Input correctly!')
-    }
-     
-      
-    // this.dataSource.filter = filterValue.trim().toLowerCase();
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
   arrangeDataSource() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-  detail(param){
-    console.log('param')
-    console.log(param)
-    this.router.navigateByUrl('/dashboard/patient/'+param.id+'/'+param.dni+'/'+param.fullName);
+
+  detail(param) {
+    this.router.navigateByUrl('/dashboard/patient/' + param.id);
   }
+
 }
 

@@ -3,6 +3,11 @@ const Schema = mongoose.Schema;
 
 const chartSchema = new Schema({
   dni: String,
+  createDate: Date,
+  alergies: {
+    type:Array,
+    default:[]
+  },
   disease: {
     type:Array,
     default:[]

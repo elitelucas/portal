@@ -8,8 +8,29 @@
                         <label> Patient Albert ! </label>
                         <button type="button" mat-button color="warn" 
                         class="mt-5 p-2 h-p-40"
-                        (click)="startVideoCall()">
+                        (click)="startVideoCall()"
+                        [disabled]="disabledCall ? false : true">
                             Start Video Call
+                        </button>
+                        <button type="button" mat-button color="warn" 
+                        class="mt-5 p-2 h-p-40"
+                        (click)="mute()">
+                            Mute
+                        </button>
+                        <button type="button" mat-button color="warn" 
+                        class="mt-5 p-2 h-p-40"
+                        (click)="desmute()">
+                            Desmute
+                        </button>
+                        <button type="button" mat-button color="warn" 
+                        class="mt-5 p-2 h-p-40"
+                        (click)="videomute()">
+                            Video Mute
+                        </button>
+                        <button type="button" mat-button color="warn" 
+                        class="mt-5 p-2 h-p-40"
+                        (click)="videodesmute()">
+                        Video  Desmute
                         </button>
                         <button type="button" mat-button color="warn" 
                         class="mt-5 p-2 h-p-40"

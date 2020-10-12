@@ -41,6 +41,8 @@ export class AppSidebarComponent implements OnInit {
   provider_connect_inactive = 'inactive';
   firstMenuItems=[];
   secondMenuItems=[];
+  alarmButtonKey=false;
+  audio:any;
 
   constructor(
     public menuItems: MenuItems,
@@ -94,8 +96,14 @@ export class AppSidebarComponent implements OnInit {
       result.forEach( (element : Patient) => {
         this.waitingPatientsData.push(element)
       });
-      /*console.log('this.waitingPatientsData')
-      console.log(this.waitingPatientsData)*/
+      if(this.waitingPatientsData.length>0){
+        this.alarmButtonKey=false;
+      }else{
+        this.alarmButtonKey=true;
+
+      }
+      // console.log('this.waitingPatientsData')
+      // console.log(this.waitingPatientsData)
     });
 
   }
@@ -127,6 +135,21 @@ export class AppSidebarComponent implements OnInit {
     this.btnDesactiveShow = false;
     this.btnActiveShow = true;
     this.meetRoomService.desactiveProvider(this.currentUser);
+  }
+
+  publicMe(){
+    this.meetRoomService.publicMe(this.currentUser.id);
+  }
+
+  privateMe(){
+    this.meetRoomService.privateMe(this.currentUser.id);
+  }
+  alarm(){
+    this.audio = new Audio();
+    this.audio.src = "../../../../../assets/sounds/patientAlarm.mp3";
+    this.audio.load();
+    this.audio.play();
+    // this.alarmButtonKey=false;
   }
 
   nextAttetion() {
