@@ -58,6 +58,8 @@ export class AuthPatientService {
   }
 
   public setCurrentUser(result) {
+    console.log("setCurrentUser result");
+    console.log(result);
     localStorage.setItem('currentPatient', JSON.stringify(result));
     this.userSubject.next(result)
   }

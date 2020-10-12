@@ -1291,7 +1291,7 @@ exports.createFeedback = async (req, res, next) => {
     await new FeedbackProvider({
       patientId: patientsData._id,
       providerId: providerData._id,
-      raking: req.body.feeback.rakingProvider,
+      ranking: req.body.feeback.rankingProvider,
       comment: req.body.feeback.feedBackProvider
     }).save();
 

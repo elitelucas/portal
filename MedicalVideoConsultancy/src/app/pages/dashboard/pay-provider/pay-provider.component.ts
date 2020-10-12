@@ -54,6 +54,8 @@ export class PayProviderComponent implements OnInit {
     //this.dniPatient = localStorage.getItem('patient_dni');
     this.activatedroute.paramMap.subscribe(async (params) => {
       this.patient = JSON.parse(localStorage.getItem(params.get("patientId")));
+      console.log("this.patient");
+      console.log(this.patient);
       this.patientData['reason'] = this.patient.reason;
       this.patientData['typeAttetion'] = this.patient.typeAttetion;
       this.dniPatient = this.patient.dni;

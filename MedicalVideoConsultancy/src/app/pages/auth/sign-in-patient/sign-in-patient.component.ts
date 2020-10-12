@@ -84,6 +84,8 @@ export class SignInPatientComponent implements OnInit {
   checkRoom() {
     localStorage.setItem('patient_auth', this.no_identify_patient);
     if (this.roomForm.valid) {
+      console.log("this.roomForm.value");
+      console.log(this.roomForm.value);
       this.authPatientService.joinValidatePatient(this.roomForm.value).subscribe((resultPatient) => {
         this.submitted = true;
         const room = this.f.room.value.substring(this.domain.length);

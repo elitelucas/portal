@@ -38,6 +38,8 @@ export class MeetPatientComponent implements OnInit {
     private authPatientService: AuthPatientService,
     private _router: Router) {
     this.patientData = this.authPatientService.getCurrentUser
+    console.log("MeetPatientComponent this.patientData");
+    console.log(this.patientData);
     //this.patientData = localStorage.getItem('patient');
     this.identify = localStorage.getItem('patient_auth');
     this.providerData = JSON.parse(localStorage.getItem('provider'));
