@@ -432,7 +432,7 @@ exports.mail = async (req, res) => {
     });
 
     var mailOptions = {
-      from: req.body.from,
+      from: emailConfig.username,
       to: req.body.email,
       subject: req.body.subject,
       html: req.body.html
@@ -809,6 +809,7 @@ exports.charge = async (req, res, next) => {
 exports.subcriptionPlanWithCard = async (req, res, next) => {
 
   try {
+    console.log(req.body)
     const providerId = req.body.providerId;
     const cardData = req.body.card;
     let cardExists = await Card.findOne({ card_number: cardData.card_number });
@@ -825,39 +826,41 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     });
 
     if (cardExists == undefined || cardExists == null) {
-      const token = await culqi.tokens.createToken({
-        card_number: cardData.card_number,
-        cvv: cardData.cvv,
-        expiration_month: cardData.expiration_month,
-        expiration_year: cardData.expiration_year,
-        email: cardData.email,
-      });
+      // const token = await culqi.tokens.createToken({
+      //   card_number: cardData.card_number,
+      //   cvv: cardData.cvv,
+      //   expiration_month: cardData.expiration_month,
+      //   expiration_year: cardData.expiration_year,
+      //   email: cardData.email,
+      // });
+      // console.log('eeee')
 
-      if(provider.customerId == undefined){
-        const cus = {
-          first_name: provider.firstName,
-          last_name: provider.lastName,
-          email: provider.email,
-          address: provider.address == undefined ? cardData.address : provider.address,
-          address_city: provider.address_city == undefined ? cardData.address_city : provider.address_city ,
-          country_code: provider.country_code == undefined ? cardData.country_code : provider.country_code,
-          phone_number: provider.phoneNumber == undefined ? cardData.phoneNumber : provider.phoneNumber,
-        };
-        console.log(cus);
-        let customerCulqi = await culqi.customers.createCustomer(cus);
-        console.log(customerCulqi);
-        provider.customerId = customerCulqi.id;
-        provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
+      // if(provider.customerId == undefined){
+        // const cus = {
+        //   first_name: provider.firstName,
+        //   last_name: provider.lastName,
+        //   email: provider.email,
+        //   address: provider.address == undefined ? cardData.address : provider.address,
+        //   address_city: provider.address_city == undefined ? cardData.address_city : provider.address_city ,
+        //   country_code: provider.country_code == undefined ? cardData.country_code : provider.country_code,
+        //   phone_number: provider.phoneNumber == undefined ? cardData.phoneNumber : provider.phoneNumber,
+        // };
+        // console.log(cus);
+        // let customerCulqi = await culqi.customers.createCustomer(cus);
+        // console.log(customerCulqi);
+        // provider.customerId = customerCulqi.id;
+        // provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
 
-      }
+      // }
+    
 
-      let cardCulqi = await culqi.cards.createCard({
-        customer_id: provider.customerId,
-        token_id: token.id
-      });
+      // let cardCulqi = await culqi.cards.createCard({
+      //   customer_id: provider.customerId,
+      //   token_id: token.id
+      // });
       cardExists = await new Card({
         description: cardData.description,
-        cardId: cardCulqi.id,
+        // cardId: cardCulqi.id,
         card_number: cardData.card_number,
         providerId: providerId,
         createDate: new Date(),
@@ -869,16 +872,15 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
 
     if(provider != undefined){
       const planSubcription = await Plan.findById(subcriptionData.id);     
-      let subscriptionCulqi = await culqi.subscriptions.createSubscription({
-        card_id: cardExists.cardId,
-        plan_id: planSubcription.planId
-      });  
-      provider.subcriptionId = subscriptionCulqi.id;
+      // let subscriptionCulqi = await culqi.subscriptions.createSubscription({
+      //   card_id: cardExists.cardId,
+      //   plan_id: planSubcription.planId
+      // });  
+      // provider.subcriptionId = subscriptionCulqi.id;
       provider.subcriptionStatus = true
       provider.planId = planSubcription._id;
-      provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
-    
-      res.status(httpStatus.OK).send()
+      provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: true});
+      res.status(httpStatus.OK).json(provider.transform())
     }else{      
       res.status(httpStatus.NOT_FOUND).send()
     }    
@@ -1232,3 +1234,15 @@ exports.createConsultEvent = async (result) => {
     return new APIError(e)
   }
 };
+
+/**
+ * @api v1/provider/feedback/:providerId
+ * param providerId
+ * */
+exports.getFeedBacks = async (req, res, next) => {
+  try {
+
+  } catch (e) {
+    console.log(e)
+  }
+}

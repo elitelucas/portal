@@ -4,19 +4,23 @@
 <ng-container >
   <mat-nav-list appAccordion>
     <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>
-    <mat-list-item appAccordionLink *ngFor="let menuitem of menuItems.getMenuitem(currentUserRole)" routerLinkActive="selected" group="{{menuitem.state}}">
-      <a class="p-2 w-100" appAccordionToggle [routerLink]="[ menuitem.state]" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" *ngIf="menuitem.type === 'link'">
-        <ng-container *ngIf="menuitem.icon === 'av_timer'">
-          <mat-icon>{{ menuitem.icon }}</mat-icon>
-        </ng-container>
-        <ng-container *ngIf="menuitem.icon !== 'av_timer'">
-          <img class="super-icon-size" src="{{menuitem.icon}}">
-        </ng-container>
-        <span class="ml-3">{{ menuitem.name }}</span>
-        <span fxFlex></span>
-        <span class="label label-{{ badge.type }}" *ngFor="let badge of menuitem.badge">{{ badge.value }}</span>
-      </a>
+    <mat-list-item appAccordionLink *ngFor="let menuitem of firstMenuItems" routerLinkActive="selected" group="{{menuitem.state}}">
+    
+        <a class="p-2 w-100" appAccordionToggle [routerLink]="[ menuitem.state]" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" *ngIf="menuitem.type === 'link'">
+          <ng-container *ngIf="menuitem.icon === 'av_timer'">
+            <mat-icon>{{ menuitem.icon }}</mat-icon>
+          </ng-container>
+          <ng-container *ngIf="menuitem.icon !== 'av_timer'">
+            <img class="super-icon-size" src="{{menuitem.icon}}">
+          </ng-container>
+          <span class="ml-3">{{ menuitem.name }}</span>
+          <span fxFlex></span>
+          <span class="label label-{{ badge.type }}" *ngFor="let badge of menuitem.badge">{{ badge.value }}</span>
+        </a>
+    
+      
     </mat-list-item>
+
     <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>
     <div class="">
       <ng-container >
@@ -28,6 +32,7 @@
         </div>
       </ng-container>
     </div>
+
     <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>
     <div class="">
       <ng-container *ngIf="(currentUserRole !== 'SuperAdmin') && (currentUserRole !== 'Admin') && (currentUserRole !== 'Patient')">
@@ -59,5 +64,20 @@
       </ng-container>
     </div>
 
+    <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>
+    <mat-list-item appAccordionLink2 *ngFor="let menuitem of secondMenuItems" routerLinkActive="selected" group="{{menuitem.state}}">
+      <a class="p-2 w-100" appAccordionToggle2 [routerLink]="[ menuitem.state]" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" *ngIf="menuitem.type === 'link'">
+        <ng-container *ngIf="menuitem.icon === 'av_timer'">
+          <mat-icon>{{ menuitem.icon }}</mat-icon>
+        </ng-container>
+        <ng-container *ngIf="menuitem.icon !== 'av_timer'">
+          <img class="super-icon-size" src="{{menuitem.icon}}">
+        </ng-container>
+        <span class="ml-3">{{ menuitem.name }}</span>
+        <span fxFlex></span>
+        <span class="label label-{{ badge.type }}" *ngFor="let badge of menuitem.badge">{{ badge.value }}</span>
+      </a>
+    </mat-list-item>
+    <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>
   </mat-nav-list>
 </ng-container>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProviderService } from './../../../_services/provider.service';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -27,6 +28,8 @@ export class SubscriptionNewComponent implements OnInit {
     private router: Router
   ) {
     this.providerData = JSON.parse(localStorage.getItem('currentUser'));
+    console.log(this.providerData)
+    console.log('this.providerData')
 
     this.activatedRoute.params.subscribe(data => {
       this.receiveData=JSON.parse(data.planId);
@@ -111,6 +114,20 @@ export class SubscriptionNewComponent implements OnInit {
     this.providerService.sendSubcriptionData(sendData).subscribe(res => {
       console.log('res')
       console.log(res)
+      if(res){
+        const mailData={
+          email:this.providerData.email,
+          subject:'Subscribed successfully.',
+          html:'<p>Subscribed successfully.</p>'
+        }
+        this.providerService.sendMailForSubscription(mailData).subscribe(res=>{
+          console.log('res')
+          console.log(res)
+        })
+           Swal.fire('Subscribed successfully.')
+           localStorage.setItem('currentUser', JSON.stringify(res));
+           this.router.navigateByUrl('/dashboard/subscription-old');
+      }
     })
   }
   Cancel() {

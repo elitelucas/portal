@@ -1,11 +1,20 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {MustMatch} from "../../../../_helpers/must-match.validator";
 import { UserService } from './../../../../_services/user.service';
 import Swal from 'sweetalert2';
+import {MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort} from "@angular/material";
 
+export interface PaymentData {
+  id: string;
+  date: string;
+  amount: string;
+  x:string;
+  email: string;
+  type: string;
+}
 
 @Component({
   selector: 'app-super-update',
@@ -13,6 +22,10 @@ import Swal from 'sweetalert2';
   styleUrls: ['./super-update.component.css']
 })
 export class SuperUpdateComponent implements OnInit {
+
+  displayedColumns: string[] = ['id', 'date', 'amount', 'x', 'email', 'type'];
+  noDataToDisplay: boolean = false;
+
   registerTitle:String;
   registerForm:FormGroup;
   passwordForm:FormGroup;
@@ -27,6 +40,21 @@ export class SuperUpdateComponent implements OnInit {
   phoneNumber:string = '';
   formData:any;
   userId:any;
+  data=[
+    {
+      id:'234',
+      date:'2020-09-09',
+      amount:'59',
+      x:'324234',
+      email:'sdf@sdf.com',
+      type:'Subscription'
+    }
+  ];
+  dataSource:any;
+
+  @ViewChild(MatTable)  table: MatTable<any>;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(
     private route:ActivatedRoute,
@@ -72,9 +100,23 @@ export class SuperUpdateComponent implements OnInit {
     }, {
       validator: MustMatch('password', 'confirmPassword')
     });
+    this.initTableData();
   }
   get f() { return this.registerForm.controls; }
   get f1() { return this.passwordForm.controls; }
+
+  initTableData(){
+    const paymentData: PaymentData[] = [];
+    this.data.forEach(function(item){
+      if(item) {
+        paymentData.push({id: item.id, date:item.date,amount:item.amount,x:item.x,email:item.email,type:item.type});
+      }
+    });
+    this.dataSource = new MatTableDataSource<PaymentData>(paymentData);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+    this.noDataToDisplay = true;
+  }
 
   onSubmit(){
     this.submitted=true;

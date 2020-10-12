@@ -28,6 +28,7 @@ const MENUITEMS_USER = [
   { state: 'profile', name: 'Profile', type: 'link', icon: 'https://img.icons8.com/doodle/48/000000/user.png' },
   { state: 'patient-charts', name: 'Patient Charts', type: 'link', icon: 'https://img.icons8.com/color/50/000000/physical-therapy.png' },
   { state: 'subscription-plan', name: 'Subscription Plan', type: 'link', icon: 'https://img.icons8.com/color/50/000000/physical-therapy.png' },
+  { state: 'feedbacks', name: 'Feedbacks', type: 'link', icon: 'https://img.icons8.com/color/50/000000/physical-therapy.png' },
 ];
 
 const MENUITEMS_FRONT = [

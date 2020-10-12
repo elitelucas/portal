@@ -182,6 +182,11 @@ export class ProviderService {
     return this.http.post(subcriptionUrl,data);
 
   }
+  sendMailForSubscription(data){
+    const sendMailForSubscription=baseUrl + 'provider/sendMail';
+    return this.http.post(sendMailForSubscription,data);
+
+  }
   getPlansById(planId){
     const getPlansUrl= baseUrl + 'plans/'+planId;
     return this.http.get<any>(getPlansUrl);
@@ -217,6 +222,10 @@ export class ProviderService {
     const deletePlansUrl = baseUrl + 'plans/'+planId;
     this.trace("deletePlansUrl:", deletePlansUrl);
     return this.http.delete(deletePlansUrl);
+  }
+  getFeedbacks(providerId){
+    const feedbackUrl= baseUrl + 'provider/feedback/'+providerId;
+    return this.http.get<any>(feedbackUrl);
   }
 
 

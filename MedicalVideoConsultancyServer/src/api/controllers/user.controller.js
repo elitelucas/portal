@@ -624,12 +624,8 @@ exports.updatePlanId = async (req, res, next) => {
 
 exports.changeSubscriptionStatus = async (req, res, next) => {
   try {
-    console.log('req.body.providerId')
-    console.log(req.body.providerId)
     const user = await User.findByIdAndUpdate(req.body.providerId, { subcriptionStatus: false }, { new: true });
-    console.log('user')
-    console.log(user)
-    res.status(httpStatus.OK).json(user);
+    res.status(httpStatus.OK).json(user.transform());
   } catch (error) {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
   }

@@ -32,6 +32,7 @@ export class AuthService {
     const signInUrl = baseUrl + 'auth/login';
     return this.http.post<any>(signInUrl, userData).pipe(map(res => {
       if(res.token) {
+ 
         this.setToken(res);
         this.setCurrentUser(res);
       }

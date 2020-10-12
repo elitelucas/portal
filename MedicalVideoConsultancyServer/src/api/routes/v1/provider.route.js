@@ -153,6 +153,12 @@ router.route('/subcription')
   .post(controller.subcriptionPlanWithCard);
 
 /**
+ * @api v1/provider/sendMail
+ * */
+router.route('/sendMail')
+  .post(controller.mail);
+
+/**
    * @api v1/provider/subcription
    * */
 router.route('/subcription/:providerid')
@@ -193,12 +199,20 @@ router.route('/getChart/:patientDni')
  * */
 router.route('/consult')
   .post(controller.createConsult);
-  /**
+
+/**
    * @api v1/provider/consult
    * @method post
    * */
 router.route('/consult/:userId')
     .get(controller.getLastAttetions);
+
+/**
+   * @api v1/provider/feedback
+   * @method post
+   * */
+router.route('/feedback/:providerId')
+.get(controller.getFeedBacks);
 
 /**
  * @api v1/provider/consult
