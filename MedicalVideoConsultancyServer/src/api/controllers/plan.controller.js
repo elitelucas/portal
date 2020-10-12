@@ -29,9 +29,13 @@ exports.list = async (req, res, next) => {
  */
 exports.create = async (req, res, next) => {
   try {
-    const planExists = await Plan.findOne({ name: req.body.name });
-    if (planExists == undefined) {
 
+    const planExists = await Plan.findOne({ name: req.body.name });
+
+    if (planExists) {
+      res.status(httpStatus.CONFLICT).json({});
+    } else {
+      
       const planData = req.body;
 
       const culqi = new Culqi({
@@ -40,13 +44,18 @@ exports.create = async (req, res, next) => {
         publicKey: culqiConfing.private_key,
       });
 
+
       let planCulqi = await culqi.plans.createPlan({
         name: planData.name,
         amount: (planData.amount * 100),
-        currency_code: planData.currency_code,
+        //currency_code: planData.currency_code,
+        currency_code: "PEN",
         interval: "meses",
-        interval_count: 1
+        interval_count: 1,
+        description: planData.description
       });
+      console.log('planCulqi')
+      console.log(planCulqi)
 
       planData['interval'] = "meses";
       planData['interval_count'] = 1;
@@ -57,12 +66,13 @@ exports.create = async (req, res, next) => {
       planData['planId'] = planCulqi.id;
 
       const plan = await new Plan(planData).save();
+      console.log('plan')
+      console.log(plan)
 
       res.status(httpStatus.CREATED).json(plan);
-    } else {
-      res.status(httpStatus.CONFLICT).json({});
     }
   } catch (error) {
+    console.log(error);
     return next(error);
   }
 };
@@ -115,3 +125,17 @@ exports.remove = async (req, res, next) => {
     return next(error);
   }
 };
+
+exports.update= async (req, res, next)=>{
+  try{
+    const planId=req.body.id;
+    const plan=await Plan.findOneAndUpdate(
+      {_id:planId},
+      {"$set":{name:req.body.name, description:req.body.description, amount:req.body.amount}},
+      {new:true}
+    );
+    res.status(httpStatus.OK).json(plan);
+  }catch (error) {
+    return next(error);
+  }
+}

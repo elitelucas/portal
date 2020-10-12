@@ -1,0 +1,94 @@
+<div class="p-3">
+    <div class="mb-3">
+        <form [formGroup]="planForm" 
+        (ngSubmit)="onSubmit(newDescription.editorInstance.getData())">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <input class="form-control shadow-sm" formControlName="name" placeholder="Plan Name"
+                            [ngClass]="{ 'is-invalid': submitted && f.name.errors }">
+                        <div *ngIf="submitted && f.name.errors" class="invalid-feedback">
+                            <div *ngIf="f.name.errors.required">Plan Name is required</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control shadow-sm" formControlName="amount" placeholder="Amount"
+                            [ngClass]="{ 'is-invalid': submitted && f.amount.errors }">
+                        <div *ngIf="submitted && f.amount.errors" class="invalid-feedback">
+                            <div *ngIf="f.amount.errors.required">Amount is required</div>
+                            <div *ngIf="f.amount.errors.pattern">Amount is number</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 text-center">
+                    <button class="btn btn-primary">Add</button>
+                </div>
+            </div> 
+            <div class="form-group">
+                <ckeditor #newDescription [editor]="Editor" ></ckeditor>
+            </div>          
+        </form>
+
+    </div>
+    <div class="border-top p-3">
+        <div *ngIf="displayData">
+            <div class="mb-3" *ngFor="let item of iteralData;let i=index;">
+                <div class="row" *ngIf="kk[i]">
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-10">
+                                <div>
+                                    <h3>{{item.name}}</h3>
+                                </div>
+                                <div [innerHtml]="item.description" ></div>
+                            </div>
+                            <div class="col-2">
+                                $/{{item.amount}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <button class="btn btn-primary mr-3" (click)=Edit(i)>
+                            Edit
+                        </button>
+                        <button class="btn btn-danger" (click)=Delete(item._id,i)>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+                <div class="row" *ngIf="!kk[i]">
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-10">
+                                <div>
+                                    <input #editName [value]="item.name">
+                                </div>
+                                <div>
+                                    <ckeditor #editDescription [editor]="Editor" [data]="item.description"></ckeditor>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                $/<input #editAmount type="text" [value]="item.amount">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <button class="btn btn-primary mr-3" 
+                        (click)="EditOk(editName.value,editDescription.editorInstance.getData(),editAmount.value,item._id,i)">
+                            Ok
+                        </button>
+                        <button class="btn btn-danger" (click)=EditCancel(i)>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+                
+               
+            </div>
+        </div>
+        
+
+    </div>
+
+</div>

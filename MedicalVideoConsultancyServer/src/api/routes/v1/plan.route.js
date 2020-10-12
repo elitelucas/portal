@@ -55,5 +55,9 @@ router
    */
   .delete(authorize(SUPER_ADMIN), controller.remove);
 
+  router
+  .route('/update')
+  .put(controller.update);
+
 
 module.exports = router;

@@ -29,7 +29,6 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
     minlength: 6,
     maxlength: 128,
   },
@@ -133,7 +132,13 @@ const userSchema = new mongoose.Schema({
   customerId: {
     type: String
   },
+  planId: {
+    type: String
+  },
   subcriptionId: {
+    type: String
+  },
+  planId: {
     type: String
   },
   subcriptionStatus: {

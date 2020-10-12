@@ -10,6 +10,10 @@ export interface Menu {
 const MENUITEMS_SUPER = [
   { state: 'super', name: 'Dashboard', type: 'link', icon: 'av_timer' },
   { state: 'profile', name: 'Profile', type: 'link', icon: 'https://img.icons8.com/doodle/48/000000/user.png' },
+  { state: 'providers', name: 'Providers', type: 'link', icon: 'https://img.icons8.com/doodle/48/000000/doctor-male.png' },
+  { state: 'administrators', name: 'Administrators', type: 'link', icon: 'https://img.icons8.com/doodle/48/000000/doctor-male.png' },
+  { state: 'feedbacks', name: 'Feedbacks', type: 'link', icon: 'https://img.icons8.com/doodle/48/000000/doctor-male.png' },
+  { state: 'plans', name: 'Plans', type: 'link', icon: 'https://img.icons8.com/doodle/48/000000/doctor-male.png' },
 ];
 
 const MENUITEMS_ADMIN = [
@@ -23,6 +27,7 @@ const MENUITEMS_USER = [
   { state: 'health-provider/edit-room',name: 'Edit Waiting Room', type: 'link',  icon: 'https://img.icons8.com/color/48/000000/waiting-room.png' },
   { state: 'profile', name: 'Profile', type: 'link', icon: 'https://img.icons8.com/doodle/48/000000/user.png' },
   { state: 'patient-charts', name: 'Patient Charts', type: 'link', icon: 'https://img.icons8.com/color/50/000000/physical-therapy.png' },
+  { state: 'subscription-plan', name: 'Subscription Plan', type: 'link', icon: 'https://img.icons8.com/color/50/000000/physical-therapy.png' },
 ];
 
 const MENUITEMS_FRONT = [
