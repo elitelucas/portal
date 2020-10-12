@@ -1,16 +1,16 @@
 import { User, Patient } from './../../../../_model/user';
-import {Component, OnInit, ViewChild, ViewEncapsulation, Input} from '@angular/core';
-import {MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort} from "@angular/material";
+import { Component, OnInit, ViewChild, ViewEncapsulation, Input } from '@angular/core';
+import { MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort } from "@angular/material";
 import { ProviderService } from './../../../../_services/provider.service';
-import {Router} from "@angular/router";
+import { Router } from "@angular/router";
 import { ConsultDialogueComponent } from './../consult-dialogue/consult-dialogue.component';
-import  Swal  from 'sweetalert2';
+import Swal from 'sweetalert2';
 
 export interface PatientData {
-  index:number;
-  patientId:string;
+  index: number;
+  patientId: string;
   date: Date;
-  consultId:string;
+  consultId: string;
 }
 
 @Component({
@@ -21,30 +21,31 @@ export interface PatientData {
 
 export class ConsultsComponent implements OnInit {
 
-  displayedColumns: string[] = [ 'index', 'fullName','date','consult'];
+  displayedColumns: string[] = ['index', 'fullName', 'date', 'consult'];
   noDataToDisplay: boolean = false;
   dataSource: any;
-  tmpData=[];
+  tmpData = [];
   @Input() patient: Patient;
-  @ViewChild(MatTable)  table: MatTable<any>;
+  @ViewChild(MatTable) table: MatTable<any>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
-   currentUser: User;
+  currentUser: User;
 
   constructor(public dialog: MatDialog, private ProviderService: ProviderService, private router: Router) {
-    
-  
+    console.log("this.patient");
+    console.log(this.patient);
   }
   ngOnInit(): void {
+    this.refresh();
   }
 
 
   initDataSource(data) {
     const PatientData: PatientData[] = [];
-    data.forEach(function(item,idx){
-      if(item) {
+    data.forEach(function (item, idx) {
+      if (item) {
         console.log
-        PatientData.push({index:idx+1, patientId:item.patientId, date: item.createdAt,consultId:item._id});
+        PatientData.push({ index: idx + 1, patientId: item.patientId, date: item.createdAt, consultId: item._id });
       }
     });
 
@@ -63,10 +64,10 @@ export class ConsultsComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-  detail(data){
+  detail(data) {
     const dialogRef = this.dialog.open(ConsultDialogueComponent, {
       width: '75%',
-      height:'70%',
+      height: '70%',
       data: data
     });
 
@@ -76,23 +77,32 @@ export class ConsultsComponent implements OnInit {
     // })
     // this.router.navigateByUrl('/dashboard/newConsult/'+data.index+'/'+data.id+'/'+data.date);
   }
-   search(startDate,endDate){
-    if(startDate==='' || endDate==='' || endDate>startDate==false){
+  search(startDate, endDate) {
+    /*if (startDate === '' || endDate === '' || endDate > startDate == false) {
       Swal.fire('Input the date correctly.')
       return;
-    }
-    this.ProviderService.getConsult(this.patient._id,startDate,endDate)
-    .subscribe(res=> {
-      if(res) {
-        console.log("consult data s>>>>>>>>>>>>>", res)
-        this.tmpData=res;
-        this.initDataSource(res)
-        this.noDataToDisplay = false;
-      } else{
-        this.noDataToDisplay = true;
-      }
-    })
+    }*/
+    this.list(startDate, endDate);
   }
+
+  refresh() {
+    this.list(undefined, undefined);
+  }
+
+  list(startDate, endDate) {
+    this.ProviderService.getConsult(this.patient._id, startDate, endDate)
+      .subscribe(res => {
+        if (res) {
+          console.log("consult data s>>>>>>>>>>>>>", res)
+          this.tmpData = res;
+          this.initDataSource(res)
+          this.noDataToDisplay = false;
+        } else {
+          this.noDataToDisplay = true;
+        }
+      })
+  }
+
 }
 
 

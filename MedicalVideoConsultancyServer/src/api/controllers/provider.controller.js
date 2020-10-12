@@ -933,7 +933,7 @@ exports.createConsult = async (req, res, next) => {
   try {
     let consultData = req.body;
     consultData['providerAttetionId'] = consultData['providerId']
-    consultData['date'] = new date()
+    consultData['createdAt'] = new Date()
     const consult = await new Consult(consultData).save();
     res.status(httpStatus.CREATED).json(consult);
   } catch (e) {
@@ -952,7 +952,8 @@ exports.closeConsult = async (req, res, next) => {
   try {
     const consultId = req.params.consultId;
     const consult = await Consult.findOneAndUpdate({ _id: consultId }, {
-      status: 'close'
+      status: 'close',
+      updatedAt: new Date()
     }, { new: false });
     res.status(httpStatus.CREATED).json(consult);
   } catch (e) {
@@ -977,43 +978,50 @@ exports.getOneConsult = async (req, res, next) => {
 
 exports.updateConsult = async (req, res, next) => {
   try {
-    /*console.log('req.body')
-    console.log(req.body)*/
+
     const consultId = req.body.consultId;
+    const patientId = req.body.patientId;
+    const providerId = req.body.providerId;
     const updateData = req.body.updateData;
-    const symptom = [updateData.symptom0, updateData.symptom1, updateData.symptom2, updateData.symptom3];
 
-    const updatedConsult = await Consult.findByIdAndUpdate(
-      consultId,
-      {
-        "$set": {
-          timeOfDisease: updateData.timeOfDisease,
-          wayOfStart: updateData.wayOfStart,
-          symptom: symptom,
-          history: updateData.history,
-          subjective: updateData.subjective,
-          objective: updateData.objective,
-          assessment: updateData.assessment,
-          plan: updateData.plan,
-          providerFiles: updateData.providerFiles,
-        }
-      },
-      { new: true });
+    const consult = await Consult.findById(consultId).exec();
 
+    let updatedConsult = null;
 
-    const updatedPatient = await Patient.findOneAndUpdate(
-      { _id: req.body.patientId },
-      {
-        "$set": {
-          fullName: updateData.name,
-          age: updateData.age,
-          phoneNumber: updateData.phoneNumber,
-        }
-      },
-      { new: true });
+    if (consultId && consult) {
+      updatedConsult = await Consult.findByIdAndUpdate(
+        consultId,
+        {
+          "$set": {
+            timeOfDisease: updateData.timeOfDisease,
+            wayOfStart: updateData.wayOfStart,
+            providerAttetionId: providerId,
+            symptom: updateData.symptom,
+            history: updateData.history,
+            subjective: updateData.subjective,
+            objective: updateData.objective,
+            assessment: updateData.assessment,
+            plan: updateData.plan,
+            providerFiles: updateData.providerFiles,
+            updatedAt: new Date()
+          }
+        },
+        { new: true });
+    } else {
+      const patient = await Patient.findById(patientId).exec();
+      updateData['dni'] = patient.dni;
+      updateData['patientId'] = patientId;
+      updateData['providerId'] = providerId;
+      updateData['providerAttetionId'] = providerId;
+      updateData['createdAt'] = new Date();
+      updateData['status'] = 'close';
+      updatedConsult = await new Consult(updateData).save();
+    }
+
     return res.status(httpStatus.OK).json(updatedConsult);
   } catch (e) {
-    return next(APIError(e))
+    console.log(e);
+    return next(new APIError(e))
   }
 };
 
@@ -1079,4 +1087,25 @@ exports.createFeedback = async (req, res, next) => {
     error = new APIError(e);
     return next(error)
   }
+};
+
+exports.download = async (req, res, next) => {
+
+  const imagePath = path.join(__dirname + './../../public/');
+  const filePath = imagePath + req.params.receiver + '\\';
+  const filename = req.params.fileName;
+  const file = filePath + filename;
+  if (fs.existsSync(file)) {
+    const mimetype = mime.lookup(file);
+
+    res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+    res.setHeader('Content-type', mimetype);
+
+    var filestream = fs.createReadStream(file);
+    filestream.pipe(res);
+  } else {
+    console.log('There is no such files');
+  }
+
+
 };

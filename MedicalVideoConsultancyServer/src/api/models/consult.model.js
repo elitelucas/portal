@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 
 const consultSchema = new Schema({
   patientId: String,
-  createDate: Date,
+  createdAt: Date,
+  updatedAt: Date,
   providerId : String,
   providerAttetionId : String,
   dni: {

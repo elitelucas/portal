@@ -1,5 +1,5 @@
 <div class="container total">
-    <div  class="header">
+    <div class="header">
         <div>
             <p>Patient Id: {{data.dni}}</p>
         </div>
@@ -11,26 +11,29 @@
             <p>Reason: {{patientData.reason}}</p>
         </div>
         <div>
-            <p>Type Atettion:  </p>
-            <div *ngIf="patientData.typeAttetion == 1 " >
+            <p>Type Atettion: </p>
+            <div *ngIf="patientData.typeAttetion == 1 ">
                 New
             </div>
-            <div *ngIf="patientData.typeAttetion == 2 " >
+            <div *ngIf="patientData.typeAttetion == 2 ">
                 Follow up
             </div>
         </div>
 
-        <p>Patient select pay method : [<span *ngIf="patientPayMethodConfirm" type="number">{{patientPayMethodConfirm}}</span>]</p>
+        <p>Patient select pay method : [<span *ngIf="patientPayMethodConfirm"
+                type="number">{{patientPayMethodConfirm}}</span>]</p>
     </div>
-    
+
 
     <div class="row" style="border-bottom: 1px solid;">
         <div class="col-xl-8 point">
             <div class="row  pt-5">
-                <div [class]="key.Consults? 'col-xl-3 left-border title-pos sub-menu':'col-xl-3 left-border title-pos'" (click)="changeBackground('Consults')">
+                <div [class]="key.Consults? 'col-xl-3 left-border title-pos sub-menu':'col-xl-3 left-border title-pos'"
+                    (click)="changeBackground('Consults')">
                     Consults
-                </div> 
-                <div [class]="key.payMethods? 'col-xl-4 left-border title-pos sub-menu':'col-xl-4 left-border title-pos'" (click)="changeBackground('payMethods')">
+                </div>
+                <div [class]="key.payMethods? 'col-xl-4 left-border title-pos sub-menu':'col-xl-4 left-border title-pos'"
+                    (click)="changeBackground('payMethods')">
                     Pay methods
                 </div>
             </div>
@@ -51,37 +54,37 @@
                             {{payData.QRimg[0].description}}
                         </div>
                         <div class="col-8">
-                             <img class="qrImage" src="{{payData.QRimg[0].name}}">   
+                            <img class="qrImage" src="{{payData.QRimg[0].name}}">
                         </div>
                     </div>
                     <div class='row margin-div' *ngIf="QRimgKey[1]">
-                         <div class="col-4">
-                             {{payData.QRimg[1].description}}
-                         </div>
-                         <div class="col-8">
-                             <img class="qrImage" src="{{payData.QRimg[1].name}}">   
-                         </div>
-                     </div> 
+                        <div class="col-4">
+                            {{payData.QRimg[1].description}}
+                        </div>
+                        <div class="col-8">
+                            <img class="qrImage" src="{{payData.QRimg[1].name}}">
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="account margin-div"  *ngIf="accountKey">
+            <div class="account margin-div" *ngIf="accountKey">
                 <h3>Account Banks</h3>
                 <div class="add-account" *ngFor="let item of payData.account;">
-                     {{item}}
-                 </div>
+                    {{item}}
+                </div>
             </div>
-            <div class="link-pay margin-div"  *ngIf="urlKey">
-                 <h3>Link Pay</h3>
-                 <div class="add-account" *ngFor="let item of payData.url;">
-                     {{item}}
-                 </div>
-             </div>
-         </div>
+            <div class="link-pay margin-div" *ngIf="urlKey">
+                <h3>Link Pay</h3>
+                <div class="add-account" *ngFor="let item of payData.url;">
+                    {{item}}
+                </div>
+            </div>
+        </div>
     </div>
 
 
     <div *ngIf="key.Consults">
-
+        <app-consults [patient]="patient"></app-consults>
     </div>
 
 
@@ -90,13 +93,12 @@
             <button class="btn btn-danger">Cancel</button>
         </div>
         <div class="col-4">
-            <button [class]="patientSocketId ? 'btn btn-primary' :'btn btn-primary disabled'" 
-            (click)="sendPay(payAmount.value)"
-            [disabled]="patientSocketId ? false : true">Send</button>
+            <button [class]="patientSocketId ? 'btn btn-primary' :'btn btn-primary disabled'"
+                (click)="sendPay(payAmount.value)" [disabled]="patientSocketId ? false : true">Send</button>
         </div>
         <div class="col-4">
-            <button class="btn btn-primary" (click)="Confirm()"
-            [disabled]="confirmKey ? false : true">Confirm Pay</button>
+            <button class="btn btn-primary" (click)="Confirm()" [disabled]="confirmKey ? false : true">Confirm
+                Pay</button>
         </div>
     </div>
 </div>

@@ -18,7 +18,7 @@
     <div class="date-bar">
         <div class="row">
             <div class="col-xl-8 col-md-6 col-sm-6">Consult #{{data.index}}</div>
-            <div class="col-xl-4 col-md-6 col-sm-6">Date:{{data.date}}</div>
+            <div class="col-xl-4 col-md-6 col-sm-6">Date:{{iteralData.createdAt}}</div>
         </div>
     </div>
     <div class="main-div">
@@ -38,23 +38,6 @@
             </div>
         </div>
         <div class="content">
-            <!--
-            <div class="main-pad">
-                <div class="input-style min-pad">
-                    1.<input #symptom0 type=text [value]="iteralData.symptom[0]===undefined?'':iteralData.symptom[0]">
-                </div>
-                <div>
-                    2.<input #symptom1 type=text [value]="iteralData.symptom[1]===undefined?'':iteralData.symptom[1]">
-                </div>
-            </div>
-            <div class="main-pad">
-                <div class="input-style">
-                    3.<input #symptom2 type=text [value]="iteralData.symptom[2]===undefined?'':iteralData.symptom[2]">
-                </div>
-                <div>
-                    4.<input #symptom3 type=text [value]="iteralData.symptom[3]===undefined?'':iteralData.symptom[3]">
-                </div>
-            </div> -->
             <div>Signs of symptons</div>
             <div>
                 <div class="containerDiv">
@@ -76,6 +59,36 @@
                 </div>
             </div>
         </div>
+        <br>
+        <div class="content">
+            <div class="title">Type Atettion:</div>
+            <div *ngIf="iteralData.typeAttetion == 1 ">
+                New
+            </div>
+            <div *ngIf="iteralData.typeAttetion == 2 ">
+                Follow up
+            </div>
+        </div>
+        <div class="content">
+            <div class="title">Reason:</div>
+            <div>
+                {{iteralData.reason}}
+            </div>
+        </div>
+        <div class="content">
+            <div class="title">Payment:</div>
+            <div>
+                {{iteralData.payment}}
+            </div>
+        </div>
+        <div class="content">
+            <div class="title">Amount:</div>
+            <div>
+                S/ {{iteralData.payAmount}}
+            </div>
+        </div>
+        <br>
+        <br>
         <div class="content">
             <div>History</div>
             <div>
@@ -83,6 +96,7 @@
             </div>
         </div>
     </div>
+    <br>
     <div class="main-div">
         <div class="title">SUBJECTIVE</div>
         <div class="content">
@@ -163,6 +177,9 @@
 
     </div>
     <div class="main-div pull-right">
+        <button class="btn btn-primary" (click)="cancel()">
+            Cancel
+        </button>
         <button class="btn btn-primary" (click)="saveData({
             name:name.value,
             age:age.value,
@@ -170,10 +187,6 @@
             allergy:allergy.value,
             timeOfDisease:timeOfDisease.value,
             wayOfStart:wayOfStart.value,
-            symptom0:symptom0.value,
-            symptom1:symptom1.value,
-            symptom2:symptom2.value,
-            symptom3:symptom3.value,
             history:history.value,
             subjective:subjective.value,
             objective:objective.value,

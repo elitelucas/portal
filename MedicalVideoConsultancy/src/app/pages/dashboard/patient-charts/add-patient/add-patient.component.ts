@@ -47,9 +47,9 @@ export class AddPatientComponent implements OnInit {
   initData() {
     this.provider = this.authService.getCurrentUser;
     this.roomForm = this.formBuilder.group({
-      dni: ['', Validators.required],
+      dni: ['', Validators.required]/*,
       reason: ['', [Validators.required, Validators.minLength(1)]],
-      typeAttetion: ['', Validators.required]
+      typeAttetion: ['', Validators.required]*/
     });
 
     this.f.dni.setValue("12312323");
@@ -58,9 +58,9 @@ export class AddPatientComponent implements OnInit {
       fullName: ['', Validators.required],
       dni: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', Validators.required],
+      phoneNumber: ['', Validators.required]/*,
       reason: ['', [Validators.required, Validators.minLength(1)]],
-      typeAttetion: ['', Validators.required]
+      typeAttetion: ['', Validators.required]*/
     });
   }
 
@@ -77,8 +77,8 @@ export class AddPatientComponent implements OnInit {
       }, error => {
         this.step = 2;
         this.f1.dni.setValue(this.f.dni.value);
-        this.f1.reason.setValue(this.f.reason.value);
-        this.f1.typeAttetion.setValue(this.f.typeAttetion.value);
+        /*this.f1.reason.setValue(this.f.reason.value);
+        this.f1.typeAttetion.setValue(this.f.typeAttetion.value);*/
       });
 
     }
@@ -109,9 +109,10 @@ export class AddPatientComponent implements OnInit {
           });
         }
       }, error => {
-        if (error) {
+        console.log(error);
+        /*if (error) {
           if (error.error) error.error.errors[0].field === "dni" ? this.isDuplicatedDNI = true : (error.error.errors[0].field === 'phoneNumber' ? this.isDuplicatedPhone = true : this.isDuplicatedEmail = true);
-        }
+        }*/
       })
   }
 

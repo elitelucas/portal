@@ -107,11 +107,11 @@ const patientSchema = new Schema({
   },
   reason: {
     type: String,
-    required: true,
+    required: false
   },
   typeAttetion: {
     type: Number,
-    required: true,
+    required: false
   },
 }, {
   timestamps:true
