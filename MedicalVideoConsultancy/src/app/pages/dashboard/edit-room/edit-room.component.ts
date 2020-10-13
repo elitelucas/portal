@@ -32,6 +32,7 @@ export class EditRoomComponent implements OnInit {
   clickKey: boolean;
   @ViewChild("imageUpload", { static: false }) imageUpload: ElementRef;
   @ViewChild("videoUpload", { static: false }) videoUpload: ElementRef;
+  @ViewChild('editBody') editBody;
   currentUser: any;
   publicUrl = environment.baseUrl + 'public/';
 
@@ -73,9 +74,10 @@ export class EditRoomComponent implements OnInit {
       Swal.fire('Blog size limit is 5Mbyte')
       return;
     }
-    this.clickKey = true;
-    if (title === '' || body === '')
+    if (title === '' || body === ''){
+      Swal.fire('Input correctly!')
       return
+    }
     this.userService.postBlog({ postTitle: title, postBody: body, userId: this.currentUser.id })
       .subscribe(res => {
         this.receiveData(res)
@@ -84,6 +86,7 @@ export class EditRoomComponent implements OnInit {
 
   edit(idx) {
     this.kk[idx] = false;
+
   }
 
   editOk(title, body, postId, idx) {

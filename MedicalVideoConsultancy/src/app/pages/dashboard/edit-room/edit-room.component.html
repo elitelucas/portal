@@ -20,7 +20,6 @@
         ">
         Publish
       </button>
-      <p *ngIf="postTitle.value===''&& clickKey" style="color:red">required*</p>
     </div>
     <div class="post-body">
       <ckeditor #postBody [editor]="Editor" (ready)="onReady($event)"></ckeditor>
@@ -28,7 +27,7 @@
   </div>
 
   <div class='post-list' *ngFor="let item of literalArr; let i=index;">
-    <div [class]="kk[i]===false?'switch':''">
+    <div *ngIf="kk[i]">
       <div class="head-bar">
         <h3 class="each-post-title pull-left">{{item.postTitle}}</h3>
         <button class="btn btn-primary edit-button edit-margin" (click)="edit(i)">Edit</button>
@@ -37,7 +36,8 @@
       <div class="each-post-body" [innerHTML]="item.postBody">
       </div>
     </div>
-    <div [class]="kk[i]?'switch':''">
+    
+    <div *ngIf="!kk[i]">
       <div class="post-title">
 
         <input #editTitle type="text" class="edit-title-input" [value]="item.postTitle" />
@@ -48,9 +48,6 @@
 
         <button class="btn btn-danger edit-button" (click)="editCancel(i)">Cancel
         </button>
-
-        <p *ngIf="editTitle.value===''&& clickKey" style="color:red">required*</p>
-
       </div>
 
       <div class="post-body">

@@ -525,6 +525,8 @@ exports.postBlog = async (req, res) => {
       res.status(httpStatus.INTERNAL_SERVER_ERROR).send();
     } else {
       logger.info("Bucket Successfully created a file on S3 : " + data.Location);
+      console.log('data')
+      console.log(data)
       // a document instance
       const post = new Post({
         providerId: providerId,

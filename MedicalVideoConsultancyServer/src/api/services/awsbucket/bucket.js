@@ -8,6 +8,8 @@ const s3 = new AWS.S3({
 });
 
 exports.uploadFile = async (folder, name, fileContent, metadata , result) => {
+  console.log('result')
+  console.log(result)
   const params = {
     Bucket: awsConfig.bucket,
     Key: folder + "/" + name,
