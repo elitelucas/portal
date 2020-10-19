@@ -39,6 +39,10 @@
                 </ng-container>
                 <br />
             </div>
+            <div>
+                <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" 
+                    (click)="exit()">Salir</button>
+            </div>
         </mat-sidenav>
 
         <div class="container-fluid">
@@ -53,11 +57,11 @@
             <div *ngIf="step == step_attetion_page && patientData != undefined">
                 <app-meet-call [patientData]="patientData" [providerData]="providerData" [roomName]="roomName">
                 </app-meet-call>
-            </div>    
+            </div>
             <div *ngIf="step == step_feeback_page && patientData != undefined">
                 <app-feeback [patientData]="patientData" [providerData]="providerData" [roomName]="roomName">
                 </app-feeback>
-            </div>            
+            </div>
         </div>
     </mat-sidenav-container>
 </div>

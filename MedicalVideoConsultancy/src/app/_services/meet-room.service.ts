@@ -34,6 +34,11 @@ export class MeetRoomService {
     this.localVideo.nativeElement.srcObject = this.localStream;
   }
 
+  public disconnectMe(){
+    console.log("disconnectMe");
+    this.socket.disconnect();
+  }
+
   public stopVideoAudio() {
     try {
       

@@ -1,64 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../../controllers/provider.controller');
-const { authorize } = require('../../middlewares/auth');
-/**
- * @api v1/provider/invite-by-sms.
- * @param userData
- * */
-
-router.route('/invite-by-sms')
-  .post(authorize(), controller.inviteBySMS);
-
-/**
- * @api v1/provider/mediaUpload
- * @param file
- * */
-router.route('/mediaUpload')
-  .post(authorize(), controller.uploadMedia);
-
-/**
- * @api v1/provider/room/:userId
- * @param id
- * */
-
-router.route('/room/:userId')
-  .get(authorize(), controller.getRoomData);
-
-/**
- * @api v1/provider/room/:userId
- * @param userId, field, value
- * */
-
-router.route('/room/:userID')
-  .patch(authorize(), controller.changeRoomField)
-
-router.route('/text/:userID')
-  .patch(authorize(), controller.changeRoomField)
-/**
- * @api v1/provider/roomName/: roomName
- * @param roomName
- * */
-
-router.route('/roomName/:room')
-  .get(authorize(), controller.checkRoomExist);
+const controller = require('../../controllers/patient.controller');
+const { authorize } = require('../../middlewares/authPatient');
 
 
-
-/*
-router.route('/patient/:patientId')
-  .get(authorize(), controller.getPatient);*/
-
-
-/**
- * @api v1/provider/patientByField
- * @params field: value
- * */
-
-
-//I added 
-router.route('/allPatients')
-  .get(authorize(), controller.getAllPatients);
 
 router.route('/initPatients')
   .get(authorize(), controller.getInitPatients);

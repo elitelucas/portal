@@ -18,17 +18,17 @@ const fileUpload = require('express-fileupload');
 const app = express();
 
 // request logging. dev: console | production: file
-//app.use(morgan(logs));
+app.use(morgan(logs));
 
 // parse body params and attache them to req.body
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyParser.json(/*{ limit: '50mb' }*/));
+//app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // update file and attach them to req.files
 app.use(fileUpload({ creatParentPath: true }));
 
 // gzip compression
-app.use(compress());
+//app.use(compress());
 
 // lets you use HTTP verbs such as PUT or DELETE
 // in places where the client doesn't support it
@@ -40,7 +40,7 @@ app.use(helmet());
 // enable CORS - Cross Origin Resource Sharing
 app.use(cors({ credentials: false, origin: true }));
 
-app.use(express.static('dist'));
+//app.use(express.static('dist'));
 // enable authentication
 app.use(passport.initialize());
 passport.use('jwt', strategies.jwt);

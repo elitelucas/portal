@@ -30,7 +30,8 @@
             <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnDesactive (click)="desactive()" *ngIf="btnDesactiveShow" >Desactive</button>
             <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnActive (click)="publicMe()" >Public</button>
             <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnDesactive (click)="privateMe()" >Private</button>
-            <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #alarmButton (click)="alarm()" *ngIf="alarmButtonKey" >Alarm</button>
+            <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #alarmActiveButton (click)="alarmActive()" *ngIf="audioActivateShow" >Alarm Activate</button>
+            <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #alarmInactiveButton (click)="alarmInactive()" *ngIf="!audioActivateShow" >Alarm Inactivate</button>
           </div>
         </div>
       </ng-container>

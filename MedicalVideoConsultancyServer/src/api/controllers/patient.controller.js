@@ -1,136 +1,23 @@
 const httpStatus = require('http-status');
 //const {PayU, Currency}  = require('@ingameltd/payu');
 const APIError = require('../utils/APIError');
-const { smsConfig, paymentConfig, culqiConfing } = require('../../config/vars');
-const client = require('twilio')(smsConfig.Sid, smsConfig.authToken);
+//const { smsConfig, paymentConfig, culqiConfing } = require('../../config/vars');
+//const client = require('twilio')(smsConfig.Sid, smsConfig.authToken);
 const path = require('path');
-const Room = require('../models/room.model');
 const User = require('../models/user.model');
 const Patient = require('../models/patient.model');
-const Transaction = require('../models/transaction.model');
-const Consult = require('../models/consult.model');
-const Chart = require('../models/chart.model');
-const Paysubcription = require('../models/paysubcription.model');
-const Plan = require('../models/plan.model');
-const Card = require('../models/card.model');
+
 const FeedbackProvider = require('../models/feedbackProvider.model');
 const FeedbackApplication = require('../models/feedbackApplication.model');
 
-const { date } = require('joi');
-const { env, emailConfig } = require('../../config/vars');
+//const { env, emailConfig } = require('../../config/vars');
 const mime = require('mime');
 const fs = require('fs');
 
-const nodemailer = require('nodemailer');
-const Culqi = require('culqi-node');
+//const nodemailer = require('nodemailer');
+//const Culqi = require('culqi-node');
 const logger = require('../../config/logger')
 
-
-/**
- * @api v1/provider/invite-by-sms.
- * @param req
- * @param res
- * @param next
- * */
-
-exports.inviteBySMS = (req, res, next) => {
-  const smsData = req.body;
-  const content = smsData.smsContent;
-  const phoneNumber = smsData.phoneNumber;
-  client.messages.create({ from: smsConfig.sender, body: content, to: phoneNumber })
-    .then(result => {
-      res.status(httpStatus.OK).send(result)
-    }).catch(e => {
-      console.log("SMS failed to sent", e);
-      return next(APIError(e))
-    })
-};
-
-
-/**
- * @api v1/provider/mediaUpload
- * @param req
- * @param res
- * @param next
- * */
-exports.uploadMedia = async (req, res, next) => {
-  const file = req.files.file;
-  const userId = req.body._id;
-  const name = req.body.room;
-  const media = req.body.media;
-  const filePath = media === 'image' ? path.join(__dirname + './../../public/images/') : path.join(__dirname + './../../public/videos/');
-  const room = new Room({ userId: userId, [media]: file.name, name: name });
-  await file.mv(filePath + file.name, function (error) {
-    if (error) {
-      return next(new APIError(error))
-    } else {
-      Room.findOne({ userId: userId }).exec().then((result1) => {
-        if (result1) {
-          Room.findOneAndUpdate({ userId: userId }, { [media]: file.name }, { new: true }).then(result2 => {
-            if (result2) {
-              // console.log("Updated new"+media+" successfully", result2);
-              res.status(httpStatus.OK).send({ [media]: file.name })
-            }
-          }).catch(error => {
-            // console.log("Upload failed to update" + media, error);
-            return next(new APIError(error))
-          })
-        } else {
-          room.save().then(result => {
-            //console.log("New" +media+ " uploaded successfully");
-            if (result) res.status(httpStatus.CREATED).send({ [media]: file.name })
-          });
-        }
-      });
-    }
-  });
-};
-
-/**
- * @api v1/provider/room/:userId
- * @param req
- * @param res
- * @param next
- * */
-exports.getRoomData = (req, res, next) => {
-  const userId = req.params.userId;
-  //console.log("getRoomData userId:"+userId)
-  Room.findOne({ userId: userId }).then(result => {
-    //console.log("getRoomData: ",result)
-    if (result) {
-      result['password'] = null;
-      res.status(httpStatus.OK).json(result);
-    }
-    else
-      res.status(httpStatus.NO_CONTENT).send({ message: 'No available data' })
-  }, error => { return next(new APIError(error)) })
-};
-
-/**
- * @api v1/provider/text/:userId
- * @param req
- * @param res
- * @param next
- * */
-exports.changeRoomField = (req, res, next) => {
-  const userId = req.query.userId;
-  const field = req.body.field;
-  const value = req.body.value;
-  const name = "asd"//req.body.name ;
-  Room.findOne({ userId: userId }).then(result => {
-    if (result) Room.findOneAndUpdate({ userId: userId }, { name: name, [field]: value }, { new: true })
-      .then(result1 => {
-        res.status(httpStatus.OK).json(result1)
-      });
-    else {
-      new Room({ userId: userId, name: name, [field]: value }).save().then(result2 => {
-        res.status(httpStatus.CREATED).json(result2)
-      });
-    }
-  }).catch(error => {
-    return next(new APIError(error))
-  })
-};
 /**
  * @api v1/provider/roomName/: roomName
  * @param req

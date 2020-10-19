@@ -156,7 +156,9 @@ export class SignInPatientComponent implements OnInit {
         }
       }, error => {
         if (error) {
-          if (error.error) error.error.errors[0].field === "dni" ? this.isDuplicatedDNI = true : (error.error.errors[0].field === 'phoneNumber' ? this.isDuplicatedPhone = true : this.isDuplicatedEmail = true);
+          console.log("error");
+          console.log(error);
+          //if (error.error) error.error.errors[0].field === "dni" ? this.isDuplicatedDNI = true : (error.error.errors[0].field === 'phoneNumber' ? this.isDuplicatedPhone = true : this.isDuplicatedEmail = true);
         }
       })
   }

@@ -29,6 +29,8 @@ export class AppSidebarComponent implements OnInit {
 
   public btnActiveShow: boolean = true;
   public btnDesactiveShow: boolean = false;
+  public audioActivateShow: boolean = true;
+  public audioActivate: boolean = false;
 
   @Output() callOutput = new EventEmitter<string>();
   currentUser: any;
@@ -39,10 +41,12 @@ export class AppSidebarComponent implements OnInit {
   provider_connect = 'OK';
   provider_connect_active = 'active';
   provider_connect_inactive = 'inactive';
-  firstMenuItems=[];
-  secondMenuItems=[];
-  alarmButtonKey=false;
-  audio:any;
+  firstMenuItems = [];
+  secondMenuItems = [];
+  // alarmButtonKey = false;
+  audio: any;
+
+  patientListMap = new Map()
 
   constructor(
     public menuItems: MenuItems,
@@ -58,17 +62,17 @@ export class AppSidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this.initSidebar();
-    let tmpArr=[];
-    this.firstMenuItems=this.menuItems.getMenuitem(this.currentUserRole);
-    this.firstMenuItems.forEach((element,index) => {
-      if(element.state==='subscription-plan' || element.state==='feedbacks'){
+    let tmpArr = [];
+    this.firstMenuItems = this.menuItems.getMenuitem(this.currentUserRole);
+    this.firstMenuItems.forEach((element, index) => {
+      if (element.state === 'subscription-plan' || element.state === 'feedbacks') {
         this.secondMenuItems.push(element);
         tmpArr.push(index);
       }
     });
-    tmpArr.sort(function(a, b){return b-a});
-    tmpArr.forEach(item=>{
-      this.firstMenuItems.splice(item,1);
+    tmpArr.sort(function (a, b) { return b - a });
+    tmpArr.forEach(item => {
+      this.firstMenuItems.splice(item, 1);
     })
   }
 
@@ -79,37 +83,58 @@ export class AppSidebarComponent implements OnInit {
     }
     this.confirmConnect();
     this.listPatient();
-    this.meetRoomService.countPatientRoom().subscribe(result => {
-      this.trace("updateListPatient counts: " + result);
-      this.listPatient();
-    });
-    
-    this.meetRoomService.disconnectPatients().subscribe(result => {
-      this.trace("disconnectPatients counts: " + result);
-      this.listPatient();
-    });
+  }
+
+  alarmActive() {
+    this.audioActivate = true;
+    this.audioActivateShow = false;
+  }
+
+  alarmInactive() {
+    this.audioActivate = false;
+    this.audioActivateShow = true;
+  }
+
+  alarm() {
+    if (this.audioActivate) {
+      this.audio = new Audio();
+      this.audio.src = "../../../../../assets/sounds/patientAlarm.mp3";
+      this.audio.load();
+      this.audio.play();
+    }
   }
 
   listPatient() {
-    this.providerService.getWaitingPatientsData(this.currentUser.room).subscribe(result => {
-      this.waitingPatientsData = [];
-      result.forEach( (element : Patient) => {
-        this.waitingPatientsData.push(element)
+    this.waitingPatientsData = [];
+    this.providerService.getWaitingPatientsData2(this.currentUser.room).subscribe(result => {
+      this._ngZone.run(() => {
+        const data = JSON.parse(result);
+        if (!this.patientListMap.get(data._id)) {
+          this.patientListMap.set(data._id, data);
+          this.updateList();
+          if (this.waitingPatientsData.length < 2 && this.waitingPatientsData.length > 0) {
+            this.alarm();
+          }
+        }
       });
-      if(this.waitingPatientsData.length>0){
-        this.alarmButtonKey=false;
-      }else{
-        this.alarmButtonKey=true;
-
-      }
-      // console.log('this.waitingPatientsData')
-      // console.log(this.waitingPatientsData)
     });
+    this.providerService.getDisconnectPatientsData2(this.currentUser.room).subscribe(result => {
+      this._ngZone.run(() => {
+        const data = JSON.parse(result);
+        if (this.patientListMap.get(data._id)) {
+          this.patientListMap.delete(data._id);
+          this.updateList();
+        }
+      });
+    });
+  }
 
+  updateList() {
+    this.waitingPatientsData = Array.from(this.patientListMap.values());
   }
 
   async confirmConnect() {
-    
+
     //await timer(2000).toPromise();  
     if (this.provider_connect_inactive == localStorage.getItem('provider_connect')) {
       localStorage.setItem('provider_connect', this.provider_connect);
@@ -137,20 +162,14 @@ export class AppSidebarComponent implements OnInit {
     this.meetRoomService.desactiveProvider(this.currentUser);
   }
 
-  publicMe(){
+  publicMe() {
     this.meetRoomService.publicMe(this.currentUser.id);
   }
 
-  privateMe(){
+  privateMe() {
     this.meetRoomService.privateMe(this.currentUser.id);
   }
-  alarm(){
-    this.audio = new Audio();
-    this.audio.src = "../../../../../assets/sounds/patientAlarm.mp3";
-    this.audio.load();
-    this.audio.play();
-    // this.alarmButtonKey=false;
-  }
+
 
   nextAttetion() {
     // console.log("startPreCall")

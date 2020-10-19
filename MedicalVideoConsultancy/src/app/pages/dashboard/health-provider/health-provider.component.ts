@@ -66,7 +66,7 @@ export class HealthProviderComponent implements OnInit {
         const patientData: Consult[] = [];
         result.forEach(function (item) {
           if (item) {
-            console.log(item);
+            //console.log(item);
             patientData.push(item);
           }
         });
@@ -83,11 +83,13 @@ export class HealthProviderComponent implements OnInit {
   }
 
   getWaitingPatientsData() {
-    this.providerService.getWaitingPatientsData(this.currentUser.room)
+    //TODO
+
+    /*this.providerService.getWaitingPatientsData(this.currentUser.room)
       .subscribe(result => {
         this.patientsData = result;
         //console.log("waiting room patients", result) 
-      });
+      });*/
   }
 
   copyRoomAddress(inputRoom) {
@@ -154,7 +156,7 @@ export class HealthProviderComponent implements OnInit {
     console.log('camera error', this.webCamError)
   }
   detail(param) {
-    this.router.navigateByUrl('/dashboard/patient/' + param.id );
+    this.router.navigateByUrl('/dashboard/patient/' + param.id);
   }
 
 

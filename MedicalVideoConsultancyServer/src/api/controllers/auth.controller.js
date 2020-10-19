@@ -121,6 +121,10 @@ exports.verifySMS = async (req, res, next) => {
 exports.join = async (req, res, next) => {
   try {
     const patientData = req.body;
+
+    console.log("join patientData");
+    console.log(patientData);
+
     patientData['role'] = "Patient";
     let patient = await new Patient(patientData).save();
     if (patient) {
@@ -151,7 +155,8 @@ exports.join = async (req, res, next) => {
 exports.joinValidatePatient = async (req, res, next) => {
   try {
     const patientData = req.body;
-    console.log("patientData");
+    console.log("joinValidatePatient patientData");
+    console.log(patientData);
     let patient = await Patient.findOne({ dni: patientData.dni });
 
     if (patient) {
@@ -165,6 +170,7 @@ exports.joinValidatePatient = async (req, res, next) => {
 
       console.log("joinValidatePatient patient");
       console.log(result);
+      console.log(patient);
 
       const { accessToken } = await Patient.findAndGenerateToken(patient);
       return res.json({ token: accessToken, patient: patient });

@@ -1,5 +1,5 @@
 import { baseUrl } from './patient.service';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs'
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../../environments/environment";
@@ -7,13 +7,17 @@ import { map } from "rxjs/operators";
 import { Patient, Consult } from '../_model/user';
 import { ArrayType } from '@angular/compiler';
 
+
 @Injectable({
   providedIn: 'root'
 })
 export class ProviderService {
 
   baseUrl = environment.baseUrl;
-  constructor(private http: HttpClient) {
+
+  //eventSource: any = window['EventSource'];
+
+  constructor(private http: HttpClient, private _zone: NgZone) {
   }
 
 
@@ -81,15 +85,15 @@ export class ProviderService {
     return this.http.get<any>(patientUrl, { params });
 
   }
-  getFilterPatientsData(providerId,filterValue,key){
+  getFilterPatientsData(providerId, filterValue, key) {
 
-    const patientUrl = baseUrl + 'provider/filterPatients/'+providerId+'/'+filterValue+'/'+key;
+    const patientUrl = baseUrl + 'provider/filterPatients/' + providerId + '/' + filterValue + '/' + key;
     this.trace("getFilterPatientsData:", patientUrl);
     return this.http.get<any>(patientUrl);
   }
 
-  getInitConsult(id){
-    const patientUrl = baseUrl + 'provider/consult/'+id;
+  getInitConsult(id) {
+    const patientUrl = baseUrl + 'provider/consult/' + id;
     this.trace("getConsult:", patientUrl);
     return this.http.get<any>(patientUrl);
   }
@@ -169,10 +173,42 @@ export class ProviderService {
     return this.http.put(patientUrl, patientData)
   }
 
-  getWaitingPatientsData(room) {
+  getWaitingPatientsData2(room) {
     const waitingPatientUrl = baseUrl + 'provider/patients-waiting/' + room;
-    this.trace("getWaitingPatientsData:", waitingPatientUrl);
-    return this.http.get<Patient[]>(waitingPatientUrl);
+    return Observable.create(observer => {
+      const eventSource = new EventSource(waitingPatientUrl);      
+      eventSource.onopen = (event) => {
+        console.log('getWaitingPatientsData2 connected');
+      };
+      eventSource.onmessage = (event) => {
+        observer.next(event.data);
+      };
+      eventSource.onerror = (event) => {
+        console.log("onerror");
+      };
+    });
+  }
+
+  getDisconnectPatientsData2(room) {
+    const waitingPatientUrl = baseUrl + 'provider/patients-disconnect/' + room;
+    return Observable.create(observer => {
+      const eventSource = new EventSource(waitingPatientUrl);      
+      eventSource.onopen = (event) => {
+        console.log('getDisconnectPatientsData2 connected');
+      };
+      eventSource.onmessage = (event) => {
+        observer.next(event.data);
+      };
+      eventSource.onerror = (event) => {
+        console.log("onerror");
+      };
+    });
+  }
+
+  disconnectPatient(patientId) {
+    const patientUrl = baseUrl + 'provider/patient/disconnect/'+patientId;
+    console.log("disconnectPatient:",patientUrl);
+    return this.http.put(patientUrl, null)
   }
 
   createConsult(consult) {
@@ -217,13 +253,13 @@ export class ProviderService {
     return this.http.post(subcriptionUrl, data);
 
   }
-  sendMailForSubscription(data){
-    const sendMailForSubscription=baseUrl + 'provider/sendMail';
-    return this.http.post(sendMailForSubscription,data);
+  sendMailForSubscription(data) {
+    const sendMailForSubscription = baseUrl + 'provider/sendMail';
+    return this.http.post(sendMailForSubscription, data);
 
   }
-  getPlansById(planId){
-    const getPlansUrl= baseUrl + 'plans/'+planId;
+  getPlansById(planId) {
+    const getPlansUrl = baseUrl + 'plans/' + planId;
     return this.http.get<any>(getPlansUrl);
   }
   getCard(providerId) {
@@ -258,7 +294,7 @@ export class ProviderService {
     this.trace("deletePlansUrl:", deletePlansUrl);
     return this.http.delete(deletePlansUrl);
   }
-  
+
 
 
   trace(...arg) {

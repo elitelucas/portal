@@ -34,7 +34,7 @@ export class MeetPatientComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private meetRoomService: MeetRoomService,
-    private providerService: ProviderService,
+    //private providerService: ProviderService,
     private authPatientService: AuthPatientService,
     private _router: Router) {
     this.patientData = this.authPatientService.getCurrentUser
@@ -44,7 +44,7 @@ export class MeetPatientComponent implements OnInit {
     this.identify = localStorage.getItem('patient_auth');
     this.providerData = JSON.parse(localStorage.getItem('provider'));
 
-    this.patientData['providerId'] =  this.providerData._id;
+    this.patientData['providerId'] = this.providerData._id;
     this.patientData['room'] = this.providerData.room;
     this.patientData['providerId'] = this.providerData._id;
 
@@ -114,10 +114,16 @@ export class MeetPatientComponent implements OnInit {
         if (text === 'endCall') {
           this.meetRoomService.endCall(this.providerData.socketId, 'acceptEnd');
           this.meetRoomService.stopVideoAudio();
+          this.meetRoomService.disconnectMe();
           this.step = this.step_feeback_page;
           localStorage.setItem('step_attetion', this.step.toString());
         }
       });
+  }
+
+  public exit() {
+    this.providerService.disconnectPatient(this.patientData["_id"]).subscribe(async (text) => {
+    });;
   }
 
   clean() {

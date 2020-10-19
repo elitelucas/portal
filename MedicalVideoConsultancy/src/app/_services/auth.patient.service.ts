@@ -90,11 +90,15 @@ export class AuthPatientService {
   }
 
   public join(patientData) {
+    console.log("patientData");
+    console.log(patientData);
     const joinUrl = baseUrl + "auth/join";
     return this.http.post<any>(joinUrl, patientData)
   }
   
   public joinValidatePatient(patientData ) : Observable<{} | any> {
+    console.log("joinValidatePatient");
+    console.log(patientData);
     const joinUrl = baseUrl + "auth/join/validate/patient";
     return this.http.post<any>(joinUrl, patientData).pipe(
       map(res => {

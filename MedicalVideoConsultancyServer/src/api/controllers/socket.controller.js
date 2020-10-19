@@ -238,41 +238,6 @@ const disconnectPatient = async (socketId) => {
   }
 };
 
-///------------------------
-
-const disconnectConnection = async (socketId, notifyProviderCallback, notifyPatientsCallback) => {
-  try {
-    let userProviderOrPatient = await User.findOne({
-      socketId: socketId
-    });
-    let isProviderDisconnect = true;
-    if (userProviderOrPatient == undefined || userProviderOrPatient == null) {
-      userProviderOrPatient = await Patient.findOne({
-        socketId: socketId
-      });
-      isProviderDisconnect = false;
-    }
-    userProviderOrPatient.connection = false;
-    userProviderOrPatient.state = false;
-    userProviderOrPatient.calling = false;
-    userProviderOrPatient.socketId = null;
-    userProviderOrPatient.peerId = null;
-    if (isProviderDisconnect) {
-      notifyProviderCallback(userProviderOrPatient)
-    } else {
-      notifyPatientsCallback(userProviderOrPatient)
-    }
-    return userProviderOrPatient.role ?
-      await User.findOneAndUpdate({
-        _id: userProviderOrPatient.id
-      }, userProviderOrPatient) :
-      await Patient.findOneAndUpdate({
-        _id: userProviderOrPatient._id
-      }, userProviderOrPatient);
-  } catch (e) {
-    logger.error("disconnectConnection e :" + e)
-  }
-};
 
 //-------------
 
@@ -361,9 +326,69 @@ const notifyProvider = async (patient, callback) => {
   }
 };
 
+///------------------------
+
+const disconnectConnection = async (socketId, notifyProviderCallback, notifyPatientsCallback) => {
+  try {
+    let userProviderOrPatient = await User.findOne({
+      socketId: socketId
+    });
+    let isProviderDisconnect = true;
+    if (userProviderOrPatient == undefined || userProviderOrPatient == null) {
+      userProviderOrPatient = await Patient.findOne({
+        socketId: socketId
+      });
+      isProviderDisconnect = false;
+    }
+    //console.log("userProviderOrPatient:",userProviderOrPatient);
+    userProviderOrPatient.connection = false;
+    userProviderOrPatient.state = false;
+    userProviderOrPatient.calling = false;
+    userProviderOrPatient.socketId = null;
+    userProviderOrPatient.peerId = null;
+    if (isProviderDisconnect) {
+      notifyProviderCallback(userProviderOrPatient)
+    } else {
+      notifyPatientsCallback(userProviderOrPatient)
+    }
+    return userProviderOrPatient.role ?
+      await User.findOneAndUpdate({
+        _id: userProviderOrPatient.id
+      }, userProviderOrPatient) :
+      await Patient.findOneAndUpdate({
+        _id: userProviderOrPatient._id
+      }, userProviderOrPatient);
+  } catch (e) {
+    logger.error("disconnectConnection e :" + e)
+  }
+};
+
 io.on('connection', (socket) => {
   //console.log('sssss')
   logger.info('connection active :' + socket.id);
+
+
+  socket.on('disconnect', async () => {
+    logger.info('----------------------------disconnect :' + socket.id);
+    disconnectConnection(socket.id,
+      (provider) => {
+        notifyPatients(provider, (patients) => {
+          if (patients && patients.length > 0) {
+            patients.forEach(patient => {
+              socket.to(patient.socketId).emit("providerDisconnect", provider.id);
+              logger.info("providerDisconnect " + patient._id);
+            });
+          }
+        });
+      },
+      (patient) => {
+        notifyProvider(patient, (provider) => {
+          logger.info("patientsDisconnect " + provider._id + " - " + provider.socketId);
+          socket.to(provider.socketId).emit("patientsDisconnect", patient);
+        });
+      });
+  });
+  //------------
 
   //provider entered in pay-provider
   socket.on('providerEnteredInPayProvider', async (userProvider, dni) => {
@@ -483,27 +508,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('disconnect', async () => {
-    logger.info('disconnect :' + socket.id);
-    disconnectConnection(socket.id,
-      (provider) => {
-        notifyPatients(provider, (patients) => {
-          if (patients && patients.length > 0) {
-            patients.forEach(patient => {
-              socket.to(patient.socketId).emit("providerDisconnect", provider.id);
-              logger.info("providerDisconnect " + patient._id);
-            });
-          }
-        });
-      },
-      (patient) => {
-        notifyProvider(patient, (provider) => {
-          logger.info("patientsDisconnect " + provider._id + " - " + provider.socketId);
-          socket.to(provider.socketId).emit("patientsDisconnect", patient);
-        });
-      });
-  });
-  //------------
 
   //send confirm provider info from patient to provider
   socket.on('confirmConnectPatient', async (patient) => {
