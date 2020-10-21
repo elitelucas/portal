@@ -5,11 +5,28 @@
 
 export const environment = {
   production: false,
-  domain:'localhost:4200/',
+  domain: 'localhost:4200/',
   jitBaseUrl: 'pasatrae.com',
   baseUrl: 'http://localhost:3000/api/v1/',
   socket_endpoint: 'http://localhost:3001',
-  peerServerHost:'nemiac.com',
-  peerServerPort:'9000',
-  peerServerPath:'/peerjs'
+  peerServerHost: 'nemiac.com',
+  peerServerPort: '9000',
+  peerServerPath: '/peerjs',
+  peerServerSecure: true, 
+  peerServerDebugLevel: 3, 
+  peerConfig: {
+    config: {
+      'iceServers': [
+        { url: 'stun:stun1.l.google.com:19302' },
+        { url: 'stun:stun2.l.google.com:19302' },
+        { url: 'stun:stun3.l.google.com:19302' },
+        { url: 'stun:stun4.l.google.com:19302' },
+        {
+          url: 'turn:numb.viagenie.ca',
+          credential: 'muazkh',
+          username: 'webrtc@live.com'
+        }
+      ]
+    }
+  }
 };

@@ -156,7 +156,7 @@ patientSchema.statics = {
     if (dni) {
       if (patient && await patient.passwordMatches(dni)) {
         const token = patient.token();
-        logger.info("generate token patient: " + patient._id + " - "+ token );
+        logger.info("generate token patient: " + patient._id /*+ " - "+ token*/ );
         return { accessToken: token };
       }
     } else {

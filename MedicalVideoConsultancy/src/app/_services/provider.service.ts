@@ -1,4 +1,5 @@
-import { baseUrl } from './patient.service';
+
+import { environment as env } from "../../environments/environment";
 import { Injectable, NgZone } from '@angular/core';
 import { Observable } from 'rxjs'
 import { HttpClient, HttpParams } from "@angular/common/http";
@@ -13,7 +14,7 @@ import { ArrayType } from '@angular/compiler';
 })
 export class ProviderService {
 
-  baseUrl = environment.baseUrl;
+  baseUrl = env.baseUrl;
 
   //eventSource: any = window['EventSource'];
 
@@ -22,39 +23,39 @@ export class ProviderService {
 
 
   sendSMS(smsData) {
-    const smsUrl = baseUrl + 'provider/invite-by-sms';
+    const smsUrl = this.baseUrl + 'provider/invite-by-sms';
     this.trace("smsUrl:", smsUrl);
     return this.http.post<any>(smsUrl, smsData);
   }
 
-  getRoomData(userId) {
-    const roomUrl = baseUrl + 'provider/room/' + userId;
+  /*getRoomData(userId) {
+    const roomUrl = this.baseUrl + 'provider/room/' + userId;
     this.trace("roomUrl:", roomUrl);
     return this.http.get<any>(roomUrl)
-  }
+  }*/
 
   changeText(userId, text) {
-    const textUrl = baseUrl + 'provider/text/' + userId;
+    const textUrl = this.baseUrl + 'provider/text/' + userId;
     this.trace("changeText:", textUrl);
     return this.http.patch(textUrl, { text: text })
   }
 
-  checkRoomExist(room) {
-    const checkRoomUrl = baseUrl + 'provider/roomName/' + room;
+  /*checkRoomExist(room) {
+    const checkRoomUrl = this.baseUrl + 'provider/roomName/' + room;
     this.trace("checkRoomExist:", checkRoomUrl);
-    /*console.log('checkRoomUrl')
-    console.log(checkRoomUrl)*/
+    console.log('checkRoomUrl')
+    console.log(checkRoomUrl)
     return this.http.get<any>(checkRoomUrl)
-  }
+  }*/
 
   checkPatient(dni) {
-    const checkPatientUrl = baseUrl + 'provider/checkPatient/' + dni;
+    const checkPatientUrl = this.baseUrl + 'provider/checkPatient/' + dni;
     this.trace("checkPatientUrl:", dni);
 
     return this.http.get<any>(checkPatientUrl)
   }
   postPatient(data) {
-    const postPatientUrl = baseUrl + 'provider/postPatient';
+    const postPatientUrl = this.baseUrl + 'provider/postPatient';
     this.trace("postPatientUrl:", postPatientUrl);
     return this.http.put(postPatientUrl, { data });
   }
@@ -62,21 +63,21 @@ export class ProviderService {
   //I added new func to get all patients data.
 
   getAllPatientsData(value, field) {
-    const patientUrl = baseUrl + 'provider/allPatients';
+    const patientUrl = this.baseUrl + 'provider/allPatients';
     let params = new HttpParams().set("key", field).set("value", value);
     this.trace("getAllPatientsData:", patientUrl, params);
     return this.http.get<any>(patientUrl, { params });
   }
 
   getInitPatientsData(value, field) {
-    const patientUrl = baseUrl + 'provider/initPatients';
+    const patientUrl = this.baseUrl + 'provider/initPatients';
     let params = new HttpParams().set("key", field).set("value", value);
     this.trace("getAllPatientsData:", patientUrl, params);
     return this.http.get<any>(patientUrl, { params });
   }
 
   getConsult(id, startDate, endDate) {
-    const patientUrl = baseUrl + 'provider/consult/patient/' + id;
+    const patientUrl = this.baseUrl + 'provider/consult/patient/' + id;
     let params = new HttpParams();
     if (undefined != startDate && endDate != undefined) {
       params = params.set("startDate", startDate).set("endDate", endDate);
@@ -87,19 +88,19 @@ export class ProviderService {
   }
   getFilterPatientsData(providerId, filterValue, key) {
 
-    const patientUrl = baseUrl + 'provider/filterPatients/' + providerId + '/' + filterValue + '/' + key;
+    const patientUrl = this.baseUrl + 'provider/filterPatients/' + providerId + '/' + filterValue + '/' + key;
     this.trace("getFilterPatientsData:", patientUrl);
     return this.http.get<any>(patientUrl);
   }
 
   getInitConsult(id) {
-    const patientUrl = baseUrl + 'provider/consult/' + id;
+    const patientUrl = this.baseUrl + 'provider/consult/' + id;
     this.trace("getConsult:", patientUrl);
     return this.http.get<any>(patientUrl);
   }
 
   getConsultInChat(patientId, providerId) {
-    const patientUrl = baseUrl + 'provider/consultInChat';
+    const patientUrl = this.baseUrl + 'provider/consultInChat';
     let params = new HttpParams().set("patientId", patientId).set("providerId", providerId);
     this.trace("getConsultInChat:", patientUrl, params);
     return this.http.get<any>(patientUrl, { params });
@@ -107,7 +108,7 @@ export class ProviderService {
 
   sendMail(from, email, subject, html) {
     //console.log('sdfsdfsdf')
-    const mailUrl = baseUrl + 'provider/mail';
+    const mailUrl = this.baseUrl + 'provider/mail';
     this.trace("getConsultInChat:", mailUrl);
     return this.http.post(mailUrl, {
       from: from,
@@ -118,26 +119,26 @@ export class ProviderService {
   }
 
   getOneConsult(patientId, consultId) {
-    const patientUrl = baseUrl + 'provider/oneConsult';
+    const patientUrl = this.baseUrl + 'provider/oneConsult';
     let params = new HttpParams().set("patientId", patientId).set("consultId", consultId);
     this.trace("getOneConsult:", patientUrl, params);
     return this.http.get<any>(patientUrl, { params });
   }
 
   updateConsult(updateData) {
-    const updateUrl = baseUrl + 'provider/updateConsult';
+    const updateUrl = this.baseUrl + 'provider/updateConsult';
     this.trace("updateUrl:", updateUrl);
     return this.http.put(updateUrl, updateData)
   }
 
   getChart(patientDni) {
-    const chartUrl = baseUrl + 'provider/getChart/' + patientDni;
+    const chartUrl = this.baseUrl + 'provider/getChart/' + patientDni;
     this.trace("getChart:", chartUrl, patientDni);
     return this.http.get<any>(chartUrl);
   }
 
   editChart(updateData) {
-    const updateUrl = baseUrl + 'provider/chart';
+    const updateUrl = this.baseUrl + 'provider/chart';
     this.trace("updateUrl:", updateUrl);
     return this.http.put(updateUrl, updateData)
   }
@@ -145,7 +146,7 @@ export class ProviderService {
   getSignature(providerId: string): Observable<Blob> {
     /*console.log('providerId')
     console.log(providerId)*/
-    const sigUrl = baseUrl + 'provider/getSignature/' + providerId;
+    const sigUrl = this.baseUrl + 'provider/getSignature/' + providerId;
     return this.http.get<any>(sigUrl)
   }
 
@@ -153,7 +154,7 @@ export class ProviderService {
   //I added end
 
   getPatient(value, field) {
-    const patientUrl = baseUrl + 'provider/patientByField';
+    const patientUrl = this.baseUrl + 'provider/patientByField';
     let params = new HttpParams().set("key", field).set("value", value);
     /*console.log(patientUrl);
     console.log(params);*/
@@ -162,69 +163,62 @@ export class ProviderService {
   }
 
   updatePatient(patientData) {
-    const patientUrl = baseUrl + 'provider/patient';
+    const patientUrl = this.baseUrl + 'provider/patient';
     this.trace("patientUrl:", patientUrl, patientData);
     return this.http.put(patientUrl, patientData)
   }
 
   updatePatientOnChart(patientData) {
-    const patientUrl = baseUrl + 'provider/patient/chart';
+    const patientUrl = this.baseUrl + 'provider/patient/chart';
     this.trace("patientUrl:", patientUrl, patientData);
     return this.http.put(patientUrl, patientData)
   }
 
-  getWaitingPatientsData2(room) {
-    const waitingPatientUrl = baseUrl + 'provider/patients-waiting/' + room;
+  getWaitingPatientsData(room, reconnect) {
+    const waitingPatientUrl = this.baseUrl + 'provider/patients-waiting/' + room;
     return Observable.create(observer => {
-      const eventSource = new EventSource(waitingPatientUrl);      
+      const eventSource = new EventSource(waitingPatientUrl);
       eventSource.onopen = (event) => {
         console.log('getWaitingPatientsData2 connected');
       };
       eventSource.onmessage = (event) => {
+        //console.log("getWaitingPatientsData2 data onmessage",event.data);
         observer.next(event.data);
       };
       eventSource.onerror = (event) => {
-        console.log("onerror");
-      };
-    });
-  }
-
-  getDisconnectPatientsData2(room) {
-    const waitingPatientUrl = baseUrl + 'provider/patients-disconnect/' + room;
-    return Observable.create(observer => {
-      const eventSource = new EventSource(waitingPatientUrl);      
-      eventSource.onopen = (event) => {
-        console.log('getDisconnectPatientsData2 connected');
-      };
-      eventSource.onmessage = (event) => {
-        observer.next(event.data);
-      };
-      eventSource.onerror = (event) => {
-        console.log("onerror");
+        console.log("onerror ", event);
+        eventSource.close();
+        switch (event.target["readyState"]) {
+          case EventSource.CLOSED:
+            setInterval(function () {
+              reconnect();
+            }, 1000);
+            break;
+        }
       };
     });
   }
 
   disconnectPatient(patientId) {
-    const patientUrl = baseUrl + 'provider/patient/disconnect/'+patientId;
-    console.log("disconnectPatient:",patientUrl);
+    const patientUrl = this.baseUrl + 'provider/patient/disconnect/' + patientId;
+    console.log("disconnectPatient:", patientUrl);
     return this.http.put(patientUrl, null)
   }
 
   createConsult(consult) {
-    let createConsultUrl = baseUrl + "provider/consult";
+    let createConsultUrl = this.baseUrl + "provider/consult";
     this.trace("createConsultUrl:", createConsultUrl);
     return this.http.post(createConsultUrl, consult);
   }
 
   closeConsult(consultId) {
-    let createConsultUrl = baseUrl + "provider/consult/" + consultId + "/close";
+    let createConsultUrl = this.baseUrl + "provider/consult/" + consultId + "/close";
     this.trace("createConsultUrl:", createConsultUrl);
     return this.http.patch(createConsultUrl, null);
   }
 
   getLastAttetionsPatientsDataProvider(userId) {
-    const lastAttetionsPatientsUrl = baseUrl + 'provider/consult/provider/' + userId;
+    const lastAttetionsPatientsUrl = this.baseUrl + 'provider/consult/provider/' + userId;
     this.trace("getLastAttetionsPatientsDataProvider:", lastAttetionsPatientsUrl);
     return this.http.get<any>(lastAttetionsPatientsUrl).pipe(map((result: Consult[]) => {
       if (result) {
@@ -234,7 +228,7 @@ export class ProviderService {
   }
 
   getLastAttetionsPatientsDataPatient(patientId) {
-    const lastAttetionsPatientsUrl = baseUrl + 'provider/consult/patient/' + patientId;
+    const lastAttetionsPatientsUrl = this.baseUrl + 'provider/consult/patient/' + patientId;
     this.trace("getLastAttetionsPatientsDataPatient:", lastAttetionsPatientsUrl);
     return this.http.get<any>(lastAttetionsPatientsUrl).pipe(map((result: Consult[]) => {
       if (result) {
@@ -245,57 +239,60 @@ export class ProviderService {
   }
 
   getPlans() {
-    const getPlansUrl = baseUrl + 'plans';
+    const getPlansUrl = this.baseUrl + 'plans';
     return this.http.get<any>(getPlansUrl);
   }
   sendSubcriptionData(data) {
-    const subcriptionUrl = baseUrl + 'provider/subcription';
+    const subcriptionUrl = this.baseUrl + 'provider/subcription';
     return this.http.post(subcriptionUrl, data);
 
   }
   sendMailForSubscription(data) {
-    const sendMailForSubscription = baseUrl + 'provider/sendMail';
+    const sendMailForSubscription = this.baseUrl + 'provider/sendMail';
     return this.http.post(sendMailForSubscription, data);
 
   }
   getPlansById(planId) {
-    const getPlansUrl = baseUrl + 'plans/' + planId;
+    const getPlansUrl = this.baseUrl + 'plans/' + planId;
     return this.http.get<any>(getPlansUrl);
   }
   getCard(providerId) {
-    const getCardUrl = baseUrl + 'provider/card/' + providerId;
+    const getCardUrl = this.baseUrl + 'provider/card/' + providerId;
     return this.http.get<any>(getCardUrl);
   }
 
   updateCard(data) {
-    const updateCardUrl = baseUrl + 'provider/card';
+    const updateCardUrl = this.baseUrl + 'provider/card';
     this.trace("updateCardUrl:", updateCardUrl);
     return this.http.put(updateCardUrl, data);
   }
 
   removeCard(cardId) {
-    const deleteCardUrl = baseUrl + 'provider/card/' + cardId;
+    const deleteCardUrl = this.baseUrl + 'provider/card/' + cardId;
     this.trace("deletePlansUrl:", deleteCardUrl);
     return this.http.delete(deleteCardUrl);
   }
   createPlan(data) {
 
-    const createPlanUrl = baseUrl + 'plans';
+    const createPlanUrl = this.baseUrl + 'plans';
     return this.http.post(createPlanUrl, data);
 
   }
   updatePlans(data) {
-    const updatePlansUrl = baseUrl + 'plans/update';
+    const updatePlansUrl = this.baseUrl + 'plans/update';
     this.trace("updatePlansUrl:", updatePlansUrl);
     return this.http.put(updatePlansUrl, data);
   }
   deletePlans(planId) {
-    const deletePlansUrl = baseUrl + 'plans/' + planId;
+    const deletePlansUrl = this.baseUrl + 'plans/' + planId;
     this.trace("deletePlansUrl:", deletePlansUrl);
     return this.http.delete(deletePlansUrl);
   }
 
-
+  getFeedbacks(providerId) {
+    const feedbackUrl = this.baseUrl + 'provider/feedback/' + providerId;
+    return this.http.get<any>(feedbackUrl);
+  }
 
   trace(...arg) {
     var now = (window.performance.now() / 1000).toFixed(3);

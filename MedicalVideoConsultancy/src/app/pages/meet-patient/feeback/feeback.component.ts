@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FeedbackService } from '../../../_services/feedback.service';
+import { PatientService } from '../../../_services/patient.service';
+import { ProviderService } from '../../../_services/provider.service';
 
 @Component({
   selector: 'app-feeback',
@@ -18,7 +19,7 @@ export class FeebackComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private feedback: FeedbackService,
+    private patientService: PatientService,
     private _router: Router) {
     this.feedBackForm = this.formBuilder.group({
       rakingProvider: ['', [Validators.required, Validators.minLength(1)]],
@@ -34,8 +35,8 @@ export class FeebackComponent implements OnInit {
   get f() { return this.feedBackForm.controls; }
 
   sendFeedBack() {
-    if(this.feedBackForm.valid){
-      this.feedback.save(this.providerData._id,this.patientData._id,this.feedBackForm.value).subscribe((res) => {
+    if (this.feedBackForm.valid) {
+      this.patientService.save(this.providerData._id, this.patientData._id, this.feedBackForm.value).subscribe((res) => {
         this._router.navigateByUrl('/');
       });
     }

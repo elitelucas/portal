@@ -82,7 +82,8 @@ export class AppSidebarComponent implements OnInit {
       this.currentUserRole = this.authService.getCurrentUser.role;
     }
     this.confirmConnect();
-    this.listPatient();
+    this.waitingPatientsData = [];
+    this.listWaitingPatient();
   }
 
   alarmActive() {
@@ -104,26 +105,28 @@ export class AppSidebarComponent implements OnInit {
     }
   }
 
-  listPatient() {
-    this.waitingPatientsData = [];
-    this.providerService.getWaitingPatientsData2(this.currentUser.room).subscribe(result => {
+  listWaitingPatient() {
+    this.providerService.getWaitingPatientsData(this.currentUser.room, () => {
+      //console.log("reconnect getWaitingPatientsData2");
+      this._ngZone.run(() => {
+        this.listWaitingPatient();
+      });
+    }).subscribe(result => {
       this._ngZone.run(() => {
         const data = JSON.parse(result);
-        if (!this.patientListMap.get(data._id)) {
+        if (data.connection) {
+          //if (!this.patientListMap.get(data._id)) {
           this.patientListMap.set(data._id, data);
           this.updateList();
           if (this.waitingPatientsData.length < 2 && this.waitingPatientsData.length > 0) {
             this.alarm();
           }
-        }
-      });
-    });
-    this.providerService.getDisconnectPatientsData2(this.currentUser.room).subscribe(result => {
-      this._ngZone.run(() => {
-        const data = JSON.parse(result);
-        if (this.patientListMap.get(data._id)) {
-          this.patientListMap.delete(data._id);
-          this.updateList();
+          //}
+        } else {
+          if (this.patientListMap.get(data._id)) {
+            this.patientListMap.delete(data._id);
+            this.updateList();
+          }
         }
       });
     });

@@ -7,6 +7,8 @@ import { constant } from "../../../_config/constant";
 import { MeetRoomService } from "../../../_services/meet-room.service";
 import { UserService } from './../../../_services/user.service';
 import { ContentBlogService } from '../../../_services/content-blog.service';
+import { PatientService } from '../../../_services/patient.service';
+import { MeetRoomPatientService } from '../../../_services/meet-room-patient.service';
 
 
 @Component({
@@ -37,10 +39,9 @@ export class WaitingRoomComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private providerService: ProviderService,
-    private meetRoomService: MeetRoomService,
+    private patientService: PatientService,
+    private meetRoomPatientService: MeetRoomPatientService,
     private _router: Router,
-    private userService: UserService,
     private contentBlogService: ContentBlogService
   ) {
 
@@ -51,7 +52,7 @@ export class WaitingRoomComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.userService.getBlog(this.providerData._id).subscribe(res => {
+    this.patientService.getBlog(this.providerData._id).subscribe(res => {
       this.literalArr = res;
       this.literalArr.forEach(item => {
         this.contentBlogService.getByUrl(item.url).subscribe(html => {
@@ -63,9 +64,9 @@ export class WaitingRoomComponent implements OnInit {
   }
 
   sendInvite(option) {
-    switch (option) {
+   /* switch (option) {
       case 'sms':
-        this.providerService.sendSMS(this.smsData.data).subscribe(result => {
+        this.patientService.sendSMS(this.smsData.data).subscribe(result => {
           if (!result.errorCode) {
             console.log("Invite sent by SMS", result)
           }
@@ -79,7 +80,7 @@ export class WaitingRoomComponent implements OnInit {
         break;
       default:
         this.sendMail('defaultMail');
-    }
+    }*/
   }
 
   sendMail(option) {
@@ -118,10 +119,10 @@ export class WaitingRoomComponent implements OnInit {
   }
 
   receiveProviderId() {
-    this.meetRoomService.receiveProvideId().subscribe(providerId => {
+   /* this.meetRoomPatientService.receiveProvideId().subscribe(providerId => {
       console.log('providerIdqqq')
       console.log(providerId)
-    })
+    })*/
   }
 
 

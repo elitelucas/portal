@@ -6,6 +6,7 @@ import { environment } from "../../../../environments/environment";
 import { ProviderService } from "../../../_services/provider.service";
 import { AuthPatientService } from '../../../_services/auth.patient.service';
 import Swal from 'sweetalert2';
+import { PatientService } from '../../../_services/patient.service';
 
 @Component({
   selector: 'app-sign-in-patient',
@@ -42,7 +43,7 @@ export class SignInPatientComponent implements OnInit {
   constructor(private formBuilder: FormBuilder,
     private authPatientService: AuthPatientService,
     private router: Router,
-    private providerService: ProviderService) { }
+    private patientService: PatientService) { }
 
   ngOnInit(): void {
     this.initData();
@@ -90,7 +91,7 @@ export class SignInPatientComponent implements OnInit {
         this.submitted = true;
         const room = this.f.room.value.substring(this.domain.length);
         const dniPatient = this.f.dni.value;
-        this.providerService.checkRoomExist(room)
+        this.patientService.checkRoomExist(room)
           .subscribe(result => {
             if (result) {
               this.step = 2;
@@ -139,7 +140,7 @@ export class SignInPatientComponent implements OnInit {
         if (result) {
           this.authPatientService.joinValidatePatient(result).subscribe(resultPatient => {
             const room = this.f1.room.value.substring(this.domain.length);
-            this.providerService.checkRoomExist(room)
+            this.patientService.checkRoomExist(room)
               .subscribe(result => {
                 this.providerData = result;
                 this.directRoomUrl = '/' + this.providerData.room;

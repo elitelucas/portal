@@ -122,8 +122,8 @@ exports.join = async (req, res, next) => {
   try {
     const patientData = req.body;
 
-    console.log("join patientData");
-    console.log(patientData);
+    /*console.log("join patientData");
+    console.log(patientData);*/
 
     patientData['role'] = "Patient";
     let patient = await new Patient(patientData).save();
@@ -155,22 +155,22 @@ exports.join = async (req, res, next) => {
 exports.joinValidatePatient = async (req, res, next) => {
   try {
     const patientData = req.body;
-    console.log("joinValidatePatient patientData");
-    console.log(patientData);
+    /*console.log("joinValidatePatient patientData");
+    console.log(patientData);*/
     let patient = await Patient.findOne({ dni: patientData.dni });
 
     if (patient) {
       patient.reason = patientData.reason;
       patient.typeAttetion = patientData.typeAttetion;
       patient.providerId = patientData.providerId;
-      console.log("joinValidatePatient patient");
-      console.log(patient);
+      /*console.log("joinValidatePatient patient");
+      console.log(patient);*/
 
       const result = await Patient.updateOne({ _id: patient._id }, patient, { upsert: true });
 
-      console.log("joinValidatePatient patient");
+      /*console.log("joinValidatePatient patient");
       console.log(result);
-      console.log(patient);
+      console.log(patient);*/
 
       const { accessToken } = await Patient.findAndGenerateToken(patient);
       return res.json({ token: accessToken, patient: patient });

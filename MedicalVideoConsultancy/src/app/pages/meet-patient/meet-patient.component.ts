@@ -1,13 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { environment } from "../../../environments/environment";
-import { constant } from "../../_config/constant";
 import { Patient } from '../../_model/user';
-import { ContentBlogService } from '../../_services/content-blog.service';
-import { MeetRoomService } from '../../_services/meet-room.service';
-import { ProviderService } from '../../_services/provider.service';
-import { UserService } from '../../_services/user.service';
 import { AuthPatientService } from '../../_services/auth.patient.service';
+import { PatientService } from '../../_services/patient.service';
+import { MeetRoomPatientService } from '../../_services/meet-room-patient.service';
 
 @Component({
   selector: 'app-meet-patient',
@@ -33,13 +29,15 @@ export class MeetPatientComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private meetRoomService: MeetRoomService,
+    private meetRoomPatientService: MeetRoomPatientService,
+    private patientService: PatientService,
     //private providerService: ProviderService,
     private authPatientService: AuthPatientService,
+    private _ngZone: NgZone,
     private _router: Router) {
     this.patientData = this.authPatientService.getCurrentUser
-    console.log("MeetPatientComponent this.patientData");
-    console.log(this.patientData);
+    /*console.log("MeetPatientComponent this.patientData");
+    console.log(this.patientData);*/
     //this.patientData = localStorage.getItem('patient');
     this.identify = localStorage.getItem('patient_auth');
     this.providerData = JSON.parse(localStorage.getItem('provider'));
@@ -48,8 +46,8 @@ export class MeetPatientComponent implements OnInit {
     this.patientData['room'] = this.providerData.room;
     this.patientData['providerId'] = this.providerData._id;
 
-    this.providerService.updatePatient(this.patientData).subscribe((patientUpdated: Patient) => {
-      this.meetRoomService.confirmConnectPatient(patientUpdated);
+    this.patientService.updatePatient(this.patientData).subscribe((patientUpdated: Patient) => {
+      this.meetRoomPatientService.confirmConnectPatient(patientUpdated);
       this.patientData = patientUpdated;
     });
 
@@ -57,6 +55,25 @@ export class MeetPatientComponent implements OnInit {
       this.roomName = params.get('roomName');
     });
 
+  }
+
+
+  getProviderState(){
+
+    this.patientService.getProviderState(this.providerData.room, () => {
+      //console.log("reconnect getWaitingPatientsData2");
+      this._ngZone.run(() => {
+        this.getProviderState();
+      });
+    }).subscribe(result => {
+      this._ngZone.run(() => {
+        let prov = JSON.parse(result);
+        //console.log(prov);
+        console.log("prov.connection:", prov.connection);
+        console.log("prov.calling:", prov.calling);
+        this.providerData.connection = prov.connection;
+      });
+    });
   }
 
   ngOnInit() {
@@ -71,26 +88,23 @@ export class MeetPatientComponent implements OnInit {
       return;
     }
 
-    this.meetRoomService.connectioProvider().subscribe(providerStatus => {
-      this.providerData.connection = true
-    });
-    this.meetRoomService.disconnectioProvider().subscribe(providerStatus => {
-      this.providerData.connection = false
-    });
+
+
+    this.getProviderState();
 
     let step_cache = localStorage.getItem('step_attetion');
     if (step_cache) {
       this.step = parseInt(step_cache);
     } else {
-      this.providerService.checkRoomExist(this.roomName)
+      this.patientService.checkRoomExist(this.roomName)
         .subscribe(result => {
           this.providerData = result;
           this.step = this.step_waiting_page;
         });
     }
-    this.meetRoomService.providerEntered().subscribe(data => {
+    this.meetRoomPatientService.providerEntered().subscribe(data => {
       if (data) {
-        this.providerService.checkRoomExist(this.roomName)
+        this.patientService.checkRoomExist(this.roomName)
           .subscribe(result => {
             this.providerData = result;
             this.step = this.step_payment_page;
@@ -98,9 +112,9 @@ export class MeetPatientComponent implements OnInit {
           });
       }
     });
-    this.meetRoomService.receiveConfirmProvider().subscribe(confirmProvider => {
+    this.meetRoomPatientService.receiveConfirmProvider().subscribe(confirmProvider => {
       if (confirmProvider) {
-        this.providerService.checkRoomExist(this.roomName)
+        this.patientService.checkRoomExist(this.roomName)
           .subscribe(result => {
             this.providerData = result;
             this.step = this.step_attetion_page;
@@ -109,12 +123,12 @@ export class MeetPatientComponent implements OnInit {
       }
     });
 
-    this.meetRoomService.receiveEndCall()
+    this.meetRoomPatientService.receiveEndCall()
       .subscribe(async (text) => {
         if (text === 'endCall') {
-          this.meetRoomService.endCall(this.providerData.socketId, 'acceptEnd');
-          this.meetRoomService.stopVideoAudio();
-          this.meetRoomService.disconnectMe();
+          this.meetRoomPatientService.endCall(this.providerData.socketId, 'acceptEnd');
+          this.meetRoomPatientService.stopVideoAudio();
+          this.meetRoomPatientService.disconnectMe();
           this.step = this.step_feeback_page;
           localStorage.setItem('step_attetion', this.step.toString());
         }
@@ -122,7 +136,7 @@ export class MeetPatientComponent implements OnInit {
   }
 
   public exit() {
-    this.providerService.disconnectPatient(this.patientData["_id"]).subscribe(async (text) => {
+    this.patientService.disconnectPatient(this.patientData["_id"]).subscribe(async (text) => {
     });;
   }
 

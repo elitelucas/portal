@@ -94,7 +94,7 @@ const confirmConnectProvider = async (idProvider, socketId, user) => {
   }
 };
 
-const connectProvider = async (idProvider, socketId, user, notify) => {
+const connectProvider = async (idProvider, socketId, user/*, notify*/) => {
   try {
     //console.log("connectProvider", user)
     const userProvider = await User.findOne({
@@ -110,14 +110,14 @@ const connectProvider = async (idProvider, socketId, user, notify) => {
       userProvider.peerId = user.peerId;
     }
     await updateUserProviderState(idProvider, userProvider);
-    notify(userProvider)
+    //notify(userProvider)
   } catch (e) {
     logger.error("confirmConnectProvider e :" + e)
   }
 };
 
 
-const disconnectProvider = async (idProvider, notify) => {
+const disconnectProvider = async (idProvider/*, notify*/) => {
   try {
     const userProvider = await User.findOne({
       _id: idProvider
@@ -127,7 +127,7 @@ const disconnectProvider = async (idProvider, notify) => {
     userProvider.socketId = null;
     userProvider.peerId = null;
     await updateUserProviderState(idProvider, userProvider);
-    notify(userProvider);
+    //notify(userProvider);
   } catch (e) {
     logger.error("disconnectProvider e :" + e)
   }
@@ -240,7 +240,7 @@ const disconnectPatient = async (socketId) => {
 
 
 //-------------
-
+/*
 const countPatientRoom = async (room, callback) => {
   try {
     if (room) {
@@ -259,7 +259,7 @@ const countPatientRoom = async (room, callback) => {
   } catch (e) {
     logger.error("countPatientRoom e :" + e)
   }
-};
+};*/
 
 //-------------
 
@@ -267,7 +267,7 @@ const getPatientById = async (patientId) => {
   try {
     return await Patient.findById(patientId);
   } catch (e) {
-    logger.error("countPatientRoom e :" + e)
+    logger.error("getPatientById e :" + e)
   }
 };
 
@@ -328,7 +328,7 @@ const notifyProvider = async (patient, callback) => {
 
 ///------------------------
 
-const disconnectConnection = async (socketId, notifyProviderCallback, notifyPatientsCallback) => {
+const disconnectConnection = async (socketId/*, notifyProviderCallback, notifyPatientsCallback*/) => {
   try {
     let userProviderOrPatient = await User.findOne({
       socketId: socketId
@@ -340,24 +340,24 @@ const disconnectConnection = async (socketId, notifyProviderCallback, notifyPati
       });
       isProviderDisconnect = false;
     }
-    //console.log("userProviderOrPatient:",userProviderOrPatient);
-    userProviderOrPatient.connection = false;
-    userProviderOrPatient.state = false;
-    userProviderOrPatient.calling = false;
-    userProviderOrPatient.socketId = null;
-    userProviderOrPatient.peerId = null;
-    if (isProviderDisconnect) {
-      notifyProviderCallback(userProviderOrPatient)
-    } else {
-      notifyPatientsCallback(userProviderOrPatient)
+    if (userProviderOrPatient) {
+      userProviderOrPatient.connection = false;
+      userProviderOrPatient.state = false;
+      userProviderOrPatient.calling = false;
+      userProviderOrPatient.socketId = null;
+      userProviderOrPatient.peerId = null;
+      if (isProviderDisconnect) {
+        await User.findOneAndUpdate({
+          _id: userProviderOrPatient._id
+        }, userProviderOrPatient);
+      } else {
+        await Patient.findOneAndUpdate({
+          _id: userProviderOrPatient._id
+        }, userProviderOrPatient);
+      }
+    }else{
+      logger.error("disconnectConnection socketId not found:" + socketId);
     }
-    return userProviderOrPatient.role ?
-      await User.findOneAndUpdate({
-        _id: userProviderOrPatient.id
-      }, userProviderOrPatient) :
-      await Patient.findOneAndUpdate({
-        _id: userProviderOrPatient._id
-      }, userProviderOrPatient);
   } catch (e) {
     logger.error("disconnectConnection e :" + e)
   }
@@ -367,29 +367,12 @@ io.on('connection', (socket) => {
   //console.log('sssss')
   logger.info('connection active :' + socket.id);
 
-
   socket.on('disconnect', async () => {
-    logger.info('----------------------------disconnect :' + socket.id);
-    disconnectConnection(socket.id,
-      (provider) => {
-        notifyPatients(provider, (patients) => {
-          if (patients && patients.length > 0) {
-            patients.forEach(patient => {
-              socket.to(patient.socketId).emit("providerDisconnect", provider.id);
-              logger.info("providerDisconnect " + patient._id);
-            });
-          }
-        });
-      },
-      (patient) => {
-        notifyProvider(patient, (provider) => {
-          logger.info("patientsDisconnect " + provider._id + " - " + provider.socketId);
-          socket.to(provider.socketId).emit("patientsDisconnect", patient);
-        });
-      });
+    //logger.info('----------------------------disconnect :' + socket.id);
+    disconnectConnection(socket.id);
   });
-  //------------
 
+  //------------
   //provider entered in pay-provider
   socket.on('providerEnteredInPayProvider', async (userProvider, dni) => {
     if (userProvider) {
@@ -441,8 +424,8 @@ io.on('connection', (socket) => {
       const provider = await User.findById(providerId);
       if (provider.socketId) {
         socket.to(provider.socketId).emit('confirmPay', {
-          "type:":'confirm',
-          "payMethodSelect":payMethodSelect
+          "type:": 'confirm',
+          "payMethodSelect": payMethodSelect
         });
       } else {
         logger.info('there is no such provider.socketId');
@@ -476,7 +459,7 @@ io.on('connection', (socket) => {
   socket.on('activate', async (userProvider) => {
     if (userProvider) {
       logger.info('activate :' + socket.id + ' - ' + userProvider.id);
-      await connectProvider(userProvider.id, socket.id, userProvider,
+      await connectProvider(userProvider.id, socket.id, userProvider/*,
         (provider) => {
           notifyPatients(provider, (patients) => {
             if (patients && patients.length > 0) {
@@ -486,14 +469,14 @@ io.on('connection', (socket) => {
               });
             }
           });
-        });
+        }*/);
     }
   });
 
   socket.on('desactivate', async (userProvider) => {
     if (userProvider) {
       logger.info('desactivate :' + socket.id + ' - ' + userProvider.id);
-      await disconnectProvider(userProvider.id,
+      await disconnectProvider(userProvider.id/*,
         (provider) => {
           notifyPatients(provider, (patients) => {
             if (patients && patients.length > 0) {
@@ -503,7 +486,7 @@ io.on('connection', (socket) => {
               });
             }
           });
-        }
+        }*/
       );
     }
   });
@@ -514,12 +497,12 @@ io.on('connection', (socket) => {
     if (patient) {
       logger.info('confirmConnectPatient :' + socket.id + ' - ' + patient._id);
       await connectConfirmPatient(patient._id, socket.id, patient);
-      await countPatientRoom(patient.room, (socketId, patients) => {
+      /*await countPatientRoom(patient.room, (socketId, patients) => {
         logger.info('countPatientRoom :' + patients.length);
         socket.to(socketId).emit("countPatientRoom", patients.length);
         socket.to(socketId).emit("updatePatientState", patient);
       });
-
+*/
     }
   });
 
@@ -566,9 +549,9 @@ io.on('connection', (socket) => {
       socket.join(id + "-" + userProvider.room);
       const patient = await getPatientById(patientId);
       socket.to(patient.socketId).emit("preparateVideoCallFormProvider", userProvider);
-      logger.info('preparateVideoCall :' + socket.id + 
-      " - join room :" + id + "-" + userProvider.room + " - wait patient: "+ patient.socketId)
-      
+      logger.info('-------------------preparateVideoCall :' + socket.id +
+        " - join room :" + id + "-" + userProvider.room + " - wait patient: " + patient.socketId)
+
     }
   });
 

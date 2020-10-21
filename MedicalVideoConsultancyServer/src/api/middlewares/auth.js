@@ -34,14 +34,14 @@ const handleJWT = (req, res, next, roles) => async (err, user, info) => {
       logger.error("logIn nok :", apiError)
       return next(apiError);
     }
-    logger.info("logIn ok :", user["_id"])
+    //logger.warn("logIn ok :", user["_id"])
     await logIn(user, { session: false });
   } catch (e) {
     logger.error("apiError :" + apiError)
     return next(apiError);
   }
 
-  logger.info("evaluate roles: " + roles )
+  //logger.warn("evaluate roles: " + roles )
   if (!roles.includes(user.role)) {
     logger.error("roles: " + roles +" user.role :" + user.role)
     apiError.status = httpStatus.FORBIDDEN;

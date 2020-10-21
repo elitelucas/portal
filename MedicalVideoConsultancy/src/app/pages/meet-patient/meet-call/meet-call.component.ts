@@ -10,6 +10,7 @@ import { catchError, map } from "rxjs/operators";
 import { PatientService } from './../../../_services/patient.service';
 import { FileUploadService } from "../../../_services/file-upload.service";
 import { saveAs } from 'file-saver'
+import { MeetRoomPatientService } from '../../../_services/meet-room-patient.service';
 
 @Component({
   selector: 'app-meet-call',
@@ -35,10 +36,9 @@ export class MeetCallComponent implements OnInit {
   downloadFile: string;
 
   constructor(
-    private providerService: ProviderService,
-    private meetRoomService: MeetRoomService,
+    private meetRoomPatientService: MeetRoomPatientService,
     private formBuilder: FormBuilder,
-    private renderer: Renderer2, private fileUploadService: FileUploadService,
+    private renderer: Renderer2,
     private patientService: PatientService
   ) {
     this.roomChatForm = this.formBuilder.group({
@@ -57,23 +57,23 @@ export class MeetCallComponent implements OnInit {
   }
 
   async ngAfterViewInit() {
-    this.meetRoomService.confirmConnectPatient(this.patientData);
-    this.meetRoomService.setLocalElement(this.localVideo);
-    this.meetRoomService.setRemoteElement(this.remoteVideo);
-    this.meetRoomService.startLocalMediaVideo();    
-    this.meetRoomService.preparateVideoCallFormProviderListener().subscribe(provider => {
+    this.meetRoomPatientService.confirmConnectPatient(this.patientData);
+    this.meetRoomPatientService.setLocalElement(this.localVideo);
+    this.meetRoomPatientService.setRemoteElement(this.remoteVideo);
+    this.meetRoomPatientService.startLocalMediaVideo();
+    this.meetRoomPatientService.preparateVideoCallFormProviderListener().subscribe(provider => {
       this.providerData = provider;
-      this.meetRoomService.connect().subscribe(peerId => {
+      this.meetRoomPatientService.connect().subscribe(peerId => {
         this.patientData.peerId = peerId;
-        this.meetRoomService.preparateVideoCallFormPatient(this.providerData, this.patientData);
+        this.meetRoomPatientService.preparateVideoCallFormPatient(this.providerData, this.patientData);
       });
     });
-    this.meetRoomService.receiveUploadFile().subscribe(uploadFileName => {
+    this.meetRoomPatientService.receiveUploadFile().subscribe(uploadFileName => {
       this.downloadFileList.push(uploadFileName);
     });
 
 
-    this.meetRoomService.recivetext().subscribe((text) => {
+    this.meetRoomPatientService.recivetext().subscribe((text) => {
       const p = this.renderer.createElement('p');
       const d = this.renderer.createText(text);
       this.renderer.appendChild(p, d);
@@ -83,23 +83,23 @@ export class MeetCallComponent implements OnInit {
 
   public sendText() {
     const text = this.f.text.value;
-    this.meetRoomService.sendtext(this.providerData.socketId, "Patient: " + text);
+    this.meetRoomPatientService.sendtext(this.providerData.socketId, "Patient: " + text);
   }
 
   public mute() {
-    this.meetRoomService.localMuteActive(true);
+    this.meetRoomPatientService.localMuteActive(true);
   }
 
   public desmute() {
-    this.meetRoomService.localMuteActive(false);
+    this.meetRoomPatientService.localMuteActive(false);
   }
 
   public videomute() {
-    this.meetRoomService.localVideoActive(true);
+    this.meetRoomPatientService.localVideoActive(true);
   }
 
   public videodesmute() {
-    this.meetRoomService.localVideoActive(false);
+    this.meetRoomPatientService.localVideoActive(false);
   }
 
   uploadFile(file) {
@@ -110,7 +110,7 @@ export class MeetCallComponent implements OnInit {
     formData.append('key', 'patient');
     file.inProgress = true;
     const fileType = file.data.type.split('/')[0];
-    this.fileUploadService.uploadFile(formData).pipe(
+    this.patientService.uploadFile(formData).pipe(
       map(event => {
         /*console.log('event')
         console.log(event)*/
@@ -135,7 +135,7 @@ export class MeetCallComponent implements OnInit {
             this.files = [];
           }, 1000);
           this.fileName.push(event.body)
-          this.meetRoomService.sendUploadFile(event.body, 'patient', this.providerData._id);
+          this.meetRoomPatientService.sendUploadFile(event.body, 'patient', this.providerData._id);
         }
       });
   }

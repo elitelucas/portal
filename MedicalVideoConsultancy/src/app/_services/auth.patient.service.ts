@@ -47,7 +47,7 @@ export class AuthPatientService {
   }
 
   public setToken(result) {
-    console.log(result);
+    /*console.log(result);*/
     const now = new Date();
     localStorage.setItem('token', result.token);
     localStorage.setItem('tokenExpiredTime', JSON.stringify(constant.TTL + now.getTime()))
@@ -58,8 +58,8 @@ export class AuthPatientService {
   }
 
   public setCurrentUser(result) {
-    console.log("setCurrentUser result");
-    console.log(result);
+    /*console.log("setCurrentUser result");
+    console.log(result);*/
     localStorage.setItem('currentPatient', JSON.stringify(result));
     this.userSubject.next(result)
   }
@@ -90,15 +90,15 @@ export class AuthPatientService {
   }
 
   public join(patientData) {
-    console.log("patientData");
-    console.log(patientData);
+   /* console.log("patientData");
+    console.log(patientData);*/
     const joinUrl = baseUrl + "auth/join";
     return this.http.post<any>(joinUrl, patientData)
   }
   
   public joinValidatePatient(patientData ) : Observable<{} | any> {
-    console.log("joinValidatePatient");
-    console.log(patientData);
+    /*console.log("joinValidatePatient");
+    console.log(patientData);*/
     const joinUrl = baseUrl + "auth/join/validate/patient";
     return this.http.post<any>(joinUrl, patientData).pipe(
       map(res => {

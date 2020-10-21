@@ -52,59 +52,59 @@ exports.inviteBySMS = (req, res, next) => {
  * @param req
  * @param res
  * @param next
- * */
+ * *//*
 exports.uploadMedia = async (req, res, next) => {
-  const file = req.files.file;
-  const userId = req.body._id;
-  const name = req.body.room;
-  const media = req.body.media;
-  const filePath = media === 'image' ? path.join(__dirname + './../../public/images/') : path.join(__dirname + './../../public/videos/');
-  const room = new Room({ userId: userId, [media]: file.name, name: name });
-  await file.mv(filePath + file.name, function (error) {
-    if (error) {
-      return next(new APIError(error))
-    } else {
-      Room.findOne({ userId: userId }).exec().then((result1) => {
-        if (result1) {
-          Room.findOneAndUpdate({ userId: userId }, { [media]: file.name }, { new: true }).then(result2 => {
-            if (result2) {
-              // console.log("Updated new"+media+" successfully", result2);
-              res.status(httpStatus.OK).send({ [media]: file.name })
-            }
-          }).catch(error => {
-            // console.log("Upload failed to update" + media, error);
-            return next(new APIError(error))
-          })
-        } else {
-          room.save().then(result => {
-            //console.log("New" +media+ " uploaded successfully");
-            if (result) res.status(httpStatus.CREATED).send({ [media]: file.name })
-          });
-        }
-      });
-    }
-  });
-};
+const file = req.files.file;
+const userId = req.body._id;
+const name = req.body.room;
+const media = req.body.media;
+const filePath = media === 'image' ? path.join(__dirname + './../../public/images/') : path.join(__dirname + './../../public/videos/');
+const room = new Room({ userId: userId, [media]: file.name, name: name });
+await file.mv(filePath + file.name, function (error) {
+  if (error) {
+    return next(new APIError(error))
+  } else {
+    Room.findOne({ userId: userId }).exec().then((result1) => {
+      if (result1) {
+        Room.findOneAndUpdate({ userId: userId }, { [media]: file.name }, { new: true }).then(result2 => {
+          if (result2) {
+            // console.log("Updated new"+media+" successfully", result2);
+            res.status(httpStatus.OK).send({ [media]: file.name })
+          }
+        }).catch(error => {
+          // console.log("Upload failed to update" + media, error);
+          return next(new APIError(error))
+        })
+      } else {
+        room.save().then(result => {
+          //console.log("New" +media+ " uploaded successfully");
+          if (result) res.status(httpStatus.CREATED).send({ [media]: file.name })
+        });
+      }
+    });
+  }
+});
+};*/
 
 /**
  * @api v1/provider/room/:userId
  * @param req
  * @param res
  * @param next
- * */
+ * *//*
 exports.getRoomData = (req, res, next) => {
-  const userId = req.params.userId;
-  //console.log("getRoomData userId:"+userId)
-  Room.findOne({ userId: userId }).then(result => {
-    //console.log("getRoomData: ",result)
-    if (result) {
-      result['password'] = null;
-      res.status(httpStatus.OK).json(result);
-    }
-    else
-      res.status(httpStatus.NO_CONTENT).send({ message: 'No available data' })
-  }, error => { return next(new APIError(error)) })
-};
+const userId = req.params.userId;
+//console.log("getRoomData userId:"+userId)
+Room.findOne({ userId: userId }).then(result => {
+  //console.log("getRoomData: ",result)
+  if (result) {
+    result['password'] = null;
+    res.status(httpStatus.OK).json(result);
+  }
+  else
+    res.status(httpStatus.NO_CONTENT).send({ message: 'No available data' })
+}, error => { return next(new APIError(error)) })
+};*/
 
 /**
  * @api v1/provider/text/:userId
@@ -136,30 +136,30 @@ exports.changeRoomField = (req, res, next) => {
  * @param req
  * @param res
  * @param next
- * */
+ * *//*
 exports.checkRoomExist = (req, res, next) => {
-  // console.log("checkRoomExist:",req.params,req.query)
+// console.log("checkRoomExist:",req.params,req.query)
 
-  User.findOne(req.params).then(result => {
-    if (result && result.status === 'active') {
-      result['password'] = null;
-      result['phoneNumber'] = null;
-      result['cmp'] = null;
-      result['createdAt'] = null;
-      result['permission'] = null;
-      result['updatedAt'] = null;
-      result['email'] = null;
-      res.status(httpStatus.OK).json(result)
-    }
-    else {
-      res.status(httpStatus.NO_CONTENT).end()
-    }
-  }).catch(error => {
-    console.log("checkRoomExist:", error)
-    return next(new APIError(error));
-  })
+User.findOne(req.params).then(result => {
+  if (result && result.status === 'active') {
+    result['password'] = null;
+    result['phoneNumber'] = null;
+    result['cmp'] = null;
+    result['createdAt'] = null;
+    result['permission'] = null;
+    result['updatedAt'] = null;
+    result['email'] = null;
+    res.status(httpStatus.OK).json(result)
+  }
+  else {
+    res.status(httpStatus.NO_CONTENT).end()
+  }
+}).catch(error => {
+  console.log("checkRoomExist:", error)
+  return next(new APIError(error));
+})
 };
-
+*/
 
 /**
  * @api v1/provider/patients-all
@@ -601,11 +601,11 @@ exports.updatePatient = async (req, res, next) => {
  * @api v1/provider/patient/disconnect
  * @params patientData
  * */
-
+/*
 exports.disconnectPatient = async (req, res, next) => {
   try {
     const patientId = req.params.patientId;
-    logger.info('disconnectPatient:',patientId)
+    logger.info('disconnectPatient:', patientId)
     const patient = await Patient.findOneAndUpdate(
       { _id: patientId },
       {
@@ -623,7 +623,7 @@ exports.disconnectPatient = async (req, res, next) => {
   } catch (e) {
     return next(APIError(e))
   }
-};
+};*/
 
 
 /**
@@ -665,27 +665,29 @@ exports.getWaitingPatientsData = async (req, res, next) => {
         $match: {
           operationType: 'update',
           'fullDocument.room': room,
-          'fullDocument.connection': true
+          //'fullDocument.connection': true
         }
       }
     ]
 
     const options = { fullDocument: 'updateLookup' };
     Patient.watch(filter, options).
-      on('change', data => {
+      on('change', async (data) => {
         logger.info("new patient connect : " + data.fullDocument._id);
         res.write("data:" + JSON.stringify(data.fullDocument) + "\n\n");
         res.write("\n");
       });
-    const patientsData = await Patient.find({ room: room, connection: true }).sort({ lastSeen: -1 });
+    const patientsData = await Patient.find({ room: room
+      //, connection: true 
+    }).sort({ lastSeen: -1 });
     patientsData.forEach(e => {
       res.write("data:" + JSON.stringify(e) + "\n\n");
     });
     req.on("close", function () {
-      console.log(`*** Close. userId: `);
+      console.log(`*** Close. room: ` + room);
     });
     req.on("end", function () {
-      console.log("*** End. userId:");
+      console.log("*** End. room:" + room);
     });
   } catch (e) {
     console.log(e);
@@ -693,89 +695,38 @@ exports.getWaitingPatientsData = async (req, res, next) => {
   }
 
 };
-
-
-/**
- * @api v1/provider/patients-disconnect/:room
- * @param req
- * @param res
- * @param next
- * */
-exports.getDisconnectPatientsData = async (req, res, next) => {
-  try {
-    const room = req.params.room;
-    logger.info("disconnect patient connect : " + room);
-    const SSE_RESPONSE_HEADER = {
-      'Connection': 'keep-alive',
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Access-Control-Allow-Origin': '*'
-    };
-    res.writeHead(200, SSE_RESPONSE_HEADER);
-    res.flushHeaders();
-    const filter = [
-      {
-        $match: {
-          operationType: 'update',
-          'fullDocument.room': room,
-          'fullDocument.connection': false
-        }
-      }
-    ]
-
-    const options = { fullDocument: 'updateLookup' };
-    Patient.watch(filter, options).
-      on('change', data => {
-        logger.info("patient disconnect : " + data.fullDocument._id);
-        res.write("data:" + JSON.stringify(data.fullDocument) + "\n\n");
-        res.write("\n");
-      });
-    res.write("\n");
-    req.on("close", function () {
-      console.log(`*** Close. userId: `);
-    });
-    req.on("end", function () {
-      console.log("*** End. userId:");
-    });
-  } catch (e) {
-    console.log(e);
-    return next(new APIError(e));
-  }
-
-};
-
 
 /**
  * @api v1/provider/patients-recent
- * */
+ * *//*
 exports.getRecentPatientsData = async (req, res, next) => {
-  try {
-    const recentPatients = await Patient.find({}).sort({ lastSeen: -1 }).limit(10);
-    if (recentPatients) res.status(httpStatus.OK).json(recentPatients);
-  } catch (e) {
-    return next(new APIError(e))
-  }
-};
+try {
+  const recentPatients = await Patient.find({}).sort({ lastSeen: -1 }).limit(10);
+  if (recentPatients) res.status(httpStatus.OK).json(recentPatients);
+} catch (e) {
+  return next(new APIError(e))
+}
+};*/
 
 /**
  * @api v1/provider/patients-all
- * */
+ * *//*
 exports.getAllPatientsData = async (req, res, next) => {
-  try {
-    const room = req.params.room;
-    const allPatients = await Patient.find({ room: room }).sort({ lastSeen: -1 });
-    if (allPatients) res.status(httpStatus.OK).json(allPatients);
-  } catch (e) {
-    return next(new APIError(e))
-  }
-};
+try {
+  const room = req.params.room;
+  const allPatients = await Patient.find({ room: room }).sort({ lastSeen: -1 });
+  if (allPatients) res.status(httpStatus.OK).json(allPatients);
+} catch (e) {
+  return next(new APIError(e))
+}
+};*/
 
 
 /**
  * @api v1/provider/resetState
  * @params model, field 'to reset'
  * */
-
+/*
 exports.resetState = async (req, res, next) => {
   try {
     const modelToReset = req.body.model;
@@ -802,7 +753,7 @@ exports.resetState = async (req, res, next) => {
     return next(new APIError(e));
   }
 };
-
+*/
 /**
  * @api v1/provider/checkout
  * @params patientId(_id), amountToPay, email
@@ -1193,36 +1144,36 @@ exports.removeCard = async (req, res, next) => {
  * @param req => notifyUrl
  * @param res
  * @param next
- * */
+ * *//*
 exports.notify = async (req, res, next) => {
-  try {
-    const payResult = req.body;
-    if (payResult && payResult.order.buyer) {
-      const email = payResult.order.buyer.email;
-      const paymentType = payResult.order.payMethod.type;
-      const paymentState = payResult.order.status;
-      if (paymentState === 'COMPLETED') {
-        const paidPatient = await Patient.findOneAndUpdate({ transactionMail: email }, {
-          paymentType: paymentType,
-          paymentState: paymentState
-        }, { new: true });
+try {
+  const payResult = req.body;
+  if (payResult && payResult.order.buyer) {
+    const email = payResult.order.buyer.email;
+    const paymentType = payResult.order.payMethod.type;
+    const paymentState = payResult.order.status;
+    if (paymentState === 'COMPLETED') {
+      const paidPatient = await Patient.findOneAndUpdate({ transactionMail: email }, {
+        paymentType: paymentType,
+        paymentState: paymentState
+      }, { new: true });
 
-        if (paidPatient) {
-          const order = payResult.order;
-          const transactionData = {
-            orderId: order.orderId, orderCreateDate: order.orderCreateDate, currencyCode: order.currencyCode,
-            totalAmount: order.totalAmount, email: order.buyer.email, firstName: order.buyer.firstName, lastName: order.buyer.lastName
-          };
-          const newTransaction = await new Transaction(transactionData).save();
-          console.log("New transaction created successfully", newTransaction)
-        }
+      if (paidPatient) {
+        const order = payResult.order;
+        const transactionData = {
+          orderId: order.orderId, orderCreateDate: order.orderCreateDate, currencyCode: order.currencyCode,
+          totalAmount: order.totalAmount, email: order.buyer.email, firstName: order.buyer.firstName, lastName: order.buyer.lastName
+        };
+        const newTransaction = await new Transaction(transactionData).save();
+        console.log("New transaction created successfully", newTransaction)
       }
     }
-    res.status(httpStatus.OK).send()
-  } catch (e) {
-    return next(APIError(e))
   }
-};
+  res.status(httpStatus.OK).send()
+} catch (e) {
+  return next(APIError(e))
+}
+};*/
 
 /**
  * @api v1/provider/chart

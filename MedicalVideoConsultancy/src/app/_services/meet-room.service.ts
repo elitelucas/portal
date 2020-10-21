@@ -12,7 +12,7 @@ declare var Peer: any;
 })
 export class MeetRoomService {
 
-  private socket = io(environment.socket_endpoint);
+  private socket ; //= io(environment.socket_endpoint);
 
   private localVideo = null;
   private localStream = null;
@@ -26,6 +26,13 @@ export class MeetRoomService {
   constructor() {
   }
 
+  public confirmConnect(userProvider) {
+    this.socket = io(environment.socket_endpoint);
+    /* console.log("confirmConnect:", userProvider);
+     console.log("confirmConnect:", this.myPeerId);*/
+    this.socket.emit('confirmConnect', userProvider);
+  }
+
   public async startLocalMediaVideo() {
     this.localStream = await window.navigator.mediaDevices.getUserMedia({
       video: true,
@@ -34,33 +41,33 @@ export class MeetRoomService {
     this.localVideo.nativeElement.srcObject = this.localStream;
   }
 
-  public disconnectMe(){
+  public disconnectMe() {
     console.log("disconnectMe");
     this.socket.disconnect();
   }
 
   public stopVideoAudio() {
     try {
-      
-    if (this.localStream != null) {
-      this.localStream.getTracks().forEach((track) => {
-        if (track.readyState == 'live' && track.kind === 'video') {
-          track.stop();
-        }
-        if (track.readyState == 'live' && track.kind === 'audio') {
-          track.stop();
-        }
-      });
-      this.localStream = null;
-    }
-    if (this.localVideo != null) {
-      this.localVideo.nativeElement.srcObject = null;
-      this.localVideo = null;
-    }
-    this.remoteVideo = null;
-    if (this.localCall != null) {
-      this.localCall.close();
-    }
+
+      if (this.localStream != null) {
+        this.localStream.getTracks().forEach((track) => {
+          if (track.readyState == 'live' && track.kind === 'video') {
+            track.stop();
+          }
+          if (track.readyState == 'live' && track.kind === 'audio') {
+            track.stop();
+          }
+        });
+        this.localStream = null;
+      }
+      if (this.localVideo != null) {
+        this.localVideo.nativeElement.srcObject = null;
+        this.localVideo = null;
+      }
+      this.remoteVideo = null;
+      if (this.localCall != null) {
+        this.localCall.close();
+      }
     } catch (error) {
       console.log(error);
     }
@@ -84,49 +91,26 @@ export class MeetRoomService {
     this.localStream.getVideoTracks()[0].enabled = !active;
   }
 
-  /*{
-      url: 'stun:stun.nemiac.com:5349',
-      credential: '12345', 
-      username: 'robin'
-  },
-  {
-      url: 'turn:turn.nemiac.com:5349',
-      credential: 'guest', 
-      username: 'somepassword'
-  }*//**/
   public connect() {
     return Observable.create((observer) => {
       let config = {
         host: environment.peerServerHost,
         port: environment.peerServerPort,
         path: environment.peerServerPath,
-        debug: 3,
-        secure: true,
-        config: {
-          'iceServers': [
-            { url: 'stun:stun1.l.google.com:19302' },
-            { url: 'stun:stun2.l.google.com:19302' },
-            { url: 'stun:stun3.l.google.com:19302' },
-            { url: 'stun:stun4.l.google.com:19302' },
-            {
-              url: 'turn:numb.viagenie.ca',
-              credential: 'muazkh',
-              username: 'webrtc@live.com'
-            }
-          ]
-        }
+        debug: environment.peerServerDebugLevel,
+        secure: environment.peerServerSecure,
+        config: environment.peerConfig.config
       };
-      //console.log("config");
-      //console.log(config);
       this.myPeer = new Peer(undefined, config);
 
       this.myPeer.on('open', () => {
+        console.log("open");
         this.myPeerId = this.myPeer.id;
         observer.next(this.myPeerId)
       });
 
       this.myPeer.on('call', call => {
-        //console.log("call               ---------------------------------------")
+        console.log("call               ---------------------------------------")
         this.localCall = call;
         call.answer(this.localStream)
         call.on('stream', userVideoStream => {
@@ -183,12 +167,6 @@ export class MeetRoomService {
     })
   }
 
-
-  public confirmConnect(userProvider) {
-    /* console.log("confirmConnect:", userProvider);
-     console.log("confirmConnect:", this.myPeerId);*/
-    this.socket.emit('confirmConnect', userProvider);
-  }
 
   public confirmConnectPatient(patient: Patient) {
     //console.log("------------confirmConnectPatient:", patient);
@@ -302,13 +280,13 @@ export class MeetRoomService {
     this.socket.emit('desactivate', userProvider);
   }
 
-  public countPatientRoom() {
+  /*public countPatientRoom() {
     return Observable.create((observer) => {
       this.socket.on('countPatientRoom', (patients) => {
         observer.next(patients)
       });
     })
-  }
+  }*/
 
   public connectioProvider() {
     return Observable.create((observer) => {

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../../controllers/provider.controller');
 const { authorize } = require('../../middlewares/auth');
+
 /**
  * @api v1/provider/invite-by-sms.
  * @param userData
@@ -14,17 +15,17 @@ router.route('/invite-by-sms')
  * @api v1/provider/mediaUpload
  * @param file
  * */
-router.route('/mediaUpload')
+/*router.route('/mediaUpload')
   .post(authorize(), controller.uploadMedia);
-
+*/
 /**
  * @api v1/provider/room/:userId
  * @param id
  * */
-
+/*
 router.route('/room/:userId')
   .get(authorize(), controller.getRoomData);
-
+*/
 /**
  * @api v1/provider/room/:userId
  * @param userId, field, value
@@ -39,10 +40,10 @@ router.route('/text/:userID')
  * @api v1/provider/roomName/: roomName
  * @param roomName
  * */
-
+/*
 router.route('/roomName/:room')
   .get(authorize(), controller.checkRoomExist);
-
+*/
 
 
 /*
@@ -122,10 +123,10 @@ router.route('/patient')
 
 router.route('/patient/chart')
   .put(authorize(), controller.updatePatientOnChart)
-
+/*
 router.route('/patient/disconnect/:patientId')
   .put(authorize(), controller.disconnectPatient)
-
+*/
 /**
  * @api v1/provider/patients-waiting/:room
  * @param no
@@ -135,35 +136,27 @@ router.route('/patients-waiting/:room')
   .get(/*authorize(),*/ controller.getWaitingPatientsData);
 
 /**
- * @api v1/provider/patients-waiting/:room
- * @param no
- * */
-
-router.route('/patients-disconnect/:room')
-  .get(/*authorize(),*/ controller.getDisconnectPatientsData);
-
-/**
  * @api v1/provider/patients-recent
  * */
-
+/*
 router.route('/patients-recent')
   .get(authorize(), controller.getRecentPatientsData);
-
+*/
 /**
  * @api v1/provider/patients-all/:room
  * @param id
- * */
+ * *//*
 router.route('/patients-all/:room')
-  .get(authorize(), controller.getAllPatientsData);
+  .get(authorize(), controller.getAllPatientsData);*/
 /**
  * @api v1/provider/resetState
  * @params model, field 'to reset'
  * */
-
+/*
 router.route('/resetState')
   .patch(authorize(), controller.resetState);
 
-
+*/
 /**
  * @api v1/provider/checkout
  * */
@@ -206,10 +199,10 @@ router.route('/card/:cardId')
 
 /**
  * @api v1/provider/notify
- * */
+ * *//*
 router.route('/notify')
   .post(authorize(), controller.notify)
-
+*/
 /**
  * @api v1/provider/chart
  * @method put
@@ -248,10 +241,10 @@ router.route('/consult/:consultId/close')
 /**
  * @api v1/provider/consult
  * @method post
- * */
+ * *//*
 router.route('/feedback')
   .post(authorize(), controller.createFeedback);
-
+*/
 /**
    * @api v1/provider/feedback
    * @method get

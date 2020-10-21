@@ -9,6 +9,8 @@ import { Patient } from '../../../_model/user';
 import { UserService } from "../../../_services/user.service";
 import { AuthService } from "../../../_services/auth.service";
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PatientService } from '../../../_services/patient.service';
+import { MeetRoomPatientService } from '../../../_services/meet-room-patient.service';
 
 
 export interface PayData {
@@ -49,8 +51,8 @@ export class PayPatientComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private meetRoomService: MeetRoomService,
-    private userService: UserService,
+    private meetRoomPatientService: MeetRoomPatientService,
+    private patientService: PatientService,
     private _route: Router
   ) {
     
@@ -69,7 +71,7 @@ export class PayPatientComponent implements OnInit {
 
   async ngAfterViewInit() {
 
-    this.userService.getPayData(this.providerData._id).subscribe(res => {
+    this.patientService.getPayData(this.providerData._id).subscribe(res => {
       this.payData = res;
       if (res === null || res.length === 0) {
         this.payData = {
@@ -102,9 +104,9 @@ export class PayPatientComponent implements OnInit {
       }
     });
 
-    this.meetRoomService.patientEnteredInPayPatient(this.providerData._id, this.patientData.dni);
+    this.meetRoomPatientService.patientEnteredInPayPatient(this.providerData._id, this.patientData.dni);
 
-    this.meetRoomService.receivePay().subscribe(payAmount => {
+    this.meetRoomPatientService.receivePay().subscribe(payAmount => {
       this.payAmount = payAmount;
     });
   }
@@ -115,7 +117,7 @@ export class PayPatientComponent implements OnInit {
     if(this.payForm.invalid){
       return;
     }
-    this.meetRoomService.confirmPay(this.providerData._id, this.f.paySelect.value );
+    this.meetRoomPatientService.confirmPay(this.providerData._id, this.f.paySelect.value );
   }
 
   Cancel() {
