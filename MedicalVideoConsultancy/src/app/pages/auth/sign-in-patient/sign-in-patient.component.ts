@@ -119,6 +119,11 @@ export class SignInPatientComponent implements OnInit {
     }
   }
 
+  telInputObject(obj) {
+    console.log(obj);
+    obj.setCountry('pe');
+  }
+  
   hasError(event: boolean) {
     this.isValidNumber = event;
   }

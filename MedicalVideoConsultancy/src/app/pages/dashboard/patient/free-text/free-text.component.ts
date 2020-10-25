@@ -28,6 +28,8 @@ export class FreeTextComponent implements OnInit {
   familyArr = [];
   toxicArr = [];
 
+  patientAge = 0;
+
   constructor(
     private providerService: ProviderService,
     //private authService:AuthService
@@ -37,6 +39,12 @@ export class FreeTextComponent implements OnInit {
 
   ngOnInit(): void {
     this.initData();
+    let dateString = this.patient.birthdate + 'T00:00:00'
+    let newDate = new Date(dateString);
+    let timeDiff = Math.abs(Date.now() - newDate.getTime());
+    let age = Math.floor((timeDiff / (1000 * 3600 * 24))/365.25);
+    this.patientAge = age;
+
   }
   initData() {
     this.providerService.getChart(this.patient.dni).subscribe(res => {
@@ -59,6 +67,14 @@ export class FreeTextComponent implements OnInit {
         }
       }
     })
+  }
+
+  changeBirthDate(e) {
+    let dateString = e.target.value + 'T00:00:00'
+    let newDate = new Date(dateString);
+    let timeDiff = Math.abs(Date.now() - newDate.getTime());
+    let age = Math.floor((timeDiff / (1000 * 3600 * 24))/365.25);
+    this.patientAge = age;
   }
 
   AddItem(Item: string, key: string) {

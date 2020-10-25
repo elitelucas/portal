@@ -211,7 +211,8 @@
                   <label class="text-white">Phone Number</label>
                   <input type="text" ng2TelInput formControlName="phoneNumber" class="form-control  text-black-50"
                     [ngClass]="{ 'is-invalid': submitted && f1.phoneNumber.errors }" (hasError)="hasError($event)"
-                    (ng2TelOutput)="getNumber($event)" />
+                    (ng2TelOutput)="getNumber($event)"
+                    (intlTelInputObject)="telInputObject($event)"  />
                   <div class="invalid-feedback d-block" *ngIf="isEmptyPhoneNumber">Phone Number is required</div>
                   <div class="invalid-feedback d-block" *ngIf="isDuplicatedPhone">Phone Number is already in use</div>
                   <div class="invalid-feedback d-block" *ngIf="!isValidNumber">Please type valid number</div>

@@ -6,6 +6,7 @@
             </div>
             <div class="col-xl-3 col-md-6 col-sm-6">
                 Birthdate:<input #age [value]="iteralData.patient.birthdate" disabled>
+                <label> Age: {{ patientAge }}</label>
             </div>
             <div class="col-xl-3 col-md-6 col-sm-6">
                 Phone number:<input #phoneNumber type="number" [value]="iteralData.patient.phoneNumber" disabled>
@@ -13,6 +14,23 @@
             <div class="col-xl-3 col-md-6 col-sm-6">
                 Allergies:<input #allergy type="text" [value]="(haveAlergy) ? 'S' : 'N'" disabled>
             </div>
+            <br>
+            <div class="col-xl-6 col-md-6 col-sm-6">
+                <div class="title">Type Atettion:</div>
+                <div *ngIf="iteralData.typeAttetion == 1 ">
+                    New
+                </div>
+                <div *ngIf="iteralData.typeAttetion == 2 ">
+                    Follow up
+                </div>
+            </div>
+            <div class="col-xl-6 col-md-6 col-sm-6">
+                <div class="title">Reason:</div>
+                <div>
+                    {{iteralData.reason}}
+                </div>
+            </div>
+            <br>
         </div>
     </div>
     <div class="date-bar">
@@ -59,35 +77,6 @@
                 </div>
             </div>
         </div>
-        <br>
-        <div class="content">
-            <div class="title">Type Atettion:</div>
-            <div *ngIf="iteralData.typeAttetion == 1 ">
-                New
-            </div>
-            <div *ngIf="iteralData.typeAttetion == 2 ">
-                Follow up
-            </div>
-        </div>
-        <div class="content">
-            <div class="title">Reason:</div>
-            <div>
-                {{iteralData.reason}}
-            </div>
-        </div>
-        <div class="content">
-            <div class="title">Payment:</div>
-            <div>
-                {{iteralData.payment}}
-            </div>
-        </div>
-        <div class="content">
-            <div class="title">Amount:</div>
-            <div>
-                S/ {{iteralData.payAmount}}
-            </div>
-        </div>
-        <br>
         <br>
         <div class="content">
             <div>History</div>

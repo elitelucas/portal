@@ -368,7 +368,7 @@ io.on('connection', (socket) => {
   logger.info('connection active :' + socket.id);
 
   socket.on('disconnect', async () => {
-    //logger.info('----------------------------disconnect :' + socket.id);
+    logger.info('----------------------------disconnect :' + socket.id);
     disconnectConnection(socket.id);
   });
 
@@ -585,6 +585,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on("endCall", data => {
+    console.log("endCall", data);
     socket.to(data.to).emit("endCall", {
       text: data.text,
       from: data.from,

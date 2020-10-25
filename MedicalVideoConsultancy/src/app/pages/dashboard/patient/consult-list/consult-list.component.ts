@@ -43,6 +43,28 @@ export class ConsultListComponent implements OnInit {
     this.list(undefined, undefined)
   }
 
+  private list(startDate, endDate) {
+    this.ProviderService.getConsult(this.patient._id, startDate, endDate)
+      .subscribe(res => {
+        if (res) {
+          this.tmpData = res;
+          this.initDataSource(res)
+          this.noDataToDisplay = false;
+        } else {
+          this.noDataToDisplay = true;
+        }
+      })
+  }
+
+
+  search(startDate, endDate) {
+    if (startDate === '' || endDate === '' || endDate > startDate == false) {
+      Swal.fire('Input the date correctly.')
+      return;
+    }
+    this.list(startDate, endDate)
+  }
+  
   initDataSource(data) {
     const PatientData: PatientData[] = [];
     data.forEach(function (item, idx) {
@@ -59,6 +81,7 @@ export class ConsultListComponent implements OnInit {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
+
   arrangeDataSource() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
@@ -66,14 +89,6 @@ export class ConsultListComponent implements OnInit {
 
   detail(data) {
     this.router.navigateByUrl('/dashboard/newConsult/' + data.index + '/' + data.id + '/' + data.consultId);
-  }
-
-  search(startDate, endDate) {
-    if (startDate === '' || endDate === '' || endDate > startDate == false) {
-      Swal.fire('Input the date correctly.')
-      return;
-    }
-    this.list(startDate, endDate)
   }
 
   newConsult() {
@@ -87,19 +102,6 @@ export class ConsultListComponent implements OnInit {
       localStorage.setItem("newConsult",JSON.stringify(result));
       this.router.navigateByUrl('/dashboard/newConsult/new/' + this.patient._id);
     })
-  }
-
-  private list(startDate, endDate) {
-    this.ProviderService.getConsult(this.patient._id, startDate, endDate)
-      .subscribe(res => {
-        if (res) {
-          this.tmpData = res;
-          this.initDataSource(res)
-          this.noDataToDisplay = false;
-        } else {
-          this.noDataToDisplay = true;
-        }
-      })
   }
 
 

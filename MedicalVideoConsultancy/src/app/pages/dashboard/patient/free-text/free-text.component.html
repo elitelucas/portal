@@ -3,7 +3,9 @@
         Name:<input #name type='text' [value]="patient.fullName" disabled>
     </div>
     <div class="col-xl-3 col-md-6 col-sm-6">
-        Birthdate: <input #birthdate type="date" name="birthdate" id="birthdate"  [value]="patient.birthdate">
+        Birthdate: 
+        <input #birthdate type="date" (change)="changeBirthDate($event)"  name="birthdate" id="birthdate"  [value]="patient.birthdate">
+        <label> Age: {{ patientAge }}</label>
     </div>
     <div class="col-xl-3 col-md-6 col-sm-6">
         Phone number:<input #phoneNumber type="number"   [value]="patient.phoneNumber">

@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const feedbackApplicationSchema = new Schema({
   providerId: String,
   patientId: String,
-  raking: String,
+  ranking: String,
   comment: String
 });
 

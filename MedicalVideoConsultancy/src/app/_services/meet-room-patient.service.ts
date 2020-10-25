@@ -28,7 +28,7 @@ export class MeetRoomPatientService {
 
   public confirmConnectPatient(patient: Patient) {
     this.socket = io(environment.socket_endpoint);
-    //console.log(this.socket);
+    console.log(this.socket);
     this.socket.emit('confirmConnectPatient', patient);
   }
 

@@ -76,7 +76,7 @@ export class HealthRoomComponent implements OnInit {
 
     this.meetRoomService.receiveEndCall()
       .subscribe(async (text) => {
-        console.log("receiveEndCall:", text);
+        console.log("receiveEndCall redirection: ", text);
         if (text === 'acceptEnd') {
           this._router.navigateByUrl("/dashboard/health-provider")
         }
@@ -124,6 +124,7 @@ export class HealthRoomComponent implements OnInit {
 
   public endCall() {
     this.providerService.closeConsult(this.consultId).subscribe(res => {
+      console.log("send End call patient : " + this.patient.socketId);
       this.meetRoomService.endCall(this.patient.socketId, 'endCall');
       this.meetRoomService.stopVideoAudio();
     });

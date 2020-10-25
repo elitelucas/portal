@@ -93,6 +93,11 @@ export class AddPatientComponent implements OnInit {
     return this.phoneNumber;
   }
 
+  telInputObject(obj) {
+    console.log(obj);
+    obj.setCountry('pe');
+  }
+
   join() {
     this.submitted = true;
     if (this.joinForm.invalid) {

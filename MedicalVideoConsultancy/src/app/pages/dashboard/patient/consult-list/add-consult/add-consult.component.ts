@@ -85,6 +85,8 @@ export class AddConsultComponent implements OnInit {
 
   confirmPay() {
     if (this.payForm.invalid) {
+      console.log(this.payForm.valid);
+      console.log(this.payForm.value);
       return;
     }
     this.dialogRef.close(this.payForm.value);

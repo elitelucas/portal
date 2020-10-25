@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 /**
  *  Room schema
  *  @Private
- * */
+ * *//*
 const Schema = mongoose.Schema;
 const roomSchema = new Schema({
   providerId: {
@@ -43,3 +43,4 @@ const roomSchema = new Schema({
 );
 
 module.exports = mongoose.model('Room', roomSchema);
+*/

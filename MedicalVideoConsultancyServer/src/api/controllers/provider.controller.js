@@ -4,7 +4,7 @@ const APIError = require('../utils/APIError');
 const { smsConfig, paymentConfig, culqiConfing } = require('../../config/vars');
 const client = require('twilio')(smsConfig.Sid, smsConfig.authToken);
 const path = require('path');
-const Room = require('../models/room.model');
+//onst Room = require('../models/room.model');
 const User = require('../models/user.model');
 const Patient = require('../models/patient.model');
 const Transaction = require('../models/transaction.model');
@@ -46,6 +46,26 @@ exports.inviteBySMS = (req, res, next) => {
     })
 };
 
+exports.updateRoom = async (req, res, next) => {
+  try {
+    const providerId = req.params.providerId;
+    console.log(req.body);
+    const room = req.body.room;
+
+    logger.info("updateRoom providerId: " + providerId + " room: " + room);
+    const roomExists = await User.findOne({ room: room });
+    if (!roomExists) {
+      const updated = await User.findOneAndUpdate({ _id: providerId }, { room: room }, { new: true });
+      res.status(httpStatus.OK).send();
+    } else {
+      res.status(httpStatus.CONFLICT).send();
+    }
+  } catch (e) {
+    console.log(e);
+    return next(new APIError(e));
+  }
+};
+
 
 /**
  * @api v1/provider/mediaUpload
@@ -61,28 +81,28 @@ const media = req.body.media;
 const filePath = media === 'image' ? path.join(__dirname + './../../public/images/') : path.join(__dirname + './../../public/videos/');
 const room = new Room({ userId: userId, [media]: file.name, name: name });
 await file.mv(filePath + file.name, function (error) {
-  if (error) {
-    return next(new APIError(error))
-  } else {
-    Room.findOne({ userId: userId }).exec().then((result1) => {
-      if (result1) {
-        Room.findOneAndUpdate({ userId: userId }, { [media]: file.name }, { new: true }).then(result2 => {
-          if (result2) {
-            // console.log("Updated new"+media+" successfully", result2);
-            res.status(httpStatus.OK).send({ [media]: file.name })
-          }
-        }).catch(error => {
-          // console.log("Upload failed to update" + media, error);
-          return next(new APIError(error))
-        })
-      } else {
-        room.save().then(result => {
-          //console.log("New" +media+ " uploaded successfully");
-          if (result) res.status(httpStatus.CREATED).send({ [media]: file.name })
-        });
-      }
-    });
-  }
+if (error) {
+return next(new APIError(error))
+} else {
+Room.findOne({ userId: userId }).exec().then((result1) => {
+if (result1) {
+Room.findOneAndUpdate({ userId: userId }, { [media]: file.name }, { new: true }).then(result2 => {
+if (result2) {
+// console.log("Updated new"+media+" successfully", result2);
+res.status(httpStatus.OK).send({ [media]: file.name })
+}
+}).catch(error => {
+// console.log("Upload failed to update" + media, error);
+return next(new APIError(error))
+})
+} else {
+room.save().then(result => {
+//console.log("New" +media+ " uploaded successfully");
+if (result) res.status(httpStatus.CREATED).send({ [media]: file.name })
+});
+}
+});
+}
 });
 };*/
 
@@ -96,13 +116,13 @@ exports.getRoomData = (req, res, next) => {
 const userId = req.params.userId;
 //console.log("getRoomData userId:"+userId)
 Room.findOne({ userId: userId }).then(result => {
-  //console.log("getRoomData: ",result)
-  if (result) {
-    result['password'] = null;
-    res.status(httpStatus.OK).json(result);
-  }
-  else
-    res.status(httpStatus.NO_CONTENT).send({ message: 'No available data' })
+//console.log("getRoomData: ",result)
+if (result) {
+result['password'] = null;
+res.status(httpStatus.OK).json(result);
+}
+else
+res.status(httpStatus.NO_CONTENT).send({ message: 'No available data' })
 }, error => { return next(new APIError(error)) })
 };*/
 
@@ -111,26 +131,26 @@ Room.findOne({ userId: userId }).then(result => {
  * @param req
  * @param res
  * @param next
- * */
+ * *//*
 exports.changeRoomField = (req, res, next) => {
-  const userId = req.query.userId;
-  const field = req.body.field;
-  const value = req.body.value;
-  const name = "asd"//req.body.name ;
-  Room.findOne({ userId: userId }).then(result => {
-    if (result) Room.findOneAndUpdate({ userId: userId }, { name: name, [field]: value }, { new: true })
-      .then(result1 => {
-        res.status(httpStatus.OK).json(result1)
-      });
-    else {
-      new Room({ userId: userId, name: name, [field]: value }).save().then(result2 => {
-        res.status(httpStatus.CREATED).json(result2)
-      });
-    }
-  }).catch(error => {
-    return next(new APIError(error))
-  })
-};
+const userId = req.query.userId;
+const field = req.body.field;
+const value = req.body.value;
+const name = "asd"//req.body.name ;
+Room.findOne({ userId: userId }).then(result => {
+if (result) Room.findOneAndUpdate({ userId: userId }, { name: name, [field]: value }, { new: true })
+.then(result1 => {
+res.status(httpStatus.OK).json(result1)
+});
+else {
+new Room({ userId: userId, name: name, [field]: value }).save().then(result2 => {
+res.status(httpStatus.CREATED).json(result2)
+});
+}
+}).catch(error => {
+return next(new APIError(error))
+})
+};*/
 /**
  * @api v1/provider/roomName/: roomName
  * @param req
@@ -141,22 +161,22 @@ exports.checkRoomExist = (req, res, next) => {
 // console.log("checkRoomExist:",req.params,req.query)
 
 User.findOne(req.params).then(result => {
-  if (result && result.status === 'active') {
-    result['password'] = null;
-    result['phoneNumber'] = null;
-    result['cmp'] = null;
-    result['createdAt'] = null;
-    result['permission'] = null;
-    result['updatedAt'] = null;
-    result['email'] = null;
-    res.status(httpStatus.OK).json(result)
-  }
-  else {
-    res.status(httpStatus.NO_CONTENT).end()
-  }
+if (result && result.status === 'active') {
+result['password'] = null;
+result['phoneNumber'] = null;
+result['cmp'] = null;
+result['createdAt'] = null;
+result['permission'] = null;
+result['updatedAt'] = null;
+result['email'] = null;
+res.status(httpStatus.OK).json(result)
+}
+else {
+res.status(httpStatus.NO_CONTENT).end()
+}
 }).catch(error => {
-  console.log("checkRoomExist:", error)
-  return next(new APIError(error));
+console.log("checkRoomExist:", error)
+return next(new APIError(error));
 })
 };
 */
@@ -165,31 +185,58 @@ User.findOne(req.params).then(result => {
  * @api v1/provider/patients-all
  * */
 
-exports.getAllPatients = async (req, res, next) => {
+exports.getAllPatientsByProvider = async (req, res, next) => {
   try {
-    const value = req.query.value;
+    const providerId = req.params.providerId;
+    const limit = parseInt(req.query.limit, 10);
+    const page = parseInt(req.query.page, 10);
+    const dniValue = req.query.dni;
+    const fullNameValue = req.query.fullName;
+
     let sendArr = [];
-    const patients = await Patient.find({ providerId: value }).sort({ fullName: -1, createdAt: -1 });
-    await Promise.all(patients.map(async (p) => {
-      let consult = await Consult.findOne({ patientId: p._id }).sort({ createdAt: -1 });
-      let consultCount = await Consult.count({ patientId: p._id });
+
+    let query = {
+      "providerId": providerId,
+      "dni": { $regex: '.*' + dniValue + '.*' },
+      "fullName": { $regex: '.*' + fullNameValue + '.*' },
+    };
+
+    logger.info("getAllPatientsByProvider : ", query);
+    let optionsPagination = {
+      limit,
+      page,
+      projection: {
+        "dni": 1,
+        "fullName": 1
+      }
+    }
+
+    let listPatient = await Patient.paginate(query, optionsPagination);
+
+    await Promise.all(listPatient.docs.map(async (p) => {
+      const consult = await Consult.findOne({ providerId: providerId, patientId: p._id }).sort({ createdAt: -1 });
+      const consultCnt = await Consult.countDocuments({ providerId: providerId, patientId: p._id }).exec();
       sendArr.push(
         {
           id: p._id,
           dni: p.dni,
           fullName: p.fullName,
-          consultCnt: (undefined == consultCount) ? null : consultCount,
+          consultCnt: (undefined == consultCnt) ? null : consultCnt,
           lastConsult: (undefined == consult) ? null : consult.createdAt
         }
       );
     }));
+
     sendArr.sort((a, b) => {
       if (null != a.lastConsult) return -1;
       if (null != b.lastConsult) return 1;
       if (b.lastConsult > a.lastConsult) return -1;
       return 0;
     });
-    res.status(httpStatus.OK).json(sendArr);
+
+    listPatient.docs = sendArr;
+
+    res.status(httpStatus.OK).json(listPatient);
   } catch (e) {
     console.log("getAllPatients:", e);
     return next(new APIError(e));
@@ -204,7 +251,7 @@ exports.getAllPatients = async (req, res, next) => {
  * */
 
 //I added
-
+/*
 exports.getInitPatients = async (req, res, next) => {
   try {
     const value = req.query.value;
@@ -239,30 +286,39 @@ exports.getInitPatients = async (req, res, next) => {
 exports.getFilterPatients = async (req, res, next) => {
   {
     const providerId = req.params.providerId;
-    const filterValue = req.params.filterValue;
-    const key = req.params.key;
+    const dniValue = req.query.dni;
+    const fullNameValue = req.query.fullName;
 
-    if (key === 'dni')
-      patient = await Patient.findOne({ dni: filterValue }).exec();
-    else
-      patient = await Patient.findOne({ fullName: filterValue }).exec();
-    if (patient) {
-      consultCnt = await Consult.countDocuments({ dni: patient.dni }).exec();
 
-      var sendObj = {
-        id: patient._id,
-        dni: patient.dni,
-        fullName: patient.fullName,
-        consultCnt: consultCnt,
-        lastConsult: patient.lastSeen
-      }
-      res.status(httpStatus.OK).json([sendObj]);
+    let listPatient = await Patient.find({
+      "providerId": providerId,
+      "dni": { $regex: '.*' + dniValue + '.*' },
+      "fullName": { $regex: '.*' + fullNameValue + '.*' },
+    });
+
+    if (listPatient) {
+      let sendArr = [];
+      await Promise.all(listPatient.map(async (p) => {
+        const consult = await Consult.findOne({ patientId: p._id }).sort({ createdAt: -1 });
+        const consultCnt = await Consult.countDocuments({ dni: p.dni }).exec();
+        sendArr.push(
+          {
+            id: p._id,
+            dni: p.dni,
+            fullName: p.fullName,
+            consultCnt: (undefined == consultCnt) ? null : consultCnt,
+            lastConsult: (undefined == consult) ? null : consult.createdAt
+          }
+        );
+      }));
+
+      res.status(httpStatus.OK).json(sendArr);
     } else {
       res.status(httpStatus.OK).json('fail');
     }
 
   }
-};
+};*/
 
 exports.getInitConsult = async (req, res, next) => {
   try {
@@ -653,9 +709,9 @@ exports.getWaitingPatientsData = async (req, res, next) => {
     logger.info("waiting patient connect : " + room);
 
     const SSE_RESPONSE_HEADER = {
-      'Connection': 'keep-alive',
+      // 'Connection': 'keep-alive',
       'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
+      // 'Cache-Control': 'no-cache',
       'Access-Control-Allow-Origin': '*'
     };
     res.writeHead(200, SSE_RESPONSE_HEADER);
@@ -671,26 +727,35 @@ exports.getWaitingPatientsData = async (req, res, next) => {
     ]
 
     const options = { fullDocument: 'updateLookup' };
-    Patient.watch(filter, options).
-      on('change', async (data) => {
-        logger.info("new patient connect : " + data.fullDocument._id);
-        res.write("data:" + JSON.stringify(data.fullDocument) + "\n\n");
-        res.write("\n");
-      });
-    const patientsData = await Patient.find({ room: room
-      //, connection: true 
+    const changeStream = await Patient.watch(filter, options);
+
+    changeStream.on('change', async (data) => {
+      logger.info("change patient connect : " + data.fullDocument._id + " | " + data.fullDocument.connection);
+      res.write(`event: message\n`);
+      res.write("data:" + JSON.stringify(data.fullDocument) + "\n\n");
+      res.write("\n");
+    });
+    const patientsData = await Patient.find({
+      room: room, connection: true
     }).sort({ lastSeen: -1 });
+
     patientsData.forEach(e => {
+      logger.info("list patient connect : " + e._id + " | " + e.connection);
       res.write("data:" + JSON.stringify(e) + "\n\n");
     });
-    req.on("close", function () {
-      console.log(`*** Close. room: ` + room);
+
+    req.on("error", (err) => {
+      logger.error("#rror Close provider for room: " + room, err);
     });
-    req.on("end", function () {
-      console.log("*** End. room:" + room);
+    req.on("close", () => {
+      logger.info("Close provider room end: " + room);
+      changeStream.close();
+    });
+    req.on("end", () => {
+      logger.info("End provider room:" + room);
     });
   } catch (e) {
-    console.log(e);
+    logger.error(e);
     return next(new APIError(e));
   }
 
@@ -701,10 +766,10 @@ exports.getWaitingPatientsData = async (req, res, next) => {
  * *//*
 exports.getRecentPatientsData = async (req, res, next) => {
 try {
-  const recentPatients = await Patient.find({}).sort({ lastSeen: -1 }).limit(10);
-  if (recentPatients) res.status(httpStatus.OK).json(recentPatients);
+const recentPatients = await Patient.find({}).sort({ lastSeen: -1 }).limit(10);
+if (recentPatients) res.status(httpStatus.OK).json(recentPatients);
 } catch (e) {
-  return next(new APIError(e))
+return next(new APIError(e))
 }
 };*/
 
@@ -713,11 +778,11 @@ try {
  * *//*
 exports.getAllPatientsData = async (req, res, next) => {
 try {
-  const room = req.params.room;
-  const allPatients = await Patient.find({ room: room }).sort({ lastSeen: -1 });
-  if (allPatients) res.status(httpStatus.OK).json(allPatients);
+const room = req.params.room;
+const allPatients = await Patient.find({ room: room }).sort({ lastSeen: -1 });
+if (allPatients) res.status(httpStatus.OK).json(allPatients);
 } catch (e) {
-  return next(new APIError(e))
+return next(new APIError(e))
 }
 };*/
 
@@ -1147,31 +1212,31 @@ exports.removeCard = async (req, res, next) => {
  * *//*
 exports.notify = async (req, res, next) => {
 try {
-  const payResult = req.body;
-  if (payResult && payResult.order.buyer) {
-    const email = payResult.order.buyer.email;
-    const paymentType = payResult.order.payMethod.type;
-    const paymentState = payResult.order.status;
-    if (paymentState === 'COMPLETED') {
-      const paidPatient = await Patient.findOneAndUpdate({ transactionMail: email }, {
-        paymentType: paymentType,
-        paymentState: paymentState
-      }, { new: true });
+const payResult = req.body;
+if (payResult && payResult.order.buyer) {
+const email = payResult.order.buyer.email;
+const paymentType = payResult.order.payMethod.type;
+const paymentState = payResult.order.status;
+if (paymentState === 'COMPLETED') {
+const paidPatient = await Patient.findOneAndUpdate({ transactionMail: email }, {
+paymentType: paymentType,
+paymentState: paymentState
+}, { new: true });
 
-      if (paidPatient) {
-        const order = payResult.order;
-        const transactionData = {
-          orderId: order.orderId, orderCreateDate: order.orderCreateDate, currencyCode: order.currencyCode,
-          totalAmount: order.totalAmount, email: order.buyer.email, firstName: order.buyer.firstName, lastName: order.buyer.lastName
-        };
-        const newTransaction = await new Transaction(transactionData).save();
-        console.log("New transaction created successfully", newTransaction)
-      }
-    }
-  }
-  res.status(httpStatus.OK).send()
+if (paidPatient) {
+const order = payResult.order;
+const transactionData = {
+orderId: order.orderId, orderCreateDate: order.orderCreateDate, currencyCode: order.currencyCode,
+totalAmount: order.totalAmount, email: order.buyer.email, firstName: order.buyer.firstName, lastName: order.buyer.lastName
+};
+const newTransaction = await new Transaction(transactionData).save();
+console.log("New transaction created successfully", newTransaction)
+}
+}
+}
+res.status(httpStatus.OK).send()
 } catch (e) {
-  return next(APIError(e))
+return next(APIError(e))
 }
 };*/
 
@@ -1382,11 +1447,13 @@ exports.createFeedback = async (req, res, next) => {
  * */
 exports.getFeedBacks = async (req, res, next) => {
   try {
-    let feedbackProvider = await FeedbackProvider.find({ providerId: req.params.providerId }).exec();
-    await Promise.all(feedbackProvider.map(async (p) => {
+    let feedbackProvider = await FeedbackProvider.find({
+      providerId: req.params.providerId
+    }, { ranking: 1, comment: 1 }).exec();
+    /*await Promise.all(feedbackProvider.map(async (p) => {
       const patient = await Patient.findById(p.patientId);
       p.patient = patient;
-    }));
+    }));*/
     res.status(httpStatus.OK).json(feedbackProvider);
   } catch (e) {
     console.log(e)

@@ -9,7 +9,7 @@
         <mat-card-title class="p-4 font-18 text-black-50">You can invite any patient to your waiting room, share this link:</mat-card-title>
         <div class=" d-block justify-content-between p-4">
           <div class="d-flex ">
-            <input  #inputRoom class="w-50 p-10 border-radius-5 " type="text" value="{{roomUrl}}" >
+            <label>{{domain}}</label><input  #inputRoom class="w-50 p-10 border-radius-5 " type="text" value="{{roomUrl}}" >
             <button  class="text-white font-bold   copy-invite-url" (click)="copyRoomAddress(inputRoom)">Copy</button>
             <button  class="text-white font-bold   copy-invite-url" (click)="saveRoomAddress(inputRoom)">Save</button>
 

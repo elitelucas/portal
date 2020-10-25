@@ -3,7 +3,7 @@ import { MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort } from "
 import { ProviderService } from './../../../_services/provider.service';
 import { Router } from "@angular/router";
 import { AddPatientComponent } from './add-patient/add-patient.component';
-import { FormGroup, FormBuilder,Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 
 
@@ -28,8 +28,11 @@ export class PatientChartsComponent implements OnInit {
   noDataToDisplay: boolean = false;
   dataSource: any;
   providerId: any;
-  searchForm:FormGroup;
-  submitted:boolean=false;
+  searchForm: FormGroup;
+  submitted: boolean = false;
+
+  limit = 10;
+  page = 1;
 
   @ViewChild(MatTable) table: MatTable<any>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -37,36 +40,35 @@ export class PatientChartsComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private providerService: ProviderService,
-    private formBuilder:FormBuilder,
+    private formBuilder: FormBuilder,
     private router: Router) {
   }
 
   ngOnInit(): void {
     this.searchForm = this.formBuilder.group({
-      matInput: ['', Validators.required]
+      dniInput: ['', Validators.maxLength(8)],
+      fullNameInput: ['', Validators.maxLength(100)]
     });
     this.initData();
   }
 
   initData() {
     this.providerId = JSON.parse(localStorage.getItem('currentUser')).id;
-    this.refreshList();
+    this.applyFilter();
+    //this.refreshList();
   }
 
-  refreshList() {
-    /*this.ProviderService.getAllPatientsData(this.providerId, 'id').subscribe(res => {
-      if (res) {
-    this.providerId=JSON.parse(localStorage.getItem('currentUser')).id;*/
-    this.providerService.getInitPatientsData(this.providerId,'id').subscribe(res=> {
-      if(res) {
-        console.log("patient data s>>>>>>>>>>>>>", res)
-        this.initDataSource(res)
-        this.noDataToDisplay = false;
-      } else {
-        this.noDataToDisplay = true;
-      }
-    });
-  }
+  /* refreshList() {
+     this.providerService.getAllPatientsData(this.providerId, "", "", this.limit, this.page).subscribe(res => {
+       if (res) {
+         console.log("patient data s>>>>>>>>>>>>>", res)
+         this.initDataSource(res)
+         this.noDataToDisplay = false;
+       } else {
+         this.noDataToDisplay = true;
+       }
+     });
+   }*/
 
   newPatient() {
     const dialogRef = this.dialog.open(AddPatientComponent, {
@@ -76,9 +78,9 @@ export class PatientChartsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe(result => {
       let param = {
-        id : result.resultPatient.patient._id
+        id: result.resultPatient.patient._id
       }
-      this.refreshList();
+      //this.refreshList();
       this.detail(param)
     })
 
@@ -86,7 +88,7 @@ export class PatientChartsComponent implements OnInit {
 
   initDataSource(data) {
     const PatientData: PatientData[] = [];
-    data.forEach(function (item) {
+    data.docs.forEach(function (item) {
       if (item) {
         PatientData.push({
           id: item.id,
@@ -100,49 +102,50 @@ export class PatientChartsComponent implements OnInit {
     this.dataSource = new MatTableDataSource<PatientData>(PatientData);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    console.log("this.dataSource.paginator");
+    console.log(this.dataSource.paginator);
+
   }
   get f() { return this.searchForm.controls; }
 
   applyFilter() {
-    this.submitted=true;
-    const filterValue = this.f.matInput.value;
-  
-    if(filterValue){
-      console.log('filterValue')
-      console.log(filterValue)
-    }
-      
-      if (this.searchForm.invalid) {
-        return;
-      }
 
-    const validateDni=/^\d*$/.test(filterValue);
-    const validateName=/^[a-zA-Z ]*$/.test(filterValue);
-    if(validateDni || validateName){
-      var key='';
-      console.log('sdf')
-      if(validateDni){
-        key='dni';
-      }else{
-        key='name';
-      }
-        this.providerService.getFilterPatientsData(this.providerId,filterValue,key).subscribe(res=> {
-          if(res!=='fail') {
-            console.log("patient data s>>>>>>>>>>>>>", res)
-            this.initDataSource(res)
-            this.noDataToDisplay = false;
-          } else{
-            Swal.fire('There is no such dni or fullName.')
-            this.noDataToDisplay = true;
-          }
-        })      
-    }else{
-      Swal.fire('Input correctly!')
+    this.submitted = true;
+    const dniValue = this.f.dniInput.value;
+    const fullNamevalue = this.f.fullNameInput.value;
+
+    if (this.searchForm.invalid) {
+      Swal.fire('Invalid values');
+      console.log(this.searchForm.value);
+      return;
     }
-     
-      
+
+    this.providerService.getAllPatientsData(this.providerId, dniValue, fullNamevalue, this.limit, this.page).subscribe(res => {
+      if (res !== 'fail') {
+        console.log("patient data s>>>>>>>>>>>>>", res)
+        this.initDataSource(res)
+        this.noDataToDisplay = false;
+      } else {
+        Swal.fire('There is no such dni or fullName.')
+        this.noDataToDisplay = true;
+      }
+    })
+
+
+
     // this.dataSource.filter = filterValue.trim().toLowerCase();
   }
+
+  onPageFired(event) {
+    console.log("event");
+    console.log(event);
+    this.page = event.pageIndex + 1;
+    this.limit = event.pageSize ;
+    this.applyFilter();
+
+  }
+
+
   arrangeDataSource() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;

@@ -11,6 +11,9 @@ const { authorize } = require('../../middlewares/auth');
 router.route('/invite-by-sms')
   .post(authorize(), controller.inviteBySMS);
 
+router.route('/room/:providerId')
+  .patch(authorize(), controller.updateRoom);
+
 /**
  * @api v1/provider/mediaUpload
  * @param file
@@ -30,12 +33,12 @@ router.route('/room/:userId')
  * @api v1/provider/room/:userId
  * @param userId, field, value
  * */
-
+/*
 router.route('/room/:userID')
   .patch(authorize(), controller.changeRoomField)
 
 router.route('/text/:userID')
-  .patch(authorize(), controller.changeRoomField)
+  .patch(authorize(), controller.changeRoomField)*/
 /**
  * @api v1/provider/roomName/: roomName
  * @param roomName
@@ -58,14 +61,14 @@ router.route('/patient/:patientId')
 
 
 //I added 
-router.route('/allPatients')
-  .get(authorize(), controller.getAllPatients);
+router.route('/allPatients/:providerId')
+  .get(authorize(), controller.getAllPatientsByProvider);
 
-router.route('/initPatients')
+/*router.route('/initPatients')
   .get(authorize(), controller.getInitPatients);
 
-router.route('/filterPatients/:providerId/:filterValue/:key')
-  .get(authorize(), controller.getFilterPatients);
+router.route('/filterPatients/:providerId')
+  .get(authorize(), controller.getFilterPatients);*/
 
 
 router.route('/consult/:patientId')
@@ -147,7 +150,7 @@ router.route('/patients-recent')
  * @param id
  * *//*
 router.route('/patients-all/:room')
-  .get(authorize(), controller.getAllPatientsData);*/
+ .get(authorize(), controller.getAllPatientsData);*/
 /**
  * @api v1/provider/resetState
  * @params model, field 'to reset'
@@ -201,7 +204,7 @@ router.route('/card/:cardId')
  * @api v1/provider/notify
  * *//*
 router.route('/notify')
-  .post(authorize(), controller.notify)
+ .post(authorize(), controller.notify)
 */
 /**
  * @api v1/provider/chart
@@ -243,7 +246,7 @@ router.route('/consult/:consultId/close')
  * @method post
  * *//*
 router.route('/feedback')
-  .post(authorize(), controller.createFeedback);
+ .post(authorize(), controller.createFeedback);
 */
 /**
    * @api v1/provider/feedback

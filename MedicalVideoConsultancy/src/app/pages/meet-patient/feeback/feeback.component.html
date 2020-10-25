@@ -11,11 +11,11 @@
                     <div class="col-md-6 w-100 p-10 border-radius-5 scroll-div">
                         <label>Dr: alt</label><br>
                         <label>Raking</label><br>
-                        <input formControlName="rakingProvider" type="radio" name="rakingProvider" value=1>Muy mala atencion<br>
-                        <input formControlName="rakingProvider" type="radio" name="rakingProvider" value=2>Mala atecion<br>
-                        <input formControlName="rakingProvider" type="radio" name="rakingProvider" value=3>Buena atecion<br>
-                        <input formControlName="rakingProvider" type="radio" name="rakingProvider" value=4>Muy buena atecion<br>
-                        <input formControlName="rakingProvider" type="radio" name="rakingProvider" value=5>Excelente atecion<br>
+                        <input formControlName="rankingProvider" type="radio" name="rankingProvider" value=1>Muy mala atencion<br>
+                        <input formControlName="rankingProvider" type="radio" name="rankingProvider" value=2>Mala atecion<br>
+                        <input formControlName="rankingProvider" type="radio" name="rankingProvider" value=3>Buena atecion<br>
+                        <input formControlName="rankingProvider" type="radio" name="rankingProvider" value=4>Muy buena atecion<br>
+                        <input formControlName="rankingProvider" type="radio" name="rankingProvider" value=5>Excelente atecion<br>
                         <label>Comment</label><br>
                         <textarea formControlName="feedBackProvider" name="feedBackProvider" class="border-radius-5 chat-input" type="text"
                             placeholder="Comment" required></textarea><br>
@@ -24,18 +24,18 @@
                     <div class="col-md-6 w-100 p-10 border-radius-5 scroll-div">
                         <label>Aplication</label><br>
                         <label>Raking</label><br>
-                        <input formControlName="rakingApp"  type="radio" name="rakingApp" value=1>Muy mala experiencia<br>
-                        <input formControlName="rakingApp" type="radio" name="rakingApp" value=2>Mala experiencia<br>
-                        <input formControlName="rakingApp" type="radio" name="rakingApp" value=3>Buena experiencia<br>
-                        <input formControlName="rakingApp" type="radio" name="rakingApp" value=4>Muy buena experiencia<br>
-                        <input formControlName="rakingApp" type="radio" name="rakingApp" value=5>Excelente experiencia<br>
+                        <input formControlName="rankingApp"  type="radio" name="rankingApp" value=1>Muy mala experiencia<br>
+                        <input formControlName="rankingApp" type="radio" name="rankingApp" value=2>Mala experiencia<br>
+                        <input formControlName="rankingApp" type="radio" name="rankingApp" value=3>Buena experiencia<br>
+                        <input formControlName="rankingApp" type="radio" name="rankingApp" value=4>Muy buena experiencia<br>
+                        <input formControlName="rankingApp" type="radio" name="rankingApp" value=5>Excelente experiencia<br>
                         <label>Comment</label><br>
                         <textarea formControlName="feedBackApp" name="feedBackApp" class="border-radius-5 chat-input" type="text"
                             placeholder="Comment" required></textarea>
                     </div>
 
                     <div>
-                        <button type="submit" style="bottom: 0;" class="btn btn-primary">Send</button>
+                        <button type="submit" style="bottom: 0;" class="btn btn-primary" [disabled]="disabledButton">Send</button>
                     </div>
                 </form>
             </mat-card-content>

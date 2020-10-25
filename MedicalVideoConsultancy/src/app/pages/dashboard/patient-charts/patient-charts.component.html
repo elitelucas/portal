@@ -3,18 +3,22 @@
   <br>
   <form [formGroup]="searchForm" (ngSubmit)="applyFilter()">
     <mat-label>Please search(DNI or FullName) ...</mat-label>
-    <input formControlName="matInput" class="input-stl" style="width:34%"
-      [ngClass]="{ 'is-invalid': submitted && f.matInput.errors }" placeholder="Jone Doe" />
-    <button type="submit" class="btn btn-primary ml-3">Search</button>
-    <div *ngIf="submitted && f.matInput.errors" class="invalid-feedback">
-      <div *ngIf="f.matInput.errors.required">Full Name or dni is required</div>
-      <div *ngIf="f.matInput.errors.pattern">Input correctly.</div>
+    <input formControlName="dniInput" class="input-stl" style="width:34%"
+      [ngClass]="{ 'is-invalid': submitted && f.dniInput.errors }" placeholder="98765432" />
+    <div *ngIf="submitted && f.dniInput.errors" class="invalid-feedback">
+      <div *ngIf="f.dniInput.errors.maxLength">Input correctly.</div>
     </div>
+    <input formControlName="fullNameInput" class="input-stl" style="width:34%"
+      [ngClass]="{ 'is-invalid': submitted && f.fullNameInput.errors }" placeholder="Jone Doe" />
+    <div *ngIf="submitted && f.fullNameInput.errors" class="invalid-feedback">
+      <div *ngIf="f.fullNameInput.errors.maxLength">Input correctly.</div>
+    </div>
+    <button type="submit" class="btn btn-primary ml-3">Search</button>
 
   </form>
   <br>
   <div>
-    <button class="text-white font-bold   copy-invite-url" (click)="refreshList()">Refresh</button>
+    <!-- <button class="text-white font-bold   copy-invite-url" (click)="refreshList()">Refresh</button> -->
     <button class="text-white font-bold   copy-invite-url" (click)="newPatient()">New Patient</button>
   </div>
   <br>
@@ -59,7 +63,8 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
-  <mat-paginator [pageSizeOptions]="[10, 15]" showFirstLastButtons></mat-paginator>
+  <mat-paginator  #paginator [pageIndex]="page"  [pageSize]="limit" [pageSizeOptions]="[10, 15]" showFirstLastButtons 
+  (page)="onPageFired($event)"></mat-paginator>
 </div>
 <ng-container *ngIf="noDataToDisplay">
   <div class="text-center">

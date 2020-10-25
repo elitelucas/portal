@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PatientService } from '../../../_services/patient.service';
 import { ProviderService } from '../../../_services/provider.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-feeback',
@@ -17,14 +18,16 @@ export class FeebackComponent implements OnInit {
 
   feedBackForm: FormGroup;
 
+  disabledButton = false;
+
   constructor(
     private formBuilder: FormBuilder,
     private patientService: PatientService,
     private _router: Router) {
     this.feedBackForm = this.formBuilder.group({
-      rakingProvider: ['', [Validators.required, Validators.minLength(1)]],
+      rankingProvider: ['', [Validators.required, Validators.minLength(1)]],
       feedBackProvider: ['', [Validators.required, Validators.minLength(2)]],
-      rakingApp: ['', [Validators.required, Validators.minLength(1)]],
+      rankingApp: ['', [Validators.required, Validators.minLength(1)]],
       feedBackApp: ['', [Validators.required, Validators.minLength(2)]]
     });
   }
@@ -36,7 +39,9 @@ export class FeebackComponent implements OnInit {
 
   sendFeedBack() {
     if (this.feedBackForm.valid) {
+      this.disabledButton = true;
       this.patientService.save(this.providerData._id, this.patientData._id, this.feedBackForm.value).subscribe((res) => {
+        Swal.fire('Feedback register')
         this._router.navigateByUrl('/');
       });
     }

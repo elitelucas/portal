@@ -34,6 +34,7 @@ export class NewConsultComponent implements OnInit {
   @ViewChild("fileUpload", { static: false }) fileUpload: ElementRef; files = [];
 
   newConsult = null;
+  patientAge = 0;
 
   constructor(
     private activatedroute: ActivatedRoute,
@@ -59,10 +60,20 @@ export class NewConsultComponent implements OnInit {
           this.fileName = this.iteralData.providerFiles;
           this.dataDisplay = true;
           this.getChart(this.iteralData.patient);
+          let dateString = this.iteralData.patient['birthdate'] + 'T00:00:00'
+          let newDate = new Date(dateString);
+          let timeDiff = Math.abs(Date.now() - newDate.getTime());
+          let age = Math.floor((timeDiff / (1000 * 3600 * 24)) / 365.25);
+          this.patientAge = age;
         })
     } else {
       this.iteralData = new Consult();
       this.providerService.getPatient(this.data.id, "id").subscribe((patient: Patient) => {
+        let dateString = patient.birthdate + 'T00:00:00'
+        let newDate = new Date(dateString);
+        let timeDiff = Math.abs(Date.now() - newDate.getTime());
+        let age = Math.floor((timeDiff / (1000 * 3600 * 24)) / 365.25);
+        this.patientAge = age;
         this.iteralData.patient = patient;
         this.iteralData.timeOfDisease = '';
         this.iteralData.wayOfStart = '';

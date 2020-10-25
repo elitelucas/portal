@@ -3,6 +3,7 @@ import * as io from 'socket.io-client'
 import { environment } from "../../environments/environment";
 import { Observable } from "rxjs";
 import { Patient } from '../_model/user';
+import { OnDestroy } from '@angular/core';
 
 declare var Peer: any;
 
@@ -28,6 +29,8 @@ export class MeetRoomService {
 
   public confirmConnect(userProvider) {
     this.socket = io(environment.socket_endpoint);
+    console.log(this.socket);
+
     /* console.log("confirmConnect:", userProvider);
      console.log("confirmConnect:", this.myPeerId);*/
     this.socket.emit('confirmConnect', userProvider);
@@ -78,6 +81,7 @@ export class MeetRoomService {
     this.localVideo.nativeElement.volume = 0;
     this.localVideo.nativeElement.muted = 0;
   }
+
 
   public setRemoteElement(rv) {
     this.remoteVideo = rv;

@@ -7,6 +7,7 @@ import { Router } from "@angular/router";
 import { MeetRoomService } from "../../../_services/meet-room.service";
 import { WebcamInitError, WebcamUtil } from "ngx-webcam";
 import { Patient, Consult } from "../../../_model/user";
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-health-provider',
@@ -50,9 +51,7 @@ export class HealthProviderComponent implements OnInit {
   }
 
   initProviderRoom() {
-    this.roomUrl = this.domain + this.currentUser.room;
-    this.checkConnectionStatus();
-    this.getWaitingPatientsData();
+    this.roomUrl = this.currentUser.room;
     WebcamUtil.getAvailableVideoInputs()
       .then((mediaDevices: MediaDeviceInfo[]) => {
         this.noDevice = !mediaDevices.length;
@@ -78,28 +77,25 @@ export class HealthProviderComponent implements OnInit {
    */
   }
 
-  checkConnectionStatus() {
-    //this.meetRoomService.setUpConnection(this.currentUser);
-  }
-
-  getWaitingPatientsData() {
-    //TODO
-
-    /*this.providerService.getWaitingPatientsData(this.currentUser.room)
-      .subscribe(result => {
-        this.patientsData = result;
-        //console.log("waiting room patients", result) 
-      });*/
-  }
-
   copyRoomAddress(inputRoom) {
+    //requeire un hidden para tener la url completa 
     inputRoom.select();
     document.execCommand('copy');
     inputRoom.setSelectionRange(0, 0);
   }
 
   saveRoomAddress(inputRoom) {
-
+    this.providerService.updateRoom(this.currentUser.id, inputRoom.value)
+    .subscribe(result => {
+      this.currentUser.room = inputRoom.value;
+      localStorage.setItem('currentUser', JSON.stringify(this.currentUser));
+      this.roomUrl = inputRoom.value;
+      Swal.fire('Updated successfully');
+    },err =>{
+      if(err.status == 409){
+        Swal.fire('Error room exists');
+      }
+    });
   }
 
   sendInvite(option) {

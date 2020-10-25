@@ -15,12 +15,45 @@ import { ArrayType } from '@angular/compiler';
 export class ProviderService {
 
   baseUrl = env.baseUrl;
+  eventSourceWaitingPatient : EventSource;
 
   //eventSource: any = window['EventSource'];
 
   constructor(private http: HttpClient, private _zone: NgZone) {
   }
 
+  close(){
+    if(this.eventSourceWaitingPatient){
+      console.log("ProviderService close");
+      this.eventSourceWaitingPatient.close();
+      this.eventSourceWaitingPatient = null;
+    }
+  }
+
+  getWaitingPatientsData(room, reconnect) {
+    const waitingPatientUrl = this.baseUrl + 'provider/patients-waiting/' + room;
+    this.eventSourceWaitingPatient = new EventSource(waitingPatientUrl);
+    return Observable.create(observer => {
+      this.eventSourceWaitingPatient.onopen = (event) => {
+        console.log('getWaitingPatientsData2 connected');
+      };
+      this.eventSourceWaitingPatient.onmessage = (event) => {
+        //console.log("getWaitingPatientsData2 data onmessage",event.data);
+        observer.next(event.data);
+      };
+      this.eventSourceWaitingPatient.onerror = (event) => {
+        console.log("onerror ", event.target["readyState"]);
+        this.eventSourceWaitingPatient.close();
+        switch (event.target["readyState"]) {
+          case EventSource.CLOSED:
+            setTimeout(function () {
+              reconnect();
+            }, 5000);
+            break;
+        }
+      };
+    });
+  }
 
   sendSMS(smsData) {
     const smsUrl = this.baseUrl + 'provider/invite-by-sms';
@@ -62,19 +95,26 @@ export class ProviderService {
 
   //I added new func to get all patients data.
 
-  getAllPatientsData(value, field) {
-    const patientUrl = this.baseUrl + 'provider/allPatients';
-    let params = new HttpParams().set("key", field).set("value", value);
-    this.trace("getAllPatientsData:", patientUrl, params);
+  getAllPatientsData(providerId, validateDni, validateName , limit, page) {
+    const patientUrl = this.baseUrl + 'provider/allPatients/'+providerId;
+    let params = new HttpParams().set("dni", validateDni).set("fullName", validateName).set("limit", limit).set("page", page);
+   // this.trace("getAllPatientsData:", patientUrl, params);
     return this.http.get<any>(patientUrl, { params });
   }
 
-  getInitPatientsData(value, field) {
+  /*getInitPatientsData2(value, field) {
     const patientUrl = this.baseUrl + 'provider/initPatients';
     let params = new HttpParams().set("key", field).set("value", value);
     this.trace("getAllPatientsData:", patientUrl, params);
     return this.http.get<any>(patientUrl, { params });
   }
+
+  getFilterPatientsData2(providerId, validateDni, validateName) {
+    const patientUrl = this.baseUrl + 'provider/filterPatients/' + providerId ;
+    this.trace("getFilterPatientsData:", patientUrl);
+    let params = new HttpParams().set("dni", validateDni).set("fullName", validateName);
+    return this.http.get<any>(patientUrl, { params });
+  }*/
 
   getConsult(id, startDate, endDate) {
     const patientUrl = this.baseUrl + 'provider/consult/patient/' + id;
@@ -86,12 +126,7 @@ export class ProviderService {
     return this.http.get<any>(patientUrl, { params });
 
   }
-  getFilterPatientsData(providerId, filterValue, key) {
 
-    const patientUrl = this.baseUrl + 'provider/filterPatients/' + providerId + '/' + filterValue + '/' + key;
-    this.trace("getFilterPatientsData:", patientUrl);
-    return this.http.get<any>(patientUrl);
-  }
 
   getInitConsult(id) {
     const patientUrl = this.baseUrl + 'provider/consult/' + id;
@@ -174,30 +209,6 @@ export class ProviderService {
     return this.http.put(patientUrl, patientData)
   }
 
-  getWaitingPatientsData(room, reconnect) {
-    const waitingPatientUrl = this.baseUrl + 'provider/patients-waiting/' + room;
-    return Observable.create(observer => {
-      const eventSource = new EventSource(waitingPatientUrl);
-      eventSource.onopen = (event) => {
-        console.log('getWaitingPatientsData2 connected');
-      };
-      eventSource.onmessage = (event) => {
-        //console.log("getWaitingPatientsData2 data onmessage",event.data);
-        observer.next(event.data);
-      };
-      eventSource.onerror = (event) => {
-        console.log("onerror ", event);
-        eventSource.close();
-        switch (event.target["readyState"]) {
-          case EventSource.CLOSED:
-            setInterval(function () {
-              reconnect();
-            }, 1000);
-            break;
-        }
-      };
-    });
-  }
 
   disconnectPatient(patientId) {
     const patientUrl = this.baseUrl + 'provider/patient/disconnect/' + patientId;
@@ -215,6 +226,14 @@ export class ProviderService {
     let createConsultUrl = this.baseUrl + "provider/consult/" + consultId + "/close";
     this.trace("createConsultUrl:", createConsultUrl);
     return this.http.patch(createConsultUrl, null);
+  }
+
+  updateRoom(providerId, room) {
+    let createConsultUrl = this.baseUrl + "provider/room/" + providerId;
+    return this.http.patch(createConsultUrl, {
+      room: room
+    });
+
   }
 
   getLastAttetionsPatientsDataProvider(userId) {

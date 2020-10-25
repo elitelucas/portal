@@ -50,6 +50,7 @@
     "jquery": "^3.5.1",
     "ng-bootstrap-pagination": "^0.2.3",
     "ng-chartist": "4.1.0",
+    "ng-event-source": "^1.0.14",
     "ng2-tel-input": "^2.3.0",
     "ngx-videogular": "^9.0.1",
     "ngx-webcam": "^0.3.0",

@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate-v2');
+
 const APIError = require('../utils/APIError');
 const httpStatus = require('http-status');
 const bcrypt = require('bcryptjs');
@@ -117,7 +119,6 @@ const patientSchema = new Schema({
   timestamps: true
 });
 
-
 patientSchema.statics = {
   checkDuplicateField(error) {
     let field = '';
@@ -198,6 +199,10 @@ patientSchema.method({
     return dni == this.dni;
   },
 });
+
+
+patientSchema.plugin(mongoosePaginate);
+
 
 /**
  * @typedef Patient

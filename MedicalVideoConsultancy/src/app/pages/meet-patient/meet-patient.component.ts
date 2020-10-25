@@ -1,4 +1,5 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit, 
+  HostListener, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Patient } from '../../_model/user';
 import { AuthPatientService } from '../../_services/auth.patient.service';
@@ -10,7 +11,7 @@ import { MeetRoomPatientService } from '../../_services/meet-room-patient.servic
   templateUrl: './meet-patient.component.html',
   styleUrls: ['./meet-patient.component.css']
 })
-export class MeetPatientComponent implements OnInit {
+export class MeetPatientComponent implements OnInit, OnDestroy {
 
   private roomName: string;
   public providerData: any;
@@ -26,6 +27,8 @@ export class MeetPatientComponent implements OnInit {
   identify = null;
   identify_patient = 'OK';
   no_identify_patient = 'NOK';
+
+  listEvent = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -46,35 +49,23 @@ export class MeetPatientComponent implements OnInit {
     this.patientData['room'] = this.providerData.room;
     this.patientData['providerId'] = this.providerData._id;
 
-    this.patientService.updatePatient(this.patientData).subscribe((patientUpdated: Patient) => {
-      this.meetRoomPatientService.confirmConnectPatient(patientUpdated);
-      this.patientData = patientUpdated;
-    });
-
     this.route.paramMap.subscribe(params => {
       this.roomName = params.get('roomName');
     });
 
   }
 
-
-  getProviderState(){
-
-    this.patientService.getProviderState(this.providerData.room, () => {
-      //console.log("reconnect getWaitingPatientsData2");
-      this._ngZone.run(() => {
-        this.getProviderState();
-      });
-    }).subscribe(result => {
-      this._ngZone.run(() => {
-        let prov = JSON.parse(result);
-        //console.log(prov);
-        console.log("prov.connection:", prov.connection);
-        console.log("prov.calling:", prov.calling);
-        this.providerData.connection = prov.connection;
-      });
-    });
+  @HostListener('window:beforeunload')
+  onBrowserClose() {
+    console.log("beforeunload");
+    this.ngOnDestroy();
   }
+  ngOnDestroy(): void {
+    console.log("ngOnDestroyngOnDestroyngOnDestroyngOnDestroy");
+    this.patientService.close();
+    //this.listEvent.unsubscribe(); 
+  }
+
 
   ngOnInit() {
     if (this.no_identify_patient == this.identify) {
@@ -88,9 +79,17 @@ export class MeetPatientComponent implements OnInit {
       return;
     }
 
-
-
     this.getProviderState();
+
+    this.patientService.updatePatient(this.patientData).subscribe((patientUpdated: Patient) => {
+      this.meetRoomPatientService.confirmConnectPatient(patientUpdated);
+      this.patientData = patientUpdated;
+      this.completeLoad();
+    });
+
+  }
+
+  completeLoad(){
 
     let step_cache = localStorage.getItem('step_attetion');
     if (step_cache) {
@@ -126,6 +125,7 @@ export class MeetPatientComponent implements OnInit {
     this.meetRoomPatientService.receiveEndCall()
       .subscribe(async (text) => {
         if (text === 'endCall') {
+          console.log("send confirm End call to provider : " + this.providerData.socketId);
           this.meetRoomPatientService.endCall(this.providerData.socketId, 'acceptEnd');
           this.meetRoomPatientService.stopVideoAudio();
           this.meetRoomPatientService.disconnectMe();
@@ -133,6 +133,26 @@ export class MeetPatientComponent implements OnInit {
           localStorage.setItem('step_attetion', this.step.toString());
         }
       });
+  }
+
+  getProviderState(){
+
+    this.listEvent =  this.patientService.getProviderState(this.providerData.room, () => {
+      //console.log("reconnect getWaitingPatientsData2");
+      this._ngZone.run(() => {
+        this.getProviderState();
+      });
+    });
+    
+    this.listEvent.subscribe(result => {
+      this._ngZone.run(() => {
+        let prov = JSON.parse(result);
+        //console.log(prov);
+        console.log("prov.connection:", prov.connection);
+        console.log("prov.calling:", prov.calling);
+        this.providerData.connection = prov.connection;
+      });
+    });
   }
 
   public exit() {

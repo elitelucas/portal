@@ -6,8 +6,9 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  HostListener, 
   ViewChild,
-  ElementRef,
+  ElementRef
 } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
 import { MenuItems } from '../../../shared/menu-items/menu-items';
@@ -25,7 +26,7 @@ import { timer } from 'rxjs';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class AppSidebarComponent implements OnInit {
+export class AppSidebarComponent implements OnInit , OnDestroy {
 
   public btnActiveShow: boolean = true;
   public btnDesactiveShow: boolean = false;
@@ -46,7 +47,9 @@ export class AppSidebarComponent implements OnInit {
   // alarmButtonKey = false;
   audio: any;
 
-  patientListMap = new Map()
+  patientListMap = new Map();
+
+  listEvent = null;
 
   constructor(
     public menuItems: MenuItems,
@@ -58,6 +61,16 @@ export class AppSidebarComponent implements OnInit {
     private router: Router
   ) {
 
+  }
+  @HostListener('window:beforeunload')
+  onBrowserClose() {
+    console.log("beforeunload");
+    this.ngOnDestroy();
+  }
+  ngOnDestroy(): void {
+    console.log("ngOnDestroyngOnDestroyngOnDestroyngOnDestroy");
+    this.providerService.close();
+    //this.listEvent.unsubscribe(); 
   }
 
   ngOnInit(): void {
@@ -106,12 +119,15 @@ export class AppSidebarComponent implements OnInit {
   }
 
   listWaitingPatient() {
-    this.providerService.getWaitingPatientsData(this.currentUser.room, () => {
-      //console.log("reconnect getWaitingPatientsData2");
+
+    this.listEvent = this.providerService.getWaitingPatientsData(this.currentUser.room, () => {
+      console.log("reconnect getWaitingPatientsData");
       this._ngZone.run(() => {
         this.listWaitingPatient();
       });
-    }).subscribe(result => {
+    })
+
+    this.listEvent.subscribe(result => {
       this._ngZone.run(() => {
         const data = JSON.parse(result);
         if (data.connection) {
@@ -139,13 +155,12 @@ export class AppSidebarComponent implements OnInit {
   async confirmConnect() {
 
     //await timer(2000).toPromise();  
+    this.meetRoomService.confirmConnect(this.currentUser);
     if (this.provider_connect_inactive == localStorage.getItem('provider_connect')) {
       localStorage.setItem('provider_connect', this.provider_connect);
-      this.meetRoomService.confirmConnect(this.currentUser);
       return;
     }
     if (this.provider_connect_active == localStorage.getItem('provider_connect')) {
-      this.meetRoomService.confirmConnect(this.currentUser);
       this.desactive();
     }
     this.active();

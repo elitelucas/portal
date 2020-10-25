@@ -166,7 +166,7 @@ exports.createFeedback = async (req, res, next) => {
     await new FeedbackApplication({
       patientId: patientsData._id,
       providerId: providerData._id,
-      raking: req.body.feeback.rakingApp,
+      ranking: req.body.feeback.rankingApp,
       comment: req.body.feeback.feedBackApp
     }).save();
 
@@ -184,9 +184,9 @@ exports.getProviderState = async (req, res, next) => {
     logger.info("getProviderState connect providerId : " + room);
 
     const SSE_RESPONSE_HEADER = {
-      'Connection': 'keep-alive',
+      // 'Connection': 'keep-alive',
       'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
+      // 'Cache-Control': 'no-cache',
       'Access-Control-Allow-Origin': '*'
     };
     res.writeHead(200, SSE_RESPONSE_HEADER);
@@ -201,22 +201,34 @@ exports.getProviderState = async (req, res, next) => {
     ]
 
     const options = { fullDocument: 'updateLookup' };
-    User.watch(filter, options).
+    const changeStream = await User.watch(filter, options);
+
+    changeStream.
       on('change', async (data) => {
-        logger.info("provider connect : " + data.fullDocument._id);
+        logger.info("change provider connect : " + data.fullDocument._id + " | " + data.fullDocument.connection + " | " + data.fullDocument.state);
+        res.write(`event: message\n`);
         res.write("data:" + JSON.stringify(data.fullDocument) + "\n\n");
         res.write("\n");
       });
-    const patientsData = await User.findOne({ room: room }).sort({ lastSeen: -1 });
-    res.write("data:" + JSON.stringify(patientsData) + "\n\n");
-    req.on("close", function () {
-      console.log(`*** Close patient for room: ` + room);
+
+    const providerData = await User.findOne({ room: room, connection: true }).sort({ lastSeen: -1 });
+    if (providerData) {
+      logger.info("provider connect : " + providerData._id + " | " + providerData.connection + " | " + providerData.state);
+      res.write("data:" + JSON.stringify(providerData) + "\n\n");
+    }
+
+    req.on("error", (err) => {
+      logger.error("Error Close patient for room: " + room, err);
     });
-    req.on("end", function () {
-      console.log("*** End patient for room:" + room);
+    req.on("close", () => {
+      logger.info("Close patient for room: " + room);
+      changeStream.close();
+    });
+    req.on("end", () => {
+      logger.info("End patient for room:" + room);
     });
   } catch (e) {
-    console.log(e);
+    logger.error(e);
     return next(new APIError(e));
   }
 
