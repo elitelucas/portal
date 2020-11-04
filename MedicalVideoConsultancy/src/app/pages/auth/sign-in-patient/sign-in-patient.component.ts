@@ -91,6 +91,8 @@ export class SignInPatientComponent implements OnInit {
         this.submitted = true;
         const room = this.f.room.value.substring(this.domain.length);
         const dniPatient = this.f.dni.value;
+
+        
         this.patientService.checkRoomExist(room)
           .subscribe(result => {
             if (result) {
@@ -108,6 +110,8 @@ export class SignInPatientComponent implements OnInit {
               this.isValidRoom = false;
             }
           });
+
+
       }, error => {
         this.step = 2;
         this.f1.room.setValue(this.f.room.value);

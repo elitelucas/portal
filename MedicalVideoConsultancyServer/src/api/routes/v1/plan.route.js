@@ -31,12 +31,12 @@ router
   /**
    * @api {post} v1/plans create plan
    */
-  .post( controller.create);
+  .post(controller.create);
 
 router
   .route('/:planId')
   //** */
-  .get(authorize(PROVIDER),  controller.get)
+  .get(authorize(PROVIDER), controller.get)
   /**
    * @api {patch} v1/users/:id Delete User
    * @apiDescription Delete a user
@@ -55,7 +55,11 @@ router
    */
   .delete(authorize(SUPER_ADMIN), controller.remove);
 
-  router
+router
+  .route('/:planId/status')
+  .patch(authorize(SUPER_ADMIN), controller.changeStatus);
+
+router
   .route('/update')
   .put(controller.update);
 

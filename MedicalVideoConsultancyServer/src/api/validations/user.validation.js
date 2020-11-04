@@ -51,7 +51,7 @@ module.exports = {
     body: {
       email: Joi.string().required(),
       role: Joi.string().valid(User.roles),
-      room: Joi.string().required(),
+    //  room: Joi.string().required(),
       cmp: Joi.required(),
       status: Joi.string().required()
     },

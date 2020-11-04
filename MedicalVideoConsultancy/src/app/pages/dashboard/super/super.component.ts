@@ -3,6 +3,7 @@ import {MatDialog, MatTable, MatPaginator, MatTableDataSource, MatSort} from "@a
 import {DialogBoxComponent} from "../dialog-box/dialog-box.component";
 import {UserService} from "../../../_services/user.service";
 import {Router} from "@angular/router";
+import Swal from 'sweetalert2';
 
 export interface UsersData {
   userId: number;
@@ -93,6 +94,9 @@ export class SuperComponent implements OnInit {
               console.log("SMS verification success", res);
             })
         }
+      },error => {
+        console.log("error verification success", error.error)
+        Swal.fire('Error user : ' ,error.error.error)
       })
   }
 

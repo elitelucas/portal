@@ -25,6 +25,7 @@
             <input type="email" formControlName="email" class="input-stl"
             [ngClass]="{ 'is-invalid': submitted && f.email.errors }" 
             placeholder="Patients email by defaults or it can be edited" />
+            <button (click)="previewPrescription()" class="btn btn-primary">Preview Prescription</button>
             <button type="submit" class="btn btn-primary">Send Prescription</button>
             <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
                 <div *ngIf="f.email.errors.required">Email address is required</div>

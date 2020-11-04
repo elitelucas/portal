@@ -41,6 +41,10 @@ router
   .get(authorize(), validate(listUsers), controller.list);
 
 router
+  .route('/verify/state/:userId')
+  .patch(authorize(), /*validate(updateUser),*/ controller.verifyState)
+
+router
   .route('/:userId')
   /**
    * @api {patch} v1/users/:id Update User by admin
@@ -69,7 +73,7 @@ router
    * @apiError (Forbidden 403)    Forbidden    Only user with same id or admins can modify the data
    * @apiError (Not Found 404)    NotFound     User does not exist
    */
-  .patch(authorize(), validate(updateUser), controller.update)
+  .patch(authorize(), /*validate(updateUser),*/ controller.update)
   /**
    * @api {patch} v1/users/:id Delete User
    * @apiDescription Delete a user
@@ -89,133 +93,133 @@ router
   .delete(authorize(ADMIN), controller.remove);
 
 
-  router.route('/super-providers')
+router.route('/super-providers')
   .get(controller.getProviders);
 
-  router.route('/getUserById/:userId')
+router.route('/getUserById/:userId')
   .get(controller.getUserById);
 
-  router.route('/super-providers')
+router.route('/super-providers')
   .post(controller.createUser);
 
-  router.route('/filterProvider/:filterValue')
+router.route('/filterProvider/:filterValue')
   .get(controller.getFilterProvider);
 
-    /**
-   * api/v1/users/deleteProvider
-   * */
-  router.route('/deleteProvider/:providerId')
+/**
+* api/v1/users/deleteProvider
+* */
+router.route('/deleteProvider/:providerId')
   .delete(controller.deleteProvider);
 
-  router.route('/super-admins')
+router.route('/super-admins')
   .get(controller.getAdmins);
 
-  router.route('/super-admins/:adminId')
+router.route('/super-admins/:adminId')
   .get(controller.getAdminById);
 
-  router.route('/super-admins')
+router.route('/super-admins')
   .post(controller.createAdmin);
 
-  router.route('/super-admins/:adminId')
+router.route('/super-admins/:adminId')
   .put(controller.updateAdmin);
 
-  router.route('/filterAdmin/:filterValue')
+router.route('/filterAdmin/:filterValue')
   .get(controller.getFilterAdmin);
 
-  router.route('/deleteAdmin/:providerId')
+router.route('/deleteAdmin/:providerId')
   .delete(controller.deleteAdmin);
 
-  /**
-  api/v1/users/email-verification
-  */
-  router.route('/email-verification')
-    .post(authorize(),controller.sendEmail);
+/**
+api/v1/users/email-verification
+*/
+router.route('/email-verification')
+  .post(authorize(), controller.sendEmail);
 
-  /**
-   * api/v1/users/sms-verification
-   * */
-  router.route('/sms-verification')
-    .post(authorize(),controller.sendSMS);
+/**
+ * api/v1/users/sms-verification
+ * */
+router.route('/sms-verification')
+  .post(authorize(), controller.sendSMS);
 
-  /**
-   * api/v1/users/images
-   * */
-  router.route('/images')
-    .post(authorize(),controller.fileUpload);
+/**
+ * api/v1/users/images
+ * */
+router.route('/images')
+  .post(authorize(), controller.fileUpload);
 
-  /**
-   * api/v1/users/sigImages
-   * */
-  router.route('/sigImages')
-  .post(authorize(),controller.sigImgUpload);
+/**
+ * api/v1/users/sigImages
+ * */
+router.route('/sigImages')
+  .post(authorize(), controller.sigImgUpload);
 
-  /**
-   * api/v1/users/update-profile/:userId
-   * */
-  router.route('/update-profile/:userId')
-    .put(authorize(), controller.updateProfile);
-
-
-    /**
-   * api/v1/users/updateSignature/:userId
-   * */
-  router.route('/updateSignature/:userId')
-  .put(authorize(),controller.updateSignature);
-
-    /**
-   * api/v1/users/updatePayment/:userId
-   * */
-  router.route('/updatePayment/:userId')
-  .put(authorize(),controller.updatePayment);
-
-  /**
-   * api/v1/users/payment/:userId
-   * */
-  router.route('/payment/:userId')
-  .get(authorize(),controller.getPayData);
+/**
+ * api/v1/users/update-profile/:userId
+ * */
+router.route('/update-profile/:userId')
+  .put(authorize(), controller.updateProfile);
 
 
-   /**
-   * api/v1/users/signature/:userId
-   * */
-  router.route('/signature/:userId')
-  .get(authorize(),controller.getSignature);
+/**
+* api/v1/users/updateSignature/:userId
+* */
+router.route('/updateSignature/:userId')
+  .put(authorize(), controller.updateSignature);
 
-  /**
-   * api/v1/users/getBlog/:userId
-   * */
-  router.route('/getBlog/:userId')
-  .get(authorize(),controller.getBlog);
+/**
+* api/v1/users/updatePayment/:userId
+* */
+router.route('/updatePayment/:userId')
+  .put(authorize(), controller.updatePayment);
 
-    /**
-   * api/v1/users/postBlog
-   * */
-  router.route('/postBlog')
-  .post(authorize(),controller.postBlog);
+/**
+ * api/v1/users/payment/:userId
+ * */
+router.route('/payment/:userId')
+  .get(authorize(), controller.getPayData);
 
-    /**
-   * api/v1/users/updateBlog
-   * */
-  router.route('/updateBlog')
-  .put(authorize(),controller.updateBlog);
 
-    /**
-   * api/v1/users/deleteBlog
-   * */
-  router.route('/deleteBlog/:postId')
-  .delete(authorize(),controller.deleteBlog);
+/**
+* api/v1/users/signature/:userId
+* */
+router.route('/signature/:userId')
+  .get(authorize(), controller.getSignature);
 
- /**
-   * api/v1/users/updatePlanId
-   * */
-  router.route('/updatePlanId')
-  .put(controller.updatePlanId);
+/**
+ * api/v1/users/getBlog/:userId
+ * */
+router.route('/getBlog/:userId')
+  .get(authorize(), controller.getBlog);
 
- /**
-   * api/v1/users/changeSubscriptionStatus
-   * */
-  router.route('/changeSubscriptionStatus')
-  .put(controller.changeSubscriptionStatus);
+/**
+* api/v1/users/postBlog
+* */
+router.route('/postBlog')
+  .post(authorize(), controller.postBlog);
+
+/**
+* api/v1/users/updateBlog
+* */
+router.route('/updateBlog')
+  .put(authorize(), controller.updateBlog);
+
+/**
+* api/v1/users/deleteBlog
+* */
+router.route('/deleteBlog/:postId')
+  .delete(authorize(), controller.deleteBlog);
+
+/**
+  * api/v1/users/updatePlanId
+  * *//*
+router.route('/updatePlanId')
+  .put(controller.updatePlanId);*/
+
+/**
+  * api/v1/users/changeSubscriptionStatus
+  * *//*
+router.route('/changeSubscriptionStatus')
+  .put(controller.changeSubscriptionStatus);*/
 
 
 module.exports = router;

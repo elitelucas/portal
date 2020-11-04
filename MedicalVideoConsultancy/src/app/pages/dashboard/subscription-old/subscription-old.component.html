@@ -4,7 +4,7 @@
             <button class="btn btn-danger float-right" (click)="cancelSubscription()">Cancel My Subscription</button>
         </div>
         <div>
-            <h3>Your account status is : Active / Unactive</h3>
+            <h3>Your account status is : Active </h3>
             <p>You can set-up automatic payments or pay as you go. If you are a small clinic or hospital and want to
                 know how we can improve your practice, contact us, we ll be happy to help.</p>
         </div>
@@ -17,8 +17,8 @@
                 </div>
                 <div class="col-4">
                     <div class="mb-1">
-                        <button class="btn btn-danger" (click)="Delete()">Remove
-                        </button>
+                   <!--      <button class="btn btn-danger" (click)="Delete()">Remove
+                        </button> -->
                     </div>
                 </div>
                 <div class="col-2">
@@ -36,9 +36,9 @@
             </div>
         </div>
 
-        <div class="mb-3">
+<!--         <div class="mb-3">
             <button class="btn btn-primary" (click)="addCard()">Add Card</button>
-        </div>
+        </div> -->
     </div>
 
     <div *ngIf="otherPlan.length>0" class="mt-3">

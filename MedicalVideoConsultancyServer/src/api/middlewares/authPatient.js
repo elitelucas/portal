@@ -4,14 +4,10 @@ const User = require('../models/user.model');
 const APIError = require('../utils/APIError');
 const logger = require('../../config/logger');
 
-const SUPER_ADMIN = 'SuperAdmin';
-const ADMIN = 'Admin';
-const PROVIDER = 'Provider';
+
 const PATIENT = 'Patient';
 
-exports.ADMIN = ADMIN;
-exports.SUPER_ADMIN = SUPER_ADMIN;
-exports.PROVIDER = User.roles;
+
 exports.PATIENT = PATIENT;
 
 exports.authorize = (roles = User.roles) => (req, res, next) => {
@@ -42,14 +38,14 @@ const handleJWT = (req, res, next, roles) => async (err, user, info) => {
   }
 
   //logger.info("evaluate roles: " + roles )
-  if (!roles.includes(user.role)) {
+ /* if (!roles.includes(user.role)) {
     logger.error("roles: " + roles +" user.role :" + user.role)
     apiError.status = httpStatus.FORBIDDEN;
     apiError.message = 'Forbidden';
     return next(apiError);
   } else if (err || !user) {
     return next(apiError);
-  }
+  }*/
 
   req.user = user;
 

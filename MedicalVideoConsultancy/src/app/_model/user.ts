@@ -12,6 +12,9 @@ export class currentUser {
   cmp: string;
   room: string;
   status: string;
+  payToDay: boolean;
+  endDate: Date;
+  freeUseTime: number;
 }
 
 export class Provider {
@@ -32,6 +35,8 @@ export class Provider {
   _id: string;
   socketId: string;
   peerId: string;
+  payToDay: boolean;
+  freeUseTime: number;
 }
 
 export class Patient {
@@ -50,9 +55,9 @@ export class Patient {
   peerId: string;
 }
 
-export class Consult {  
+export class Consult {
   patientId: String;
-  providerId : String;
+  providerId: String;
   dni: String;
   birthDate: number;
   allergy: String;
@@ -79,10 +84,10 @@ export class Consult {
 
 export class Chart {
   dni: String;
-  disease:Array<string>;
-  medication:Array<string>;
-  surgery:Array<string>;
-  family:Array<string>;
-  toxic:Array<string>;
+  disease: Array<string>;
+  medication: Array<string>;
+  surgery: Array<string>;
+  family: Array<string>;
+  toxic: Array<string>;
   _id: String;
 }

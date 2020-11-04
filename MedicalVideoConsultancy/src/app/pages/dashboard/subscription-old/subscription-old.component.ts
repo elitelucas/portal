@@ -3,6 +3,8 @@ import { ProviderService } from './../../../_services/provider.service';
 import { UserService } from './../../../_services/user.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../../_services/auth.service';
+import { MeetRoomService } from '../../../_services/meet-room.service';
 
 
 @Component({
@@ -11,93 +13,94 @@ import Swal from 'sweetalert2';
   styleUrls: ['./subscription-old.component.css']
 })
 export class SubscriptionOldComponent implements OnInit {
-  providerData: any;
+
+  currectUser: any;
+
   planData: any;
-  cardData:any;
+  cardData: any;
   currentPlan: any;
   otherPlan = [];
   newCardVal: any;
   newPlanVal: any;
   updateKey = false;
   iteralData = [];
+  plan_supcription: any;
   constructor(
+    private authService: AuthService,
+    private meetRoomService: MeetRoomService,
     private providerService: ProviderService,
     private userService: UserService,
-    private router:Router
+    private router: Router
   ) {
-    this.providerData = JSON.parse(localStorage.getItem('currentUser'));
-
-
+    this.currectUser = this.authService.getCurrentUser
+    this.plan_supcription = JSON.parse(localStorage.getItem("plan_supcription"));
   }
 
   ngOnInit(): void {
-    if (this.providerData.planId)
+    console.log("this.plan_supcription");
+    console.log(this.plan_supcription);
+
+    if (this.plan_supcription.card) {
+      this.cardData = this.plan_supcription.card
+    }
+    if (this.plan_supcription.plan._id) {
       this.providerService.getPlans()
         .subscribe(res => {
           this.planData = res;
           this.planData.forEach(element => {
-            if (this.providerData.planId === element._id)
+            if (this.plan_supcription.plan._id === element._id)
               this.currentPlan = element;
             else
               this.otherPlan.push(element)
           });
-
-          this.providerService.getCard(this.providerData.id)
-            .subscribe(res => {
-              this.cardData=res;
-            })
-
         })
-
-  }
-  Delete() {
-   
-  }
-  addCard() {
-    const sendData={
-      key:'update',
-      val:this.currentPlan._id
     }
-    this.router.navigateByUrl('/dashboard/subscription-new/'+JSON.stringify(sendData));
+
   }
+
+  Delete() {
+
+  }
+
+  addCard() {
+    const sendData = {
+      key: 'update',
+      val: this.currentPlan._id
+    }
+    localStorage.setItem("plan_select", JSON.stringify(sendData));
+    this.router.navigateByUrl('/dashboard/subscription-new');
+  }
+
   Upgrade(item) {
-    // this.newPlanVal=item;
-    // if(this.newCardVal && this.newPlanVal)
-    // this.updateKey=true;
-    this.currentPlan = item;
+    console.log(item);
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Plan select " + item.name,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      this.currentPlan = item;
+      this.Save();
+    });
   }
+
   Save() {
-
-    if (this.cardData.length > 1)
-      Swal.fire('cardNumder is only one.')
-
-    this.currentPlan.id = this.providerData.planId;
-    this.cardData[0].providerId = this.providerData.id
-
-    this.userService.updateUserPlanId({ providerId: this.providerData.id, planId: this.currentPlan._id })
-      .subscribe(res => {
-        if (res) {
-          this.providerService.updateCard(this.cardData[0]).subscribe(res2 => {
-            if (res2)
-              Swal.fire('Updated successfully!')
-          })
-          this.providerService.getPlans()
-            .subscribe(res => {
-              this.planData = res;
-              this.planData.forEach(element => {
-                if (this.currentPlan._id === element._id)
-                  this.currentPlan = element;
-                else{
-                  this.otherPlan=[];
-                  this.otherPlan.push(element)
-                }
-                  
-              });
-            })
-        }
-      })
+    this.currentPlan.id = this.currectUser.planId;
+    this.cardData.providerId = this.currectUser.id
+    this.providerService.changeSubscribePlan(this.currectUser.id, this.currentPlan._id).subscribe(res => {
+      Swal.fire('Updated successfully!').then((result) => {
+      this.router.navigated = false;
+      this.reloadCurrentRoute('/dashboard/subscription-plan');
+      });
+    }, err => {
+      Swal.fire('Error al cambiar de subcripcion');
+    });
   }
-  cancelSubscription(){
+
+  cancelSubscription() {
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -108,20 +111,35 @@ export class SubscriptionOldComponent implements OnInit {
       confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.providerService.removeCard(this.cardData._id)
-        .subscribe(res=>{
-          if(res){
-            this.userService.changeUserSubscriptionStatus(this.providerData.id).subscribe(res2=>{
-              Swal.fire('Deleted successfully');
-              localStorage.setItem('currentUser', JSON.stringify(res2));
-              this.router.navigateByUrl('/dashboard/subscription-plan');
-            })
-           
-          }
-        })
+        if (this.plan_supcription.plan.type == "charge") {
+          this.providerService.cancelCharge(this.currectUser.id)
+            .subscribe(res => {
+              this.continuesCancelations();
+            });
+        }
+        if (this.plan_supcription.plan.type == "subcription") {
+          this.providerService.cancelSupcription(this.currectUser.id)
+            .subscribe(res => {
+              this.continuesCancelations();
+            });
+        }
       }
-    })
-    
+    });
+  }
+
+  continuesCancelations() {
+    Swal.fire('Cancelation successfully').then((result) => {
+      this.currectUser.payToDay = false
+      this.authService.refreshCurrentUser(this.currectUser);
+      this.router.navigated = false;
+      this.reloadCurrentRoute('/dashboard/subscription-plan');
+    });
+  }
+
+  reloadCurrentRoute(url) {
+    this.router.navigate([url]).then(() => {
+      window.location.reload();
+    });;
   }
 
 }

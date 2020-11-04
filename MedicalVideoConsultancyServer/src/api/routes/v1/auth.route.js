@@ -78,7 +78,7 @@ router.route('/login')
  */
 
 router.route('/verify-email/:token')
-  //.post(controller.verifyEmail)
+  .post(controller.verifyEmail)
   .get(controller.verifyEmail);
 
 /**

@@ -83,7 +83,7 @@ const routes:Routes = [{
       component: SubscriptionOldComponent
     },
     {
-      path: 'subscription-new/:planId',
+      path: 'subscription-new',
       component: SubscriptionNewComponent
     },
     {

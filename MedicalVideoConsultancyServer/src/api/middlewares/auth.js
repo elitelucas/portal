@@ -12,7 +12,6 @@ const PATIENT = 'Patient';
 exports.ADMIN = ADMIN;
 exports.SUPER_ADMIN = SUPER_ADMIN;
 exports.PROVIDER = User.roles;
-exports.PATIENT = PATIENT;
 
 exports.authorize = (roles = User.roles) => (req, res, next) => {
   passport.authenticate('jwt', { session: false }, handleJWT(req, res, next, roles), )(req, res, next)
@@ -31,10 +30,10 @@ const handleJWT = (req, res, next, roles) => async (err, user, info) => {
 
   try {
     if (error || !user) {
-      logger.error("logIn nok :", apiError)
+      logger.error("logIn nok :" + apiError)
       return next(apiError);
     }
-    //logger.warn("logIn ok :", user["_id"])
+    logger.warn("logIn ok :" + user["_id"])
     await logIn(user, { session: false });
   } catch (e) {
     logger.error("apiError :" + apiError)

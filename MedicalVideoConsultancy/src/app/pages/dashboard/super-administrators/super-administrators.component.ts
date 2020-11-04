@@ -114,6 +114,9 @@ export class SuperAdministratorsComponent implements OnInit {
               console.log("SMS verification success", res);
             })
         }
+      },error => {
+        console.log("error verification success", error.error)
+        Swal.fire('Error user : ' ,error.error.error)
       })
   }
 

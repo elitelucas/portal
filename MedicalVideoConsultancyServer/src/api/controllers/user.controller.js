@@ -8,8 +8,9 @@ const nodemailer = require("nodemailer");
 const { emailConfig, smsConfig } = require("../../config/vars");
 const client = require('twilio')(smsConfig.Sid, smsConfig.authToken);
 const bcrypt = require('bcryptjs');
-const { env, baseUrl } = require('../../config/vars');
+const { env, baseUrl, baseWebUrl } = require('../../config/vars');
 const Bucket = require("../services/awsbucket/bucket");
+const validateCMP = require("../services/cmp/cmp");
 const logger = require('../../config/logger')
 /**
  * Load user and append to req.
@@ -33,12 +34,49 @@ exports.load = async (req, res, next, id) => {
  * @public
  */
 exports.update = async (req, res, next) => {
+  console.log("update patch");
   const user = await User.findOne({ _id: req.body.userId });
   const userModel = user ? User : Admin;
   userModel.findOneAndUpdate({ _id: req.body.userId }, req.body, { new: true })
     .then(savedUser => res.json(savedUser))
     .catch(e => next(userModel.checkDuplicateField(e)));
 };
+
+exports.verifyState = async (req, res, next) => {
+  let userData = req.body;
+  const user = await User.findOne({ _id: req.body.userId });
+  const userModel = user ? User : Admin;
+
+  /*console.log("userDate.permission");
+  console.log(userDate.permission);
+  console.log("user.cmp");
+  console.log(user.cmp);*/
+
+  if (userData.permission.includes("approved") > 0 && (user.cmp != null || user.cmp != "")) {
+    validateCMP.validateCMPActive(user.cmp, (active, photo) => {
+
+      if (active) {
+        userData.image = photo;
+        userData.createdAt = new Date();
+        userData.freeUse = true
+        /*console.log("userDate");
+        console.log(userDate);*/
+        userModel.findOneAndUpdate({ _id: req.body.userId }, userData, { new: true })
+          .then(savedUser => res.json(savedUser))
+          .catch(e => next(userModel.checkDuplicateField(e)));
+      } else {
+        res.status(httpStatus.CONFLICT).send({ error: "Inactive user CMP" });
+      }
+
+    });
+  } else {
+    userModel.findOneAndUpdate({ _id: req.body.userId }, req.body, { new: true })
+      .then(savedUser => res.json(savedUser))
+      .catch(e => next(userModel.checkDuplicateField(e)));
+  }
+
+};
+
 
 /**
  * Get user list
@@ -63,11 +101,11 @@ exports.list = async (req, res, next) => {
   }
 };
 
-exports.getUserById=(req,res)=>{
+exports.getUserById = (req, res) => {
   User.findById(req.params.userId).then((user) => {
     res.status(httpStatus.OK).json(user)
   })
-  .catch(e => next(e));
+    .catch(e => next(e));
 }
 
 exports.createUser = async (req, res, next) => {
@@ -210,19 +248,20 @@ exports.sendEmail = (req, res) => {
   let user = req.body;
   const buffer = new Buffer(user.email);
   const fakeToken = buffer.toString('base64');
-  const verifyUrl = baseUrl + `api/v1/auth/verify-email/${fakeToken}`;
+  const verifyUrl = baseWebUrl + `auth/verify-email/${fakeToken}`;
 
   console.log("verifyUrl:" + verifyUrl)
 
   const transporter = nodemailer.createTransport({
     host: emailConfig.host,
     port: emailConfig.port,
-    secure: true,
+    secure: false,
     auth: {
       user: emailConfig.username,
       pass: emailConfig.password
     }
   });
+
   let mailOptions = {};
   if (user.permission.includes("approved")) {
     mailOptions = {
@@ -243,9 +282,10 @@ exports.sendEmail = (req, res) => {
   }
 
 
-  transporter.sendMail(mailOptions, function (error, info) {
+  transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.log("sendMail:", error);
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
     } else {
       res.status(200).send(user);
       console.log('Email sent: ' + info.response);
@@ -260,6 +300,10 @@ exports.sendEmail = (req, res) => {
 
 exports.sendSMS = (req, res) => {
   const userData = req.body;
+
+  console.log("userData");
+  console.log(userData);
+
   const buffer = new Buffer(userData.email);
   const fakeToken = buffer.toString('base64');
   const code = Math.floor(100000 + Math.random() * 900000)
@@ -285,6 +329,7 @@ exports.sendSMS = (req, res) => {
       }
     }).catch(e => {
       console.log("SMS failed to sent", e)
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).send(e);
     })
 };
 
@@ -612,7 +657,7 @@ exports.deleteBlog = async (req, res, next) => {
 
 };
 
-exports.updatePlanId = async (req, res, next) => {
+/*exports.updatePlanId = async (req, res, next) => {
   try {
     console.log('req.body')
     console.log(req.body)
@@ -622,8 +667,8 @@ exports.updatePlanId = async (req, res, next) => {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
   }
 
-};
-
+};*/
+/*
 exports.changeSubscriptionStatus = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(req.body.providerId, { subcriptionStatus: false }, { new: true });
@@ -632,7 +677,7 @@ exports.changeSubscriptionStatus = async (req, res, next) => {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
   }
 
-};
+};*/
 
 
 

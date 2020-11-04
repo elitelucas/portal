@@ -6,7 +6,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
-  HostListener, 
+  HostListener,
   ViewChild,
   ElementRef
 } from '@angular/core';
@@ -26,7 +26,7 @@ import { timer } from 'rxjs';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class AppSidebarComponent implements OnInit , OnDestroy {
+export class AppSidebarComponent implements OnInit, OnDestroy {
 
   public btnActiveShow: boolean = true;
   public btnDesactiveShow: boolean = false;
@@ -51,6 +51,10 @@ export class AppSidebarComponent implements OnInit , OnDestroy {
 
   listEvent = null;
 
+  providerRoleOptionsShow = true;
+
+  patientOnattetion = null;
+
   constructor(
     public menuItems: MenuItems,
     protected authService: AuthService,
@@ -64,12 +68,12 @@ export class AppSidebarComponent implements OnInit , OnDestroy {
   }
   @HostListener('window:beforeunload')
   onBrowserClose() {
-    console.log("beforeunload");
     this.ngOnDestroy();
   }
   ngOnDestroy(): void {
-    console.log("ngOnDestroyngOnDestroyngOnDestroyngOnDestroy");
-    this.providerService.close();
+    if (this.providerRoleOptionsShow) {
+      this.providerService.close();
+    }
     //this.listEvent.unsubscribe(); 
   }
 
@@ -77,12 +81,22 @@ export class AppSidebarComponent implements OnInit , OnDestroy {
     this.initSidebar();
     let tmpArr = [];
     this.firstMenuItems = this.menuItems.getMenuitem(this.currentUserRole);
+    /*console.log("this.firstMenuItems");
+    console.log(this.firstMenuItems);*/
+
     this.firstMenuItems.forEach((element, index) => {
+      /*console.log(element.state);
+      console.log(element.state === 'subscription-plan');
+      console.log(element.state === 'feedbacks');*/
       if (element.state === 'subscription-plan' || element.state === 'feedbacks') {
         this.secondMenuItems.push(element);
         tmpArr.push(index);
       }
     });
+    /*console.log("this.secondMenuItems");
+    console.log(this.secondMenuItems);*/
+
+
     tmpArr.sort(function (a, b) { return b - a });
     tmpArr.forEach(item => {
       this.firstMenuItems.splice(item, 1);
@@ -93,10 +107,17 @@ export class AppSidebarComponent implements OnInit , OnDestroy {
     if (this.authService.getCurrentUser) {
       this.currentUser = this.authService.getCurrentUser;
       this.currentUserRole = this.authService.getCurrentUser.role;
+      if ('SuperAdmin' == this.currentUserRole || 'Admin' == this.currentUserRole) {
+        this.providerRoleOptionsShow = false;
+      }
     }
-    this.confirmConnect();
-    this.waitingPatientsData = [];
-    this.listWaitingPatient();
+    console.log("this.currentUser.payToDay");
+    console.log(this.currentUser.payToDay);
+    if (this.providerRoleOptionsShow && this.currentUser.payToDay) {
+      this.confirmConnect();
+      this.waitingPatientsData = [];
+      this.listWaitingPatient();
+    }
   }
 
   alarmActive() {
@@ -190,14 +211,21 @@ export class AppSidebarComponent implements OnInit , OnDestroy {
 
 
   nextAttetion() {
-    // console.log("startPreCall")
+    console.log("nextAttetion")
     //console.log(this.waitingPatientsData)this.meetRoomService.init();
-    if (this.waitingPatientsData && this.waitingPatientsData.length) {
-      let patient = this.waitingPatientsData[0];
+    if (this.waitingPatientsData && this.waitingPatientsData.length > 0) {
+      let pat = this.waitingPatientsData[0];
+      if (this.patientOnattetion != null) {
+        if (pat.dni == this.patientOnattetion.dni) {
+          let patListOne = this.waitingPatientsData.splice(0, 1);
+          this.waitingPatientsData.push(patListOne[0]);
+        }
+      }
+      this.patientOnattetion = this.waitingPatientsData[0];
       //console.log(patient)
       localStorage.setItem('provider_data', JSON.stringify(this.currentUser));
-      localStorage.setItem(patient._id, JSON.stringify(patient));
-      this.router.navigateByUrl('/dashboard/pay-provider/' + patient._id);
+      localStorage.setItem(this.patientOnattetion._id, JSON.stringify(this.patientOnattetion));
+      this.router.navigateByUrl('/dashboard/pay-provider/' + this.patientOnattetion._id);
     }
   }
 

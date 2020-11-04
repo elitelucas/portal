@@ -1,7 +1,8 @@
-import { filter } from 'rxjs/operators';
+import { catchError, filter, map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { environment } from "../../environments/environment";
+import { Observable, throwError } from 'rxjs';
 const baseUrl = environment.baseUrl + "users";
 @Injectable({
   providedIn: 'root'
@@ -71,9 +72,21 @@ export class UserService {
   }
 
 
-  updateUserData(userData) {
-    let updateUrl = baseUrl + "/" + userData.userId;
-    return this.http.patch<any>(updateUrl, userData)
+  updateUserData(userData /*, errorUpdate*/) {
+    let updateUrl = baseUrl + "/verify/state/" + userData.userId;
+    return this.http.patch<any>(updateUrl, userData).pipe(
+      catchError( (err) => {
+        //errorUpdate(err);
+        return throwError(err);
+      }));
+    /*.pipe(
+      map((res) => {
+        return res;
+      }), catchError(err => {
+        console.log("err");
+        console.log(err);
+        return throwError(err);
+      }))*/;
   }
 
   deleteUserData(userData) {
@@ -152,10 +165,10 @@ export class UserService {
     return this.http.put<any>(updatePlanId, data);
   }
 
-  changeUserSubscriptionStatus(providerId) {
+  /*changeUserSubscriptionStatus(providerId) {
     const changeUserSubscriptionStatus = baseUrl + '/changeSubscriptionStatus/';
     return this.http.put(changeUserSubscriptionStatus, { providerId });
-  }
+  }*/
 
 
 }

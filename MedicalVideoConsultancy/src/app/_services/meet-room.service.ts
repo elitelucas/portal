@@ -13,7 +13,7 @@ declare var Peer: any;
 })
 export class MeetRoomService {
 
-  private socket ; //= io(environment.socket_endpoint);
+  private socket; //= io(environment.socket_endpoint);
 
   private localVideo = null;
   private localStream = null;
@@ -46,7 +46,9 @@ export class MeetRoomService {
 
   public disconnectMe() {
     console.log("disconnectMe");
-    this.socket.disconnect();
+    if (this.socket) {
+      this.socket.disconnect();
+    }
   }
 
   public stopVideoAudio() {

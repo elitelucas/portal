@@ -1,7 +1,6 @@
 <div class="p-3">
     <div class="mb-3">
-        <form [formGroup]="planForm" 
-        (ngSubmit)="onSubmit(newDescription.editorInstance.getData())">
+        <form [formGroup]="planForm" (ngSubmit)="onSubmit(newDescription.editorInstance.getData())">
             <div class="row">
                 <div class="col-6">
                     <div class="form-group">
@@ -9,6 +8,16 @@
                             [ngClass]="{ 'is-invalid': submitted && f.name.errors }">
                         <div *ngIf="submitted && f.name.errors" class="invalid-feedback">
                             <div *ngIf="f.name.errors.required">Plan Name is required</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <mat-select value="" formControlName="type">
+                            <mat-option value="">Select Type</mat-option>
+                            <mat-option value="charge">Charge</mat-option>
+                            <mat-option value="subcription">Subcription</mat-option>
+                        </mat-select>
+                        <div *ngIf="submitted && f.type.errors" class="invalid-feedback">
+                            <div *ngIf="f.type.errors.required">Type is required</div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -24,10 +33,10 @@
                 <div class="col-6 text-center">
                     <button class="btn btn-primary">Add</button>
                 </div>
-            </div> 
+            </div>
             <div class="form-group">
-                <ckeditor #newDescription [editor]="Editor" ></ckeditor>
-            </div>          
+                <ckeditor #newDescription [editor]="Editor"></ckeditor>
+            </div>
         </form>
 
     </div>
@@ -41,16 +50,27 @@
                                 <div>
                                     <h3>{{item.name}}</h3>
                                 </div>
-                                <div [innerHtml]="item.description" ></div>
+                                <div [innerHtml]="item.description"></div>
                             </div>
                             <div class="col-2">
-                                $/{{item.amount}}
+                                S/{{item.amount}}
+                            </div>
+                            <div class="col-2">
+                                {{item.type}}
                             </div>
                         </div>
                     </div>
                     <div class="col-6 text-center">
                         <button class="btn btn-primary mr-3" (click)=Edit(i)>
                             Edit
+                        </button>
+                        <button *ngIf="item.status=='inactive'" class="btn btn-primary mr-3"
+                            (click)="changeStatusPlan(item._id, true)">
+                            Activate
+                        </button>
+                        <button *ngIf="item.status=='active'" class="btn btn-primary mr-3"
+                            (click)="changeStatusPlan(item._id, false)">
+                            Desactivate
                         </button>
                         <button class="btn btn-danger" (click)=Delete(item._id,i)>
                             Delete
@@ -62,20 +82,23 @@
                         <div class="row">
                             <div class="col-10">
                                 <div>
-                                    <input #editName [value]="item.name">
+                                    <label>{{item.name}}</label>
+                                </div>
+                                <div>
+                                    <label>{{item.type}}</label>
                                 </div>
                                 <div>
                                     <ckeditor #editDescription [editor]="Editor" [data]="item.description"></ckeditor>
                                 </div>
                             </div>
                             <div class="col-2">
-                                $/<input #editAmount type="text" [value]="item.amount">
+                                <label>S/ {{item.amount}}</label>
                             </div>
                         </div>
                     </div>
                     <div class="col-6 text-center">
-                        <button class="btn btn-primary mr-3" 
-                        (click)="EditOk(editName.value,editDescription.editorInstance.getData(),editAmount.value,item._id,i)">
+                        <button class="btn btn-primary mr-3"
+                            (click)="EditOk(editDescription.editorInstance.getData(),item._id,i)">
                             Ok
                         </button>
                         <button class="btn btn-danger" (click)=EditCancel(i)>
@@ -83,11 +106,11 @@
                         </button>
                     </div>
                 </div>
-                
-               
+
+
             </div>
         </div>
-        
+
 
     </div>
 

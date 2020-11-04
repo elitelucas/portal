@@ -37,6 +37,11 @@
         <button mat-icon-button (click)="snav2.toggle()" value="sidebarclosed">
             <mat-icon>menu</mat-icon>
         </button>
+        
+        <div *ngIf="!currentUser.payToDay"> Debe seleccionar un plan de subcripcion </div>
+        <div *ngIf="daysEndSubcriptions != null"> Le quedan {{daysEndSubcriptions}} en su plan </div>
+        <div *ngIf="daysEndFreeUse != null"> Le quedan {{daysEndFreeUse}} de libre uso </div>
+        
         <span fxFlex></span>
         <!-- ============================================================== -->
         <!-- app header component - style you can find in header.scss / header.component.ts-->

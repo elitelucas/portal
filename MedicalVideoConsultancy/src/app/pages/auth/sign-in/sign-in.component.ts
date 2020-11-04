@@ -26,7 +26,6 @@ export class SignInComponent implements OnInit {
     const token: string = this.route.snapshot.params.url;
     if(token) {
       this.authService.emailVerify(token).subscribe(res=> {
-        console.log("email verify success", res);
         this.router.navigateByUrl('/auth/sign-in');
       });
     }
@@ -41,6 +40,7 @@ export class SignInComponent implements OnInit {
     }
      this.authService.signIn(this.authForm.value).subscribe( res => {
       if (res.token) {
+        console.log(res.user);
         if(res.user.permission.includes("approved") && res.user.status === "active") {
           this.isApproved = true;
           this.isActive = true;

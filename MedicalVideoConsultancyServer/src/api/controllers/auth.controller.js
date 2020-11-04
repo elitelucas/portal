@@ -5,6 +5,11 @@ const Patient = require('../models/patient.model');
 const RefreshToken = require('../models/refreshToken.model');
 const moment = require('moment-timezone');
 const { jwtExpirationInterval } = require('../../config/vars');
+const { baseWebUrl } = require('../../config/vars');
+const Culqi = require('culqi-node');
+const { culqiConfing } = require('../../config/vars');
+const Plan = require('../models/plan.model');
+const SubcriptionPay = require('../models/subcriptionPay.model');
 
 /**
  * Returns a formated object with tokens
@@ -48,21 +53,99 @@ exports.register = async (req, res) => {
  */
 exports.login = async (req, res, next) => {
   try {
-    /*console.log("login")
-    console.log(req.body.email)*/
     const userData = await User.findOne({ 'email': req.body.email });
-    /*console.log("userData")
-    console.log(userData)*/
     const userModel = userData ? User : Admin;
-    const { user, accessToken } = await userModel.findAndGenerateToken(req.body);
-    /*console.log("accessToken")
-    console.log(accessToken)*/
+    let { user, accessToken } = await userModel.findAndGenerateToken(req.body);
+    if (user.role != "Admin" && user.role != "SuperAdmin") {
+      let now = new Date();
+      now.setHours(23);
+      now.setMinutes(59);
+      now.setSeconds(59);
+      //console.log("now:", now);
+      //console.log("now.getTime():", now.getTime());
+
+      let userRegister = user.createdAt;
+      userRegister.setMonth(userRegister.getMonth() + 1);
+      userRegister.setHours(0);
+      userRegister.setMinutes(0);
+      userRegister.setSeconds(0);
+      //console.log("userRegister:", userRegister);
+
+      /*console.log("userRegister.getTime():", userRegister.getTime());
+
+      console.log("eval:", (userRegister.getTime() <= now.getTime()));
+      console.log("eval:", (userRegister.getTime() - now.getTime()));
+      console.log("eval:", (now.getTime() - userRegister.getTime()));*/
+
+      const diff = userRegister.getTime() - now.getTime();
+
+      if (diff > 0) {
+        //console.log("ok");
+        user.payToDay = true;
+        user.freeUse = true;
+        user.freeUseTime = diff;
+      } else {
+        const subcrioptionPay = await SubcriptionPay.findOne({ providerId: user._id, status: "active" });
+        //console.log("subcrioptionPay");
+        //console.log(subcrioptionPay);
+        //console.log("userData");
+        //console.log(userData);
+        //console.log("user");
+        //console.log(user);
+        if (subcrioptionPay) {
+          //console.log("subcrioptionPay.subcriptionId");
+          if (subcrioptionPay.planId) {
+            const planSubcription = await Plan.findById(subcrioptionPay.planId);
+            //console.log("planSubcription");
+            //console.log(planSubcription);
+            if (planSubcription.type == "subcription") {
+              const culqi = new Culqi({
+                privateKey: culqiConfing.private_key,
+                pciCompliant: true,
+                publicKey: culqiConfing.private_key,
+              });
+              const subscriptionCulqi = await culqi.subscriptions.getSubscription({
+                id: subcrioptionPay.subcriptionId
+              });
+              //console.log(subscriptionCulqi.status);
+              if (subscriptionCulqi.status != "Activa") {
+                await SubcriptionPay.update({ _id: subcrioptionPay._id }, { status: "inactive" }, { new: false });
+                await User.findOneAndUpdate({ _id: user._id }, { payToDay: false }, { new: true });
+              }
+
+            } else
+              if (planSubcription.type == "charge") {
+
+                let planSubcriptionEndDate = subcrioptionPay.endDate;
+                planSubcriptionEndDate.setHours(0);
+                planSubcriptionEndDate.setMinutes(0);
+                planSubcriptionEndDate.setSeconds(0);
+                //console.log("charge");
+                //console.log(now);
+                //console.log(planSubcriptionEndDate);
+                user.endDate = planSubcriptionEndDate;
+                if (now.getTime() >= planSubcriptionEndDate.getTime()) {
+                  await SubcriptionPay.update({ _id: subcrioptionPay._id }, { status: "inactive" }, { new: false });
+                  await User.findOneAndUpdate({ _id: user._id }, { payToDay: false }, { new: true });
+                }
+              }
+          }
+        }else{
+          user.payToDay = false;
+          user.freeUse = false;
+        }
+      }
+    }
+    console.log("user");
+    console.log(user);
     const token = generateTokenResponse(user, accessToken);
-    /*console.log(token);
-    console.log(accessToken);*/
     const userTransformed = user.transform();
+    /*console.log("userTransformed");
+    console.log(userTransformed);*/
     return res.json({ token, user: userTransformed });
   } catch (error) {
+    console.log("error", error);
+    error = new APIError(e);
     return next(error)
   }
 };
@@ -82,8 +165,8 @@ exports.verifyEmail = async (req, res, next) => {
     const user = await User.findOne({ email: email });
     const userModel = user ? User : Admin;
     await userModel.findOneAndUpdate({ email: email }, { status: "active" }, { new: true }).then(result => {
-      //res.status(200).json(result);
-      res.redirect('http://localhost:4200/auth/sign-in');
+      res.status(200).json(result);
+      //res.redirect(baseWebUrl+'auth/sign-in');
     })
   } catch (e) {
     return next(e)

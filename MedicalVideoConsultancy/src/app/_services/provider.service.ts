@@ -15,16 +15,15 @@ import { ArrayType } from '@angular/compiler';
 export class ProviderService {
 
   baseUrl = env.baseUrl;
-  eventSourceWaitingPatient : EventSource;
+  eventSourceWaitingPatient: EventSource;
 
   //eventSource: any = window['EventSource'];
 
   constructor(private http: HttpClient, private _zone: NgZone) {
   }
 
-  close(){
-    if(this.eventSourceWaitingPatient){
-      console.log("ProviderService close");
+  close() {
+    if (this.eventSourceWaitingPatient) {
       this.eventSourceWaitingPatient.close();
       this.eventSourceWaitingPatient = null;
     }
@@ -95,10 +94,10 @@ export class ProviderService {
 
   //I added new func to get all patients data.
 
-  getAllPatientsData(providerId, validateDni, validateName , limit, page) {
-    const patientUrl = this.baseUrl + 'provider/allPatients/'+providerId;
+  getAllPatientsData(providerId, validateDni, validateName, limit, page) {
+    const patientUrl = this.baseUrl + 'provider/allPatients/' + providerId;
     let params = new HttpParams().set("dni", validateDni).set("fullName", validateName).set("limit", limit).set("page", page);
-   // this.trace("getAllPatientsData:", patientUrl, params);
+    // this.trace("getAllPatientsData:", patientUrl, params);
     return this.http.get<any>(patientUrl, { params });
   }
 
@@ -261,11 +260,38 @@ export class ProviderService {
     const getPlansUrl = this.baseUrl + 'plans';
     return this.http.get<any>(getPlansUrl);
   }
+
+  getPlanSupcription(id) {
+    const subcriptionUrl = this.baseUrl + 'provider/subcription/' + id;
+    return this.http.get(subcriptionUrl);
+  }
+
   sendSubcriptionData(data) {
     const subcriptionUrl = this.baseUrl + 'provider/subcription';
     return this.http.post(subcriptionUrl, data);
 
   }
+
+  cancelCharge(id) {
+    const subcriptionUrl = this.baseUrl + 'provider/charge/' + id;
+    return this.http.delete(subcriptionUrl);
+  }
+
+  cancelSupcription(id) {
+    const subcriptionUrl = this.baseUrl + 'provider/subcription/' + id;
+    return this.http.delete(subcriptionUrl);
+  }
+
+  chargePayPLan(data) {
+    const subcriptionUrl = this.baseUrl + 'provider/charge';
+    return this.http.post(subcriptionUrl, data);
+  }
+
+  changeSubscribePlan(providerid, planId) {
+    const subcriptionUrl = this.baseUrl + 'provider/subcription/' + providerid + '/' + planId;
+    return this.http.put(subcriptionUrl, {});
+  }
+
   sendMailForSubscription(data) {
     const sendMailForSubscription = this.baseUrl + 'provider/sendMail';
     return this.http.post(sendMailForSubscription, data);
@@ -302,6 +328,15 @@ export class ProviderService {
     this.trace("updatePlansUrl:", updatePlansUrl);
     return this.http.put(updatePlansUrl, data);
   }
+
+  changeStatusPlan(id, status) {
+    const changeStatusPlanUrl = this.baseUrl + 'plans/' + id + '/status';
+    this.trace("changeStatusPlanUrl:", changeStatusPlanUrl);
+    return this.http.patch(changeStatusPlanUrl, {
+      status: status
+    });
+  }
+
   deletePlans(planId) {
     const deletePlansUrl = this.baseUrl + 'plans/' + planId;
     this.trace("deletePlansUrl:", deletePlansUrl);

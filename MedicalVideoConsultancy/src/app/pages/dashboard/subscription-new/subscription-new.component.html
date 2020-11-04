@@ -1,7 +1,7 @@
 <div class="p-4">
-    <div>
+    <!-- <div>
         <button class="btn btn-danger float-right" (click)="Cancel()">Cancel My Subscription</button>
-    </div>
+    </div> -->
     <div>
         <h3>Subscription Plan:Basic</h3>
         <p>You can set-up automatic payments or pay as you go. If you are a small clinic or hospital and want to
@@ -114,7 +114,7 @@
                     </div>
                 </div>
                 
-                <div class="text-center mt-5">
+                <div class="text-center mt-5" *ngIf="planData">
                     <button class="btn btn-primary">{{buttonText&&buttonText}} now</button>
                 </div>
 

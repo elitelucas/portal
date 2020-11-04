@@ -104,6 +104,3 @@ export class ConsultsComponent implements OnInit {
   }
 
 }
-
-
-

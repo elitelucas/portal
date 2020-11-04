@@ -1,7 +1,7 @@
 import { ProviderService } from './../../../_services/provider.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import  Swal  from 'sweetalert2';
+import Swal from 'sweetalert2';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 
@@ -14,10 +14,10 @@ export class SuperPlansComponent implements OnInit {
   public Editor = ClassicEditor;
 
 
-  planForm:FormGroup;
-  submitted=false;
-  displayData=false;
-  iteralData=[];
+  planForm: FormGroup;
+  submitted = false;
+  displayData = false;
+  iteralData = [];
 
   kk = [];
   tmpKk = [];
@@ -27,45 +27,54 @@ export class SuperPlansComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private providerService:ProviderService
-    ) { }
+    private providerService: ProviderService
+  ) { }
 
   ngOnInit(): void {
-    this.planForm=this.formBuilder.group({
-      name:['',Validators.required],
-      amount:['',[Validators.required, Validators.pattern('[0-9]*')]],
-    })
+    this.planForm = this.formBuilder.group({
+      name: ['', Validators.required],
+      type: [''],
+      amount: ['', [Validators.required, Validators.pattern('[0-9]*')]],
+    });
 
-    this.providerService.getPlans().subscribe(res=>{
-      this.tmpKk=[];
-      this.iteralData=res;
-      this.iteralData.forEach(item=>{
+    this.listPlans();
+  }
+
+  listPlans(){
+    this.providerService.getPlans().subscribe(res => {
+      this.tmpKk = [];
+      this.iteralData = res;
+      this.iteralData.forEach(item => {
         this.tmpKk.push(true)
       })
-      this.kk=this.tmpKk;
-      this.displayData=true;
+      this.kk = this.tmpKk;
+      this.displayData = true;
     })
   }
-  get f() {return this.planForm.controls;}
 
-  onSubmit(descriptionData){
-    this.submitted=true;
-    if(this.planForm.invalid)
-    return;
-    const sendData={
-      name:this.f.name.value,
-      amount:this.f.amount.value,
-      description:descriptionData,
-      currency_code:'us'
+  get f() { return this.planForm.controls; }
+
+  onSubmit(descriptionData) {
+    this.submitted = true;
+    console.log(this.planForm.invalid);
+    console.log(this.f.type.errors);
+    if (this.planForm.invalid)
+      return;
+    const sendData = {
+      name: this.f.name.value,
+      amount: this.f.amount.value,
+      type: this.f.type.value,
+      description: descriptionData,
+      currency_code: 'PEN'
     }
-    this.providerService.createPlan(sendData).subscribe(res=>{
+    this.providerService.createPlan(sendData).subscribe(res => {
       this.iteralData.push(res);
       this.tmpKk = [];
       this.iteralData.forEach(item => {
         this.tmpKk.push(true)
       })
       this.kk = this.tmpKk;
-  
+
       this.onReset();
       this.newDescription.editorInstance.setData('')
     })
@@ -75,24 +84,33 @@ export class SuperPlansComponent implements OnInit {
     this.submitted = false;
     this.planForm.reset();
   }
-  Edit(idx){
+
+  Edit(idx) {
     this.kk[idx] = false;
   }
-  EditOk(name, description, amount, id,i){
-    this.providerService.updatePlans({name, description, amount, id}).subscribe(res=>{
+
+  EditOk( description, id, i) {
+    this.providerService.updatePlans({ description, id }).subscribe(res => {
       this.iteralData.splice(i, 1, res);
       this.tmpKk = [];
       this.iteralData.forEach(item => {
         this.tmpKk.push(true)
       })
       this.kk = this.tmpKk;
-    })
-
+    });
   }
-  EditCancel(idx){
+  
+  changeStatusPlan(id, status){
+    this.providerService.changeStatusPlan(id,status).subscribe(res => {
+      this.listPlans();
+    });
+  }
+
+  EditCancel(idx) {
     this.kk[idx] = true;
   }
-  Delete(planId,idx){
+
+  Delete(planId, idx) {
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",

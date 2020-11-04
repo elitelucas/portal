@@ -56,8 +56,18 @@ export class AuthService {
   }
 
   public setCurrentUser(result) {
+    console.log("setCurrentUser");
+    console.log(result);
     localStorage.setItem('currentUser', JSON.stringify(result.user));
     this.userSubject.next(result.user)
+  }
+
+  
+  public refreshCurrentUser(user) {
+    console.log("refreshCurrentUser");
+    console.log(user);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    this.userSubject.next(user)
   }
 
   public get getCurrentUser(): currentUser {
@@ -74,8 +84,8 @@ export class AuthService {
   }
 
   public emailVerify(token) {
-    const emailVerifyUrl = baseUrl + "auth/verify-email";
-    return this.http.post<any>(emailVerifyUrl, {token:token});
+    const emailVerifyUrl = baseUrl + "auth/verify-email/"+token;
+    return this.http.post<any>(emailVerifyUrl, {});
   }
 
   public smsVerify(code, token) {

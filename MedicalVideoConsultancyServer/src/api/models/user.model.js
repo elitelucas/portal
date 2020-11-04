@@ -13,7 +13,7 @@ const logger = require('../../config/logger')
 /**
 * User Roles
 */
-const roles = ['Admin', 'Dr', 'Mr', 'Mrs', 'Miss', 'Ms', 'Other', 'SuperAdmin','Patient'];
+const roles = ['Admin', 'Dr', 'Mr', 'Mrs', 'Miss', 'Ms', 'Other', 'SuperAdmin', 'Patient'];
 
 /**
  * User Schema
@@ -65,7 +65,7 @@ const userSchema = new mongoose.Schema({
   },
   room: {
     type: String,
-    required: true,
+    //   required: true,
     unique: true,
     trim: true,
     lowercase: true,
@@ -81,24 +81,16 @@ const userSchema = new mongoose.Schema({
     lowercase: false,
     default: "pending"
   },
-  status: {
-    type: String,
-    lowercase: true,
-    default: "inactive"
-  },
-  state: {
-    type: Boolean,
-    default: true,
-  },
   image: {
     type: String,
     default: ''
   },
-
   smsCode: {
     type: Number
   },
-
+  freeUseTime: {
+    type: Number
+  },
   peerId: {
     type: String
   },
@@ -117,8 +109,18 @@ const userSchema = new mongoose.Schema({
   payMethod: {
     type: Object
   },
-  blog: {
-    type: Array
+  status: {
+    type: String,
+    lowercase: true,
+    default: "inactive"
+  },
+  state: {
+    type: Boolean,
+    default: true,
+  },
+  providerPublic: {
+    type: Boolean,
+    default: false
   },
   address: {
     type: String
@@ -126,28 +128,32 @@ const userSchema = new mongoose.Schema({
   address_city: {
     type: String
   },
-  country_code: {
-    type: String
-  },
   customerId: {
     type: String
   },
-  planId: {
+  country_code: {
     type: String
   },
-  subcriptionId: {
-    type: String
-  },
-  planId: {
-    type: String
-  },
-  subcriptionStatus: {
+  payToDay: {
     type: Boolean,
     default: false
   },
-  providerPublic: {
+  freeUse: {
     type: Boolean,
     default: false
+  },
+  subcriptionPayId: {
+    type: String,
+    default: ''
+  },
+  createdAt: {
+    type: Date
+  },
+  updatedAt: {
+    type: Date
+  },
+  endDate: {
+    type: Date
   },
 }, {
   timestamps: true,
@@ -180,7 +186,7 @@ userSchema.pre('save', async function save(next) {
 userSchema.method({
   transform() {
     const transformed = {};
-    const fields = ['id', 'firstName', 'lastName', 'email', 'phoneNumber','planId', 'subcriptionId', 'subcriptionStatus', 'providerPublic', 'room', 'cmp', 'socketId', 'peerId', 'role', 'permission', 'status', 'state', 'image', 'connection', 'calling', 'createdAt'];
+    const fields = ['id', 'firstName', 'endDate','freeUseTime', 'lastName', 'email', 'phoneNumber', 'planId', 'subcriptionId', 'subcriptionStatus', 'providerPublic', 'room', 'cmp', 'socketId', 'peerId', 'role', 'permission', 'payToDay', 'freeUse', 'status', 'state', 'image', 'connection', 'calling', 'createdAt'];
 
     fields.forEach((field) => {
       transformed[field] = this[field];
@@ -237,7 +243,7 @@ userSchema.statics = {
     if (password) {
       if (user && await user.passwordMatches(password)) {
         const token = user.token();
-        logger.info("generate user :" + user._id + " | " +token  )
+        logger.info("generate user :" + user._id + " | " + token)
         return { user, accessToken: token };
       }
       err.message = 'Incorrect email or password';
@@ -246,7 +252,7 @@ userSchema.statics = {
         err.message = 'Invalid refresh token.';
       } else {
         const token = user.token();
-        logger.info("generate user :" + user._id + " | " +token  )
+        logger.info("generate user :" + user._id + " | " + token)
         return { user, accessToken: token };
       }
     } else {

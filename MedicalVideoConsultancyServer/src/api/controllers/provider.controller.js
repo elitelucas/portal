@@ -10,7 +10,7 @@ const Patient = require('../models/patient.model');
 const Transaction = require('../models/transaction.model');
 const Consult = require('../models/consult.model');
 const Chart = require('../models/chart.model');
-const Paysubcription = require('../models/paysubcription.model');
+const SubcriptionPay = require('../models/subcriptionPay.model');
 const Plan = require('../models/plan.model');
 const Card = require('../models/card.model');
 const FeedbackProvider = require('../models/feedbackProvider.model');
@@ -823,83 +823,84 @@ exports.resetState = async (req, res, next) => {
  * @api v1/provider/checkout
  * @params patientId(_id), amountToPay, email
  * */
+/*const id = req.body.checkoutData.id;
+const email = req.body.checkoutData.email;
+const totalAmount = req.body.checkoutData.amountToPay;*/
+
+/* const clientId = paymentConfig.clientId;
+ const clientSecret = paymentConfig.clientSecret;
+ const secondKey = paymentConfig.secondKey;
+ const notifyUrl = paymentConfig.notifyUrl;
+ const continueUrl = paymentConfig.clientUrl + req.body.checkoutData.room;
+ const merchantPosId = paymentConfig.merchantPosId;
+ const description = paymentConfig.description;*/
+//const currencyCode = Currency.PLN;
+/*
 exports.checkout = async (req, res, next) => {
-  try {
-    /*const id = req.body.checkoutData.id;
-    const email = req.body.checkoutData.email;
-    const totalAmount = req.body.checkoutData.amountToPay;*/
+try {
 
-    /* const clientId = paymentConfig.clientId;
-     const clientSecret = paymentConfig.clientSecret;
-     const secondKey = paymentConfig.secondKey;
-     const notifyUrl = paymentConfig.notifyUrl;
-     const continueUrl = paymentConfig.clientUrl + req.body.checkoutData.room;
-     const merchantPosId = paymentConfig.merchantPosId;
-     const description = paymentConfig.description;*/
-    //const currencyCode = Currency.PLN;
-
-    const culqi = new Culqi({
-      privateKey: culqiConfing.private_key,
-      pciCompliant: true,
-      publicKey: culqiConfing.private_key,
-    });
-    console.log(culqi);
+const culqi = new Culqi({
+  privateKey: culqiConfing.private_key,
+  pciCompliant: true,
+  publicKey: culqiConfing.private_key,
+});
+console.log(culqi);
 
 
-    const token = await culqi.tokens.createToken({
-      card_number: '4111111111111111',
-      cvv: '123',
-      expiration_month: '09',
-      expiration_year: '2025',
-      email: 'richard@piedpiper.com',
-    });
-    console.log(token);
+const token = await culqi.tokens.createToken({
+  card_number: '4111111111111111',
+  cvv: '123',
+  expiration_month: '09',
+  expiration_year: '2025',
+  email: 'richard@piedpiper.com',
+});
+console.log(token);
 
-    console.log(token.id);
+console.log(token.id);
 
 
-    const charge = await culqi.charges.createCharge({
-      amount: '10000',
-      currency_code: 'PEN',
-      email: 'richard@piedpiper.com',
-      source_id: token.id,
-    });
+const charge = await culqi.charges.createCharge({
+  amount: '10000',
+  currency_code: 'PEN',
+  email: 'richard@piedpiper.com',
+  source_id: token.id,
+});
 
-    console.log(charge);
-    console.log(charge.id);
-    /*const payU = new PayU(clientId, clientSecret, merchantPosId, secondKey, {
-      sandbox: true,
-    });
-    const result = await payU.createOrder({
-      notifyUrl: notifyUrl,
-      customerIp: "127.0.0.1",
-      continueUrl: continueUrl,
-      description: description,
-      currencyCode: currencyCode,
-      totalAmount: totalAmount,
-      buyer: {
-        email: email,
-      },
-      products: [{
-        name: "Video consultancy fee",
-        quantity: 1,
-        unitPrice: totalAmount
-      }]
-    });
-    if(result) {
-        const patient = await Patient.findOneAndUpdate({_id: id}, {transactionMail: email}, {new: true});
-        if(patient){ res.status(httpStatus.OK).json(result)}
-    }*/
+console.log(charge);
+console.log(charge.id);
 
 
 
-    res.status(httpStatus.OK).send()
-  } catch (e) {
-    console.log("error ", e)
-    return next(new APIError(e))
-  }
+res.status(httpStatus.OK).send()
+} catch (e) {
+console.log("error ", e)
+return next(new APIError(e))
+}
 };
-
+*/
+/*const payU = new PayU(clientId, clientSecret, merchantPosId, secondKey, {
+  sandbox: true,
+});
+const result = await payU.createOrder({
+  notifyUrl: notifyUrl,
+  customerIp: "127.0.0.1",
+  continueUrl: continueUrl,
+  description: description,
+  currencyCode: currencyCode,
+  totalAmount: totalAmount,
+  buyer: {
+    email: email,
+  },
+  products: [{
+    name: "Video consultancy fee",
+    quantity: 1,
+    unitPrice: totalAmount
+  }]
+});
+if(result) {
+    const patient = await Patient.findOneAndUpdate({_id: id}, {transactionMail: email}, {new: true});
+    if(patient){ res.status(httpStatus.OK).json(result)}
+}*/
 
 
 /**
@@ -908,6 +909,7 @@ exports.checkout = async (req, res, next) => {
  * */
 exports.charge = async (req, res, next) => {
   let charge = null;
+  const planId = req.body.chargeData.planId;
   const providerId = req.body.chargeData.providerId;
   const card_number = req.body.chargeData.card_number;
   const cvv = req.body.chargeData.cvv;
@@ -915,8 +917,10 @@ exports.charge = async (req, res, next) => {
   const expiration_year = req.body.chargeData.expiration_year;
   const email = req.body.chargeData.email;
   const amount = req.body.chargeData.amount;
-  const currency_code = req.body.chargeData.currency_code;
+  //const currency_code = req.body.chargeData.currency_code;
   try {
+    const planSubcription = await Plan.findById(planId);
+
     const culqi = new Culqi({
       privateKey: culqiConfing.private_key,
       pciCompliant: true,
@@ -930,29 +934,71 @@ exports.charge = async (req, res, next) => {
       email: email,
     });
     charge = await culqi.charges.createCharge({
-      amount: (amount * 100),
-      currency_code: currency_code,
+      amount: (planSubcription.amount * 100),
+      currency_code: planSubcription.currency_code,
       email: email,
       source_id: token.id,
     });
-  } catch (e) {
-    console.log("error ", e)
-    error = new APIError(e);
-    return next(error)
-  }
-  try {
-    const paysubcription = new Paysubcription({
-      plan: "basic",
+    console.log("charge");
+    console.log(charge);
+
+    let cardExists = await Card.findOne({ card_number: card_number });
+    if (!cardExists) {
+      cardExists = await new Card({
+        card_number: card_number,
+        providerId: providerId,
+        createDate: new Date(),
+        status: "active",
+      }).save();
+    }
+
+    /* } catch (e) {
+       console.log("error ", e)
+       error = new APIError(e);
+       return next(error)
+     }
+     try {*/
+
+    const subcrioptionPayList = await SubcriptionPay.find({ providerId: providerId, status: "active" });
+    if (subcrioptionPayList) {
+      subcrioptionPayList.forEach(async (element) => {
+        await SubcriptionPay.update({ _id: element._id }, { status: "inactive" }, { new: false });
+      });
+    }
+
+    let endDate = new Date();
+
+    console.log("endDate");
+    console.log(endDate);
+
+    if (planSubcription.interval == "meses") {
+      endDate.setMonth(endDate.getMonth() + planSubcription.interval_count);
+    }
+
+    if (planSubcription.interval == "anno") {
+      endDate.setFullYear(endDate.getFullYear() + planSubcription.interval_count);
+    }
+
+    console.log(endDate);
+
+    const subcriptionPay = new SubcriptionPay({
+      planId: planId,
+      chargeId: charge.id,
+      cardId: cardExists._id,
       providerId: providerId,
       chargeId: charge.id,
       createDate: new Date(),
-      currencyCode: currency_code,
+      endDate: endDate,
+      subcriptionStatus: true,
+      currency: planSubcription.currency_code,
       card: card_number,
-      amount: (amount * 100),
+      amount: planSubcription.amount,
       email: email,
       status: "active"
     });
-    await paysubcription.save();
+
+    await subcriptionPay.save();
+    await User.findOneAndUpdate({ _id: providerId }, { payToDay: true, freeUse: false, subcriptionPayId: subcriptionPay._id }, { new: true });
     res.status(httpStatus.OK).send()
   } catch (e) {
     console.log("error ", e)
@@ -961,6 +1007,60 @@ exports.charge = async (req, res, next) => {
   }
 };
 
+exports.chargeCancel = async (req, res, next) => {
+  try {
+
+    const providerId = req.params.providerId;
+    console.log("chargeCancel");
+    console.log(providerId);
+
+    const subcrioptionPayList = await SubcriptionPay.find({ providerId: providerId, status: "active" });
+    console.log("subcrioptionPayList");
+    console.log(subcrioptionPayList);
+    if (subcrioptionPayList) {
+      subcrioptionPayList.forEach(async (element) => {
+        await SubcriptionPay.update({ _id: element._id }, { status: "inactive" }, { new: false });
+      });
+    }
+
+    res.status(httpStatus.OK).send();
+
+  } catch (e) {
+    console.log("error ", e)
+    error = new APIError(e);
+    return next(error)
+  }
+};
+
+exports.getSubcriptionActive = async (req, res, next) => {
+  try {
+    const providerId = req.params.providerid;
+    const subcriptionPay = await SubcriptionPay.findOne({ providerId: providerId, status: "active" });
+    console.log("getSubcriptionActive");
+    console.log(subcriptionPay);
+    if (subcriptionPay) {
+      console.log("a");
+      const plan = await Plan.findById(subcriptionPay.planId);
+      console.log("v");
+      const card = await Card.findOne({ _id: subcriptionPay.cardId });
+      console.log("f");
+      const subcrioptionPay = {
+        card: card,
+        plan: plan,
+        subcription: subcriptionPay
+      }
+      console.log("t");
+      res.status(httpStatus.OK).json(subcrioptionPay);
+    } else {
+      console.log("6");
+      res.status(httpStatus.NOT_FOUND).send();
+    }
+  } catch (e) {
+    console.log("error ", e)
+    error = new APIError(e);
+    return next(error)
+  }
+};
 
 /**
  * @api v1/provider/subcription
@@ -972,11 +1072,17 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
     console.log(req.body)
     const providerId = req.body.providerId;
     const cardData = req.body.card;
-    let cardExists = await Card.findOne({ card_number: cardData.card_number });
+    //let cardExists = await Card.findOne({ card_number: cardData.card_number });
     console.log(providerId);
     let provider = await User.findOne({ _id: providerId });
+    const subcrioptionPay = await SubcriptionPay.findOne({ providerId: providerId, status: "active" });
+    let cardExists = null;
 
+    console.log("subcrioptionPay");
+    console.log(subcrioptionPay);
+    console.log("provider");
     console.log(provider);
+    console.log("cardExists");
     console.log(cardExists);
 
     const culqi = new Culqi({
@@ -985,42 +1091,45 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
       publicKey: culqiConfing.private_key,
     });
 
+    if (subcrioptionPay != null) {
+      cardExists = await Card.findOne({ _id: subcrioptionPay.cardId });
+    }
+
     if (cardExists == undefined || cardExists == null) {
-      // const token = await culqi.tokens.createToken({
-      //   card_number: cardData.card_number,
-      //   cvv: cardData.cvv,
-      //   expiration_month: cardData.expiration_month,
-      //   expiration_year: cardData.expiration_year,
-      //   email: cardData.email,
-      // });
-      // console.log('eeee')
+      const token = await culqi.tokens.createToken({
+        card_number: cardData.card_number,
+        cvv: cardData.cvv,
+        expiration_month: cardData.expiration_month,
+        expiration_year: cardData.expiration_year,
+        email: cardData.email,
+      });
 
-      // if(provider.customerId == undefined){
-      // const cus = {
-      //   first_name: provider.firstName,
-      //   last_name: provider.lastName,
-      //   email: provider.email,
-      //   address: provider.address == undefined ? cardData.address : provider.address,
-      //   address_city: provider.address_city == undefined ? cardData.address_city : provider.address_city ,
-      //   country_code: provider.country_code == undefined ? cardData.country_code : provider.country_code,
-      //   phone_number: provider.phoneNumber == undefined ? cardData.phoneNumber : provider.phoneNumber,
-      // };
-      // console.log(cus);
-      // let customerCulqi = await culqi.customers.createCustomer(cus);
-      // console.log(customerCulqi);
-      // provider.customerId = customerCulqi.id;
-      // provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
+      console.log('eeee');
 
-      // }
+      if (provider.customerId == undefined) {
+        const cus = {
+          first_name: provider.firstName,
+          last_name: provider.lastName,
+          email: provider.email,
+          address: provider.address == undefined ? cardData.address : provider.address,
+          address_city: provider.address_city == undefined ? cardData.address_city : provider.address_city,
+          country_code: provider.country_code == undefined ? cardData.country_code : provider.country_code,
+          phone_number: provider.phoneNumber == undefined ? cardData.phoneNumber : provider.phoneNumber,
+        };
+        let customerCulqi = await culqi.customers.createCustomer(cus);
+        provider.customerId = customerCulqi.id;
+        provider = await User.findOneAndUpdate({ _id: providerId }, provider, { new: false });
 
+      }
 
-      // let cardCulqi = await culqi.cards.createCard({
-      //   customer_id: provider.customerId,
-      //   token_id: token.id
-      // });
+      let cardCulqi = await culqi.cards.createCard({
+        customer_id: provider.customerId,
+        token_id: token.id
+      });
+
       cardExists = await new Card({
         description: cardData.description,
-        // cardId: cardCulqi.id,
+        cardId: cardCulqi.id,
         card_number: cardData.card_number,
         providerId: providerId,
         createDate: new Date(),
@@ -1032,14 +1141,32 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
 
     if (provider != undefined) {
       const planSubcription = await Plan.findById(subcriptionData.id);
-      // let subscriptionCulqi = await culqi.subscriptions.createSubscription({
-      //   card_id: cardExists.cardId,
-      //   plan_id: planSubcription.planId
-      // });  
-      // provider.subcriptionId = subscriptionCulqi.id;
-      provider.subcriptionStatus = true
-      provider.planId = planSubcription._id;
-      provider = await User.findOneAndUpdate({ _id: providerId }, provider, { new: true });
+      let subscriptionCulqi = await culqi.subscriptions.createSubscription({
+        card_id: cardExists.cardId,
+        plan_id: planSubcription.planId
+      });
+      //provider.subcriptionId = subscriptionCulqi.id;
+      //provider.subcriptionStatus = true
+      //provider.planId = planSubcription._id;
+      //provider = await User.findOneAndUpdate({ _id: providerId }, provider, { new: true });
+
+      const subcriptionPay = new SubcriptionPay({
+        planId: planSubcription._id,
+        cardId: cardExists._id,
+        subcriptionId: subscriptionCulqi.id,
+        providerId: providerId,
+        subcriptionStatus: true,
+        createDate: new Date(),
+        status: "active"
+      });
+
+      await subcriptionPay.save();
+
+      provider.subcriptionPayId = subcriptionPay._id;
+      provider.payToDay = true;
+      provider.freeUse = false;
+      await User.findOneAndUpdate({ _id: providerId }, provider, { new: true });
+
       res.status(httpStatus.OK).json(provider.transform())
     } else {
       res.status(httpStatus.NOT_FOUND).send()
@@ -1047,6 +1174,56 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
   } catch (e) {
     console.log("error ", e)
     e["message"] = e.user_message;
+    error = new APIError(e);
+    return next(error)
+  }
+};
+
+
+/**
+ * @api v1/provider/subcription
+ * @params providerId(_id), card_number, cvv, expiration_month, expiration_year, email, amount, currency_code
+ * */
+exports.changeSubscribePlan = async (req, res, next) => {
+  try {
+    const providerId = req.params.providerid;
+    const planId = req.params.planId;
+    const planSubcription = await Plan.findById(planId);
+    const subcrioptionPay = await SubcriptionPay.findOne({ providerId: providerId, status: "active" });
+    const cardExists = await Card.findById(subcrioptionPay.cardId);
+
+    if (planSubcription == null) {
+      res.status(httpStatus.NOT_FOUND).send();
+    } else {
+      if (planSubcription.type == "subcription") {
+        const culqi = new Culqi({
+          privateKey: culqiConfing.private_key,
+          pciCompliant: true,
+          publicKey: culqiConfing.private_key,
+        });
+
+        await culqi.subscriptions.deleteSubscription({
+          id: subcrioptionPay.subcriptionId
+        });
+
+
+
+        let subscriptionCulqi = await culqi.subscriptions.createSubscription({
+          card_id: cardExists.cardId,
+          plan_id: planSubcription.planId
+        });
+
+        await SubcriptionPay.update({ _id: subcrioptionPay._id }, { planId: planId, subcriptionId: subscriptionCulqi.id }, { new: false });
+
+        res.status(httpStatus.OK).send();
+
+      } else {
+
+        res.status(httpStatus.NOT_ACCEPTABLE).send();
+      }
+    }
+  } catch (e) {
+    console.log("error ", e)
     error = new APIError(e);
     return next(error)
   }
@@ -1061,22 +1238,41 @@ exports.unsubscribePlanWithCard = async (req, res, next) => {
     const providerId = req.params.providerid;
     console.log('providerId')
     console.log(providerId)
-    let userProvider = await User.findById(providerId);
-    const subcriptionId = userProvider.subcriptionId;
-    const culqi = new Culqi({
-      privateKey: culqiConfing.private_key,
-      pciCompliant: true,
-      publicKey: culqiConfing.private_key,
-    });
-    // await culqi.subscriptions.deleteSubscription({
-    //   id: subcriptionId
-    // });
-    userProvider.subcriptionId = null;
-    userProvider.planId = null;
-    userProvider.subcriptionStatus = false;
-    console.log(userProvider);
-    userProvider = await User.findOneAndUpdate({ _id: providerId }, userProvider, { new: false });
-    res.status(httpStatus.OK).send();
+    //const userProvider = await User.findById(providerId);
+    const subcrioptionPay = await SubcriptionPay.findOne({ providerId: providerId, status: "active" });
+    console.log('subcrioptionPay')
+    console.log(subcrioptionPay)
+
+    if (subcrioptionPay != null) {
+
+      //const subcriptionId = userProvider.subcriptionId;
+      const culqi = new Culqi({
+        privateKey: culqiConfing.private_key,
+        pciCompliant: true,
+        publicKey: culqiConfing.private_key,
+      });
+
+      await culqi.subscriptions.deleteSubscription({
+        id: subcrioptionPay.subcriptionId
+      });
+
+      const cardExists = await Card.findOne({ _id: subcrioptionPay.cardId });
+
+      await culqi.cards.deleteCard({
+        id: cardExists.cardId
+      });
+      await cardExists.remove();
+
+      await SubcriptionPay.update({ _id: subcrioptionPay._id }, { status: "inactive" }, { new: false });
+
+      await User.findOneAndUpdate({ _id: providerId }, { payToDay: false }, { new: true });
+
+      res.status(httpStatus.OK).send();
+
+    } else {
+      res.status(httpStatus.NOT_FOUND).send();
+    }
+
   } catch (e) {
     console.log("error ", e)
     error = new APIError(e);
@@ -1098,7 +1294,6 @@ exports.getCard = async (req, res, next) => {
 
 exports.updateCard = async (req, res, next) => {
   try {
-
     const providerId = req.body.providerId;
     const card = await Card.findOneAndUpdate({ providerId: providerId }, { card_number: req.body.card_number }, { new: true });
     res.status(httpStatus.OK).json(card);
@@ -1108,54 +1303,6 @@ exports.updateCard = async (req, res, next) => {
     return next(error)
   }
 }
-
-
-/**
- * @api v1/provider/subcription
- * @params providerId(_id), card_number, cvv, expiration_month, expiration_year, email, amount, currency_code
- * */
-exports.changeSubscribePlan = async (req, res, next) => {
-  try {
-    const providerId = req.params.providerid;
-    const cardData = req.body.card;
-    const subcriptionData = req.body.subcription;
-
-    let userProvider = await User.findById(providerId);
-    const subcriptionId = userProvider.subcriptionId;
-
-    const culqi = new Culqi({
-      privateKey: culqiConfing.private_key,
-      pciCompliant: true,
-      publicKey: culqiConfing.private_key,
-    });
-
-    await culqi.subscriptions.deleteSubscription({
-      id: subcriptionId
-    });
-
-    const cardExists = await Card.findOne({ card_number: cardData.card_number });
-
-    const planSubcription = await Plan.findById(subcriptionData.id);
-    let subscriptionCulqi = await culqi.subscriptions.createSubscription({
-      card_id: cardExists.cardId,
-      plan_id: planSubcription.planId
-    });
-    userProvider.subcriptionId = subscriptionCulqi.id;
-    userProvider.subcriptionStatus = true
-    userProvider = await User.findOneAndUpdate({ _id: providerId }, userProvider, { new: false });
-
-    res.status(httpStatus.OK).send()
-
-    /*userProvider.subcriptionId = null;
-    userProvider.subcriptionStatus = false;
-    userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});*/
-    res.status(httpStatus.OK).send();
-  } catch (e) {
-    console.log("error ", e)
-    error = new APIError(e);
-    return next(error)
-  }
-};
 
 
 /**
@@ -1187,14 +1334,14 @@ exports.removeCard = async (req, res, next) => {
     if (cardExists == undefined) {
       res.status(httpStatus.NOT_FOUND).send();
     } else {
-      // const culqi = new Culqi({
-      //   privateKey: culqiConfing.private_key,
-      //   pciCompliant: true,
-      //   publicKey: culqiConfing.private_key,
-      // });
-      // await culqi.cards.deleteCard({
-      //   id: cardExists.cardId
-      // });
+      const culqi = new Culqi({
+        privateKey: culqiConfing.private_key,
+        pciCompliant: true,
+        publicKey: culqiConfing.private_key,
+      });
+      await culqi.cards.deleteCard({
+        id: cardExists.cardId
+      });
       await cardExists.remove();
       res.status(httpStatus.OK).json('ok')
     }

@@ -150,7 +150,7 @@ router.route('/patients-recent')
  * @param id
  * *//*
 router.route('/patients-all/:room')
- .get(authorize(), controller.getAllPatientsData);*/
+.get(authorize(), controller.getAllPatientsData);*/
 /**
  * @api v1/provider/resetState
  * @params model, field 'to reset'
@@ -162,16 +162,18 @@ router.route('/resetState')
 */
 /**
  * @api v1/provider/checkout
- * */
+ * *//*
 router.route('/checkout')
-  .post(authorize(), controller.checkout);
-
+.post(authorize(), controller.checkout);
+*/
 
 /**
  * @api v1/provider/checkout
  * */
 router.route('/charge')
   .post(authorize(), controller.charge);
+router.route('/charge/:providerId')
+  .delete(authorize(), controller.chargeCancel);
 
 /**
  * @api v1/provider/subcription
@@ -189,7 +191,11 @@ router.route('/sendMail')
    * @api v1/provider/subcription
    * */
 router.route('/subcription/:providerid')
+  .get(authorize(), controller.getSubcriptionActive)
   .delete(authorize(), controller.unsubscribePlanWithCard);
+
+router.route('/subcription/:providerid/:planId')
+  .put(authorize(), controller.changeSubscribePlan)
 
 router.route('/card/:providerId')
   .get(authorize(), controller.getCard)
@@ -204,7 +210,7 @@ router.route('/card/:cardId')
  * @api v1/provider/notify
  * *//*
 router.route('/notify')
- .post(authorize(), controller.notify)
+.post(authorize(), controller.notify)
 */
 /**
  * @api v1/provider/chart
@@ -246,7 +252,7 @@ router.route('/consult/:consultId/close')
  * @method post
  * *//*
 router.route('/feedback')
- .post(authorize(), controller.createFeedback);
+.post(authorize(), controller.createFeedback);
 */
 /**
    * @api v1/provider/feedback
