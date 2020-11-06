@@ -10,6 +10,10 @@ const uuidv4 = require('uuid/v4');
 const { env, jwtSecret, jwtExpirationInterval } = require('../../config/vars');
 const logger = require('../../config/logger')
 /**
+* User Roles
+*/
+const roles = ['Patient'];
+/**
  * Patient Schema
  * @Private
  * */
@@ -120,6 +124,8 @@ const patientSchema = new Schema({
 });
 
 patientSchema.statics = {
+  roles,
+
   checkDuplicateField(error) {
     let field = '';
     for (let key in error.keyValue) {
@@ -203,6 +209,8 @@ patientSchema.method({
 
 patientSchema.plugin(mongoosePaginate);
 
+
+exports.roles = roles;
 
 /**
  * @typedef Patient

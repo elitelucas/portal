@@ -1502,6 +1502,7 @@ exports.updateConsult = async (req, res, next) => {
             assessment: updateData.assessment,
             plan: updateData.plan,
             providerFiles: updateData.providerFiles,
+            prescriptions: updateData.prescriptions,
             updatedAt: new Date()
           }
         },

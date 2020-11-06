@@ -26,7 +26,7 @@ export class HealthRoomComponent implements OnInit {
   key = {
     Prescription: true,
     Consults: false,
-    Files: false,
+    Consult: false,
     Charts: false
   };
 
@@ -43,6 +43,12 @@ export class HealthRoomComponent implements OnInit {
     this.route.paramMap.subscribe(async (params) => {
       this.patient = JSON.parse(localStorage.getItem(params.get("patientId")));
       this.consultId = params.get('consultId');
+
+      this.providerService.getOneConsult(this.patient._id, this.consultId).subscribe(res => {
+        localStorage.setItem("newConsult", JSON.stringify(res));
+        localStorage.setItem("data_consult", JSON.stringify({ "id": this.patient._id, "consultId": this.consultId }));
+      });
+
     });
     this.currentUser = Object.assign(new Provider(), JSON.parse(localStorage.getItem('provider_data')));
   }
@@ -117,7 +123,7 @@ export class HealthRoomComponent implements OnInit {
   changeBackground(kk) {
     this.key.Prescription = false;
     this.key.Consults = false;
-    this.key.Files = false;
+    this.key.Consult = false;
     this.key.Charts = false;
     this.key[kk] = true;
   }
@@ -126,6 +132,7 @@ export class HealthRoomComponent implements OnInit {
     this.providerService.closeConsult(this.consultId).subscribe(res => {
       console.log("send End call patient : " + this.patient.socketId);
       this.meetRoomService.endCall(this.patient.socketId, 'endCall');
+      localStorage.removeItem("data_consult")
       this.meetRoomService.stopVideoAudio();
     });
   }

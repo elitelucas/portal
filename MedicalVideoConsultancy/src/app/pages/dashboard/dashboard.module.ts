@@ -40,7 +40,7 @@ import { SubscriptionOldComponent } from './subscription-old/subscription-old.co
 import { SubscriptionNewComponent } from './subscription-new/subscription-new.component';
 import { SuperUpdateComponent } from './super-providers/super-update/super-update.component';
 import { AdminUpdateComponent } from './super-administrators/admin-update/admin-update.component';
-
+import { PreviewPrescriptionComponent } from './new-consult/preview-prescription/preview-prescription.component';
 
 @NgModule({
   declarations: [
@@ -62,11 +62,20 @@ import { AdminUpdateComponent } from './super-administrators/admin-update/admin-
     ChartsComponent, 
     PayProviderComponent, 
     PayMethodComponent, 
-    ConsultDialogueComponent, AddPatientComponent, AddConsultComponent,
+    ConsultDialogueComponent, 
+    AddPatientComponent, 
+    AddConsultComponent,
     ConsultListComponent,              
-    SuperProvidersComponent, SuperAdministratorsComponent, SuperFeedbacksComponent, 
-    SuperPlansComponent, SubscriptionPlanComponent, SubscriptionOldComponent, 
-    SubscriptionNewComponent, SuperUpdateComponent, AdminUpdateComponent],
+    SuperProvidersComponent, 
+    SuperAdministratorsComponent, 
+    SuperFeedbacksComponent, 
+    SuperPlansComponent, 
+    SubscriptionPlanComponent, 
+    SubscriptionOldComponent, 
+    SubscriptionNewComponent, 
+    SuperUpdateComponent, 
+    AdminUpdateComponent, 
+    PreviewPrescriptionComponent],
   imports: [
     SharedModule,
     ReactiveFormsModule,

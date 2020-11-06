@@ -75,6 +75,10 @@ const consultSchema = new Schema({
     type:Array,
     default:[]
   },
+  prescriptions: {
+    type:Array,
+    default:[]
+  },
   payment:Object,
   patient: Object,
 },{

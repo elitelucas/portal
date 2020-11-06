@@ -7,7 +7,6 @@ const logger = require('./../../config/logger');
 const SUPER_ADMIN = 'SuperAdmin';
 const ADMIN = 'Admin';
 const PROVIDER = 'Provider';
-const PATIENT = 'Patient';
 
 exports.ADMIN = ADMIN;
 exports.SUPER_ADMIN = SUPER_ADMIN;

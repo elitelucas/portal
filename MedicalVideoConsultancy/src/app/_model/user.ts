@@ -65,6 +65,7 @@ export class Consult {
   timeOfDisease: String;
   wayOfStart: String;
   symptom: Array<string>;
+  prescriptions: Array<string>;
   historyId: String;
   subjective: String;
   objective: String;

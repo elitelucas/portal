@@ -6,35 +6,23 @@
                     <h4 class="font-weight-bold">Video Chat</h4>
                     <div>
                         <label> Patient Albert ! </label>
-                        <button type="button" mat-button color="warn" 
-                        class="mt-5 p-2 h-p-40"
-                        (click)="startVideoCall()"
-                        [disabled]="disabledCall ? false : true">
+                        <button type="button" mat-button color="warn" class="mt-5 p-2 h-p-40" (click)="startVideoCall()"
+                            [disabled]="disabledCall ? false : true">
                             Start Video Call
                         </button>
-                        <button type="button" mat-button color="warn" 
-                        class="mt-5 p-2 h-p-40"
-                        (click)="mute()">
+                        <button type="button" mat-button color="warn" class="mt-5 p-2 h-p-40" (click)="mute()">
                             Mute
                         </button>
-                        <button type="button" mat-button color="warn" 
-                        class="mt-5 p-2 h-p-40"
-                        (click)="desmute()">
+                        <button type="button" mat-button color="warn" class="mt-5 p-2 h-p-40" (click)="desmute()">
                             Desmute
                         </button>
-                        <button type="button" mat-button color="warn" 
-                        class="mt-5 p-2 h-p-40"
-                        (click)="videomute()">
+                        <button type="button" mat-button color="warn" class="mt-5 p-2 h-p-40" (click)="videomute()">
                             Video Mute
                         </button>
-                        <button type="button" mat-button color="warn" 
-                        class="mt-5 p-2 h-p-40"
-                        (click)="videodesmute()">
-                        Video  Desmute
+                        <button type="button" mat-button color="warn" class="mt-5 p-2 h-p-40" (click)="videodesmute()">
+                            Video Desmute
                         </button>
-                        <button type="button" mat-button color="warn" 
-                        class="mt-5 p-2 h-p-40"
-                        (click)="endCall()">
+                        <button type="button" mat-button color="warn" class="mt-5 p-2 h-p-40" (click)="endCall()">
                             End Call
                         </button>
                     </div>
@@ -60,9 +48,9 @@
                         <div class="w-100 p-10 border-radius-5 scroll-div" id="chatText" #chatText>
                         </div>
                         <div>
-                            <input #textInput formControlName="text" class="border-radius-5 chat-input" type="text" placeholder="message">
-                            <button type="submit" style="bottom: 0;"
-                                class="btn btn-primary">Send</button>
+                            <input #textInput formControlName="text" class="border-radius-5 chat-input" type="text"
+                                placeholder="message">
+                            <button type="submit" style="bottom: 0;" class="btn btn-primary">Send</button>
                         </div>
                     </form>
                 </mat-card-content>
@@ -72,16 +60,20 @@
     <div class="row" style="border-bottom: 1px solid;">
         <div class="col-xl-8 point">
             <div class="row  pt-5">
-                <div [class]="key.Prescription? 'col-xl-4 left-border title-pos sub-menu':'col-xl-4 left-border title-pos'" (click)="changeBackground('Prescription')">
+                <div [class]="key.Prescription? 'col-xl-4 left-border title-pos sub-menu':'col-xl-4 left-border title-pos'"
+                    (click)="changeBackground('Prescription')">
                     Medical Prescription
                 </div>
-                <div [class]="key.Consults? 'col-xl-3 left-border title-pos sub-menu':'col-xl-3 left-border title-pos'" (click)="changeBackground('Consults')">
+                <div [class]="key.Consults? 'col-xl-3 left-border title-pos sub-menu':'col-xl-3 left-border title-pos'"
+                    (click)="changeBackground('Consults')">
                     Consults
-                </div> 
-                <div [class]="key.Files? 'col-xl-2 left-border title-pos sub-menu':'col-xl-2 left-border title-pos'" (click)="changeBackground('Files')">
-                    Files
                 </div>
-                <div [class]="key.Charts? 'col-xl-3 left-border title-pos sub-menu':'col-xl-3 left-border title-pos'" (click)="changeBackground('Charts')">
+                <div [class]="key.Consult? 'col-xl-2 left-border title-pos sub-menu':'col-xl-2 left-border title-pos'"
+                    (click)="changeBackground('Consult')">
+                    Consult
+                </div>
+                <div [class]="key.Charts? 'col-xl-3 left-border title-pos sub-menu':'col-xl-3 left-border title-pos'"
+                    (click)="changeBackground('Charts')">
                     Charts
                 </div>
             </div>
@@ -95,10 +87,10 @@
         <app-prescription></app-prescription>
     </div>
     <div *ngIf="key.Consults">
-        <app-consults [patient]="patient" ></app-consults>
+        <app-consults [patient]="patient"></app-consults>
     </div>
-    <div *ngIf="key.Files">
-        <app-files></app-files>
+    <div *ngIf="key.Consult">
+        <app-new-consult></app-new-consult>
     </div>
     <div *ngIf="key.Charts">
         <app-charts></app-charts>
