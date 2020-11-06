@@ -2,7 +2,30 @@
 <!-- sidebar -->
 <!-- ============================================================== -->
 <ng-container >
-  <mat-nav-list appAccordion>
+  <mat-nav-list appAccordion style="background-color: #005662;">
+    <ng-container>
+      <div class="navbar-header">
+        <a class="navbar-brand" href="index.html">
+            <!-- Logo icon --><b>
+                <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
+                <!-- Dark Logo icon -->
+                <!-- <img src="assets/images/logo-icon.png" alt="homepage" class="dark-logo"> -->
+                <!-- Light Logo icon -->
+                <img src="assets/images/logo.png" alt="homepage" class="light-logo">
+            </b>
+            <!--End Logo icon -->
+            <!-- Logo text -->
+          <!-- <span fxShow="false" fxShow.gt-xs class="text-dark"> -->
+             <!-- dark Logo text -->
+             <!-- <img src="assets/images/logo-text.png" alt="homepage" class="dark-logo"> -->
+            <!-- Light Logo text -->
+            <!--                 <img src="assets/images/logo-light-text.png" class="" alt="homepage">-->
+            <!-- MEVICO
+          </span> -->
+        </a>
+    </div>
+    </ng-container>
+ 
     <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>
     <mat-list-item appAccordionLink *ngFor="let menuitem of firstMenuItems" routerLinkActive="selected" group="{{menuitem.state}}">
     
@@ -16,9 +39,7 @@
           <span class="ml-3">{{ menuitem.name }}</span>
           <span fxFlex></span>
           <span class="label label-{{ badge.type }}" *ngFor="let badge of menuitem.badge">{{ badge.value }}</span>
-        </a>
-    
-      
+        </a> 
     </mat-list-item>
 
     <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>

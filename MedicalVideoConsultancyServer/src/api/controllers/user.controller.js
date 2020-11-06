@@ -11,6 +11,7 @@ const bcrypt = require('bcryptjs');
 const { env, baseUrl } = require('../../config/vars');
 const Bucket = require("../services/awsbucket/bucket");
 const logger = require('../../config/logger')
+const Site = require('../models/site.model');
 /**
  * Load user and append to req.
  * @public
@@ -131,17 +132,19 @@ exports.deleteProvider = async (req, res, next) => {
 }
 
 exports.getAdmins = (req, res, next) => {
-  Admin.find()
-    .then((admin) => {
-      res.status(httpStatus.OK).json(admin)
+  Site.find()
+    .then((site) => {
+      console.log('site')
+      console.log(site)
+      res.status(httpStatus.OK).json(site)
     })
     .catch(e => next(e));
 };
 
-exports.getAdminById = (req, res, next) => {
-  Admin.findById(req.params.adminId)
-    .then((admin) => {
-      res.status(httpStatus.OK).json(admin)
+exports.getSiteById = (req, res, next) => {
+  Site.findById(req.params.adminId)
+    .then((site) => {
+      res.status(httpStatus.OK).json(site)
     })
     .catch(e => next(e));
 };
@@ -150,7 +153,7 @@ exports.createAdmin = async (req, res, next) => {
   try {
     console.log('req.body')
     console.log(req.body)
-    new Admin(req.body).save().then(result => {
+    new Site(req.body).save().then(result => {
       console.log('result')
       console.log(result)
       res.status(httpStatus.OK).json(result);
@@ -167,7 +170,7 @@ exports.updateAdmin = async (req, res, next) => {
     console.log(req.body)
     console.log('req.params.adminId')
     console.log(req.params.adminId)
-    await Admin.findByIdAndUpdate(req.params.adminId, req.body);
+    await Site.findByIdAndUpdate(req.params.adminId, req.body);
     res.status(httpStatus.OK).json('ok');
   } catch (error) {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
@@ -193,7 +196,7 @@ exports.getFilterAdmin = (req, res, next) => {
 exports.deleteAdmin = async (req, res, next) => {
   try {
     const providerId = req.params.providerId;
-    const admin = await Admin.findByIdAndDelete(providerId);
+    const site = await Site.findByIdAndDelete(providerId);
     res.status(httpStatus.OK).send();
   } catch (error) {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);

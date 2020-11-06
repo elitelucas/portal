@@ -3,59 +3,65 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "material": {
+    "ng-admin-free": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
+      "prefix": "app",
+      "schematics": {
+        "@schematics/angular:component": {
+          "styleext": "scss"
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "aot": true,
-            "outputPath": "dist",
+            "outputPath": "dist/ng-admin-free",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.app.json",
             "assets": [
-              "src/assets",
-              "src/assets/images/favicon.png"
+              "src/favicon.ico",
+              "src/assets"
             ],
             "styles": [
-              "./node_modules/bootstrap/dist/css/bootstrap.css",
-              "node_modules/chartist/dist/chartist.css",
-              "node_modules/intl-tel-input/build/css/intlTelInput.css",
-              "src/styles.css",
-              "src/assets/styles/style.scss",
-              "node_modules/datatables.net-dt/css/jquery.dataTables.css"
+              "node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss",
+              "node_modules/@fortawesome/fontawesome-free/scss/solid.scss",
+              "node_modules/@fortawesome/fontawesome-free/scss/regular.scss",
+              "node_modules/@fortawesome/fontawesome-free/scss/brands.scss",
+              "node_modules/angular-bootstrap-md/assets/scss/bootstrap/bootstrap.scss",
+              "node_modules/angular-bootstrap-md/assets/scss/mdb.scss",
+              "node_modules/angular-calendar/scss/angular-calendar.scss",
+              "src/styles.scss"
             ],
             "scripts": [
-              "node_modules/intl-tel-input/build/js/intlTelInput.min.js",
-              "node_modules/jquery/dist/jquery.js",
-              "node_modules/datatables.net/js/jquery.dataTables.js"
+              "node_modules/chart.js/dist/Chart.js"
             ]
           },
           "configurations": {
             "production": {
-              "budgets": [
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": true,
-              "extractCss": true,
-              "namedChunks": true,
-              "aot": false,
-              "extractLicenses": false,
-              "vendorChunk": false,
-              "buildOptimizer": false,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
                 }
               ]
             }
@@ -64,37 +70,34 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "material:build"
+            "browserTarget": "ng-admin-free:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "material:build:production"
+              "browserTarget": "ng-admin-free:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "material:build"
+            "browserTarget": "ng-admin-free:build"
           }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "src/test.ts",
-            "karmaConfig": "./karma.conf.js",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
-            "scripts": [
-              "node_modules/jquery/dist/jquery.min.js"
-            ],
+            "karmaConfig": "src/karma.conf.js",
             "styles": [
-              "src/styles.css",
-              "src/assets/styles/style.scss"
+              "src/styles.scss"
             ],
+            "scripts": [],
             "assets": [
-              "src/assets",
-              "src/assets/images/favicon.png"
+              "src/favicon.ico",
+              "src/assets"
             ]
           }
         },
@@ -112,24 +115,27 @@
         }
       }
     },
-    "material-e2e": {
-      "root": "",
-      "sourceRoot": "",
+    "ng-admin-free-e2e": {
+      "root": "e2e/",
       "projectType": "application",
+      "prefix": "",
       "architect": {
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
-            "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "material:serve"
+            "protractorConfig": "e2e/protractor.conf.js",
+            "devServerTarget": "ng-admin-free:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "ng-admin-free:serve:production"
+            }
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "e2e/tsconfig.e2e.json"
-            ],
+            "tsConfig": "e2e/tsconfig.e2e.json",
             "exclude": [
               "**/node_modules/**"
             ]
@@ -138,17 +144,5 @@
       }
     }
   },
-  "defaultProject": "material",
-  "schematics": {
-    "@schematics/angular:component": {
-      "prefix": "app",
-      "style": "css"
-    },
-    "@schematics/angular:directive": {
-      "prefix": "app"
-    }
-  },
-  "cli": {
-    "analytics": "5cb4f5c0-988d-4ec0-9ecb-42d8ddf7f8c7"
-  }
+  "defaultProject": "ng-admin-free"
 }

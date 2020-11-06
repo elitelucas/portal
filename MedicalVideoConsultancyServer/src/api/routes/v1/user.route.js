@@ -111,7 +111,7 @@ router
   .get(controller.getAdmins);
 
   router.route('/super-admins/:adminId')
-  .get(controller.getAdminById);
+  .get(controller.getSiteById);
 
   router.route('/super-admins')
   .post(controller.createAdmin);
