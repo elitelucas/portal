@@ -1,5 +1,7 @@
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import { Router } from '@angular/router';
 
 import {MustMatch} from "../../../_helpers/must-match.validator";
 import {AuthService} from "../../../_services/auth.service";
@@ -14,6 +16,8 @@ export class SignUpComponent implements OnInit {
 
   registerForm: FormGroup;
   submitted = false;
+duplicatedKey=false;
+
   isDuplicatedRoom: boolean = false;
   isPending: boolean = false;
   isDuplicatedEmail:boolean = false;
@@ -21,19 +25,17 @@ export class SignUpComponent implements OnInit {
   isValidNumber: boolean = true;
   isEmptyPhoneNumber: boolean = false;
   phoneNumber:string = '';
-constructor(private formBuilder: FormBuilder, private auth: AuthService) { }
+constructor(
+  private formBuilder: FormBuilder, 
+  private auth: AuthService,
+  private router:Router
+  ) { }
 
   ngOnInit() {
     this.registerForm = this.formBuilder.group({
-      firstName: ['', [Validators.required,Validators.pattern("[a-zA-Z ]*"), Validators.maxLength(100)]],
-      lastName: ['', [Validators.required,Validators.pattern("[a-zA-Z ]*"),Validators.maxLength(100)]],
-      room: ['', [Validators.required,Validators.pattern("[a-zA-Z ]*"), Validators.maxLength(40)]],
-      cmp: ['', [Validators.required,Validators.pattern("[0-9]*"), Validators.minLength(4), Validators.maxLength(8)]],
       email: ['', [Validators.required, Validators.email,Validators.maxLength(100)]],
-      phoneNumber: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', Validators.required],
       confirmPassword: ['', Validators.required],
-      acceptTerms: [false, Validators.requiredTrue]
     }, {
       validator: MustMatch('password', 'confirmPassword')
     });
@@ -44,51 +46,25 @@ constructor(private formBuilder: FormBuilder, private auth: AuthService) { }
 
   onSubmit() {
     this.submitted = true;
-    this.isEmptyPhoneNumber = !this.registerForm.value.phoneNumber;
     // stop here if form is invalid
-    if (this.registerForm.invalid || !this.isValidNumber || this.isEmptyPhoneNumber) {
+    if (this.registerForm.invalid) {
       return;
     }
-    this.registerForm.value.phoneNumber = this.phoneNumber;
-    const dataNewUser = this.registerForm.value;
-    dataNewUser['role'] = 'Dr';
-    console.log(dataNewUser);
+
     this.auth.signUp(this.registerForm.value).subscribe(res=> {
+    if(res==='duplicate'){
+      this.duplicatedKey=true;
+    }
       if(res.token) {
-        this.onReset();
-        this.isPending = true;
+        this.router.navigateByUrl('/dashboard/health-provider');
       } else if(res.status == "409") {
-        res.errors[0].field == "room" ? this.isDuplicatedRoom = true: (res.errors[0].field == 'phoneNumber' ? this.isDuplicatedPhone = true: this.isDuplicatedEmail = true);
+        console.log('sdfsdf')
       }
     });
   }
 
-  onReset() {
-    this.submitted = false;
-    this.isPending = false;
-    this.isDuplicatedEmail = false;
-    this.isDuplicatedRoom = false;
-    this.isDuplicatedPhone = false;
-    this.isValidNumber = true;
-    this.isEmptyPhoneNumber = false;
-    this.registerForm.reset();
-  }
 
   hasError(event: boolean) {
     this.isValidNumber = event;
-  }
-
-  getNumber(phoneNumber: any) {
-    console.log("entered number>>>>>>>>",phoneNumber );
-    this.phoneNumber = phoneNumber;
-    return this.phoneNumber;
-  }
-
-  telInputObject(event: any) {
-    console.log("input object >>>>>>>>>>", event)
-  }
-
-  onCountryChange(event: any) {
-    console.log("change number >>>>>>>>>>>>>>", event)
   }
 }

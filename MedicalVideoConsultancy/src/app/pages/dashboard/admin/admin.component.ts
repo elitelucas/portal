@@ -3,8 +3,14 @@ import {MatDialog, MatPaginator, MatSort, MatTable, MatTableDataSource} from "@a
 import {UserService} from "../../../_services/user.service";
 import {Router} from "@angular/router";
 import {DialogBoxComponent} from "../dialog-box/dialog-box.component";
-import {UsersData} from "../super/super.component";
 import {AuthService} from "../../../_services/auth.service";
+
+export interface UsersData {
+  userId: number;
+  email: string;
+  role: string;
+  createdAt: Date;
+}
 
 @Component({
   selector: 'app-admin',
@@ -13,11 +19,12 @@ import {AuthService} from "../../../_services/auth.service";
 })
 export class AdminComponent implements OnInit {
   currentUser: any;
-  displayedColumns: string[] = ['userId', 'name', 'role', 'room', 'email', 'cmp', 'phoneNumber', 'permission', 'status', 'createdAt', 'action'];
+  displayedColumns: string[] = ['userId', 'email', 'role', 'createdAt','action'];
   noDataToDisplay: boolean = false;
   dataSource: any;
 
   @ViewChild(MatTable)  table: MatTable<any>;
+
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   constructor(public dialog: MatDialog, private userService: UserService, private router: Router, private authService: AuthService) {
@@ -46,11 +53,13 @@ export class AdminComponent implements OnInit {
   }
 
   initDataSource(data) {
+    console.log('data')
+    console.log(data)
     const userData: UsersData[] = [];
     data.forEach(function(item){
       if(item) {
         if(item.role !== "Admin")
-        userData.push({userId: item.id, name: item.firstName +" " + item.lastName, role: item.role, room: item.room, email: item.email, cmp: item.cmp, phoneNumber: item.phoneNumber, status: item.status,permission: item.permission, createdAt: item.createdAt});
+        userData.push({userId: item.id,email:item.email, role: item.role, createdAt: item.createdAt});
       }
     });
     this.dataSource = new MatTableDataSource<UsersData>(userData);

@@ -7,12 +7,10 @@
     <img src="assets/images/users/1.jpg" alt="user" class="profile-pic">
   </ng-container>
   <ng-container *ngIf="currentUser.image">
-    <img [src]="currentUser.image" alt="user" class="profile-pic">
+    <img [src]="publicUrl + currentUser.image" alt="user" class="profile-pic">
   </ng-container>
 </button>
 <mat-menu #profile="matMenu" class="mymegamenu">
-    <button mat-menu-item (click)="viewProfile()">
-        <mat-icon>account_box</mat-icon> Profile </button>
     <button mat-menu-item (click)="logout()">
         <mat-icon>exit_to_app</mat-icon> Sign Out </button>
 </mat-menu>

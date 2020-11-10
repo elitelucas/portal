@@ -1,0 +1,56 @@
+<div class="w-50 mx-auto">
+    <div class="mb-5">
+        <div>
+            <h3>File Analysis</h3>
+        </div>
+        <div class="mb-3">
+            <label>FileName: </label><span class="ml-2">{{fileName&&fileName}}</span>
+            <button class="ml-2" type="button" mat-button color="primary" class="p-2 h-p-40"
+                (click)="handleDownload(fileName)">
+                <mat-icon>file_download</mat-icon>
+                Download
+            </button>
+        </div>
+        <div  class="mb-3">
+            <label>Provider: </label><span class="ml-2">{{formData&&formData.user.email}}</span>
+        </div>
+        <div *ngIf="typeData"  class="mb-3">
+            <label>Type: </label>
+            <select class="ml-2" value="{{fileType&&fileType}}" (change)="changeType( $event)">
+                <option *ngFor="let type of typeData" [value]="type._id">{{type.name}}</option>
+            </select>
+        </div>
+
+        <div  class="mb-3">
+            <label>Status: </label>
+            <select class="ml-2" value="{{fileStatus&&fileStatus}}" (change)="changeStatus( $event)">
+                <option value="pending">pending</option>
+                <option value="done">done</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>ReportedFile: </label><span class="ml-2">{{reportFile&&reportFile}}</span>
+            <button class="ml-2" type="button" mat-button color="primary" class="p-2 h-p-40"
+                (click)="handleDownload(reportFile)">
+                <mat-icon>file_download</mat-icon>
+                Download
+            </button>
+        </div>
+
+        <div class="upload-btn"  class="mb-3">
+            <label>Upload Report/Change Report: </label>
+            <button class="ml-2" type="button" mat-button color="primary" class="p-2 h-p-40" (click)="handleUpload()">
+                <mat-icon>file_upload</mat-icon>
+                Upload
+            </button>
+            <input  type="file" #fileUpload id="fileUpload" name="fileUpload" multiple="multiple" accept="*"
+                style="display:none;" />
+
+        </div>
+
+    </div>
+
+
+
+</div>

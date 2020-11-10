@@ -17,7 +17,7 @@ export class SignInComponent implements OnInit {
   constructor(private authService: AuthService, private route: ActivatedRoute, private router: Router, private formBuilder: FormBuilder) {
     this.authForm  =  this.formBuilder.group({
       email: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(100)]]
+      password: ['', [Validators.required, Validators.maxLength(100)]]
     });
   }
 
@@ -40,26 +40,23 @@ export class SignInComponent implements OnInit {
       return;
     }
      this.authService.signIn(this.authForm.value).subscribe( res => {
-      if (res.token) {
-        if(res.user.permission.includes("approved") && res.user.status === "active") {
-          this.isApproved = true;
-          this.isActive = true;
-          this.allowLogin(res);
-        } else if(res.user.permission.includes("approved")  && res.user.status !== "active") {
-          this.isApproved = true;
-          this.isActive = false;
-        } else if(!res.user.permission.includes("approved") && res.user.status == "active") {
-          this.isApproved = false;
-          this.isActive = true;
-        } else{
-          this.isApproved = false;
-          this.isActive = false;
-        }
-      }
+       console.log('res')
+       console.log(res)
+       if(res.user.role==='User'){
+        this.router.navigateByUrl('/dashboard/health-provider')
+       }else if(res.user.role==='Analysis'){
+        this.router.navigateByUrl('/dashboard/analysis')
+       }else if(res.user.role==='SuperAdmin'){
+        this.router.navigateByUrl('/dashboard/administrators')
+       }
     }, error => {
       this.isLoginFailed = !!error;
      }
    );
+  }
+
+  gotoRegister(){
+    this.router.navigateByUrl('/auth/sign-up/provider')
   }
 
   allowLogin(res) {

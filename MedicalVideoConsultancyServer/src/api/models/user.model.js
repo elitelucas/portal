@@ -13,7 +13,7 @@ const logger = require('../../config/logger')
 /**
 * User Roles
 */
-const roles = ['Admin', 'Dr', 'Mr', 'Mrs', 'Miss', 'Ms', 'Other', 'SuperAdmin','Patient'];
+const roles = ['User','Analysis','SuperAdmin'];
 
 /**
  * User Schema
@@ -29,126 +29,12 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    minlength: 6,
     maxlength: 128,
   },
-  firstName: {
-    type: String,
-    maxlength: 128,
-    index: true,
-    trim: true,
-    default: ''
-  },
-  lastName: {
-    type: String,
-    maxlength: 128,
-    index: true,
-    trim: true,
-    default: ''
-  },
-  services: {
-    facebook: String,
-    google: String,
-  },
-  role: {
-    type: String,
-    enum: roles,
-  },
-  cmp: {
-    type: Number,
-    unique: true,
-    trim: true,
-    lowercase: true,
-  },
-  socketId: {
-    type: String,
-  },
-  room: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    lowercase: true,
-  },
-  phoneNumber: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true
-  },
-  permission: {
-    type: String,
-    lowercase: false,
-    default: "pending"
-  },
-  status: {
-    type: String,
-    lowercase: true,
-    default: "inactive"
-  },
-  state: {
-    type: Boolean,
-    default: true,
-  },
-  image: {
-    type: String,
-    default: ''
-  },
+  role:{
+    type:String
+  }
 
-  smsCode: {
-    type: Number
-  },
-
-  peerId: {
-    type: String
-  },
-  connection: {
-    type: Boolean,
-    default: false
-  },
-  calling: {
-    type: Boolean,
-    default: false
-  },
-  sigImgSrc: {
-    type: String,
-    default: ''
-  },
-  payMethod: {
-    type: Object
-  },
-  blog: {
-    type: Array
-  },
-  address: {
-    type: String
-  },
-  address_city: {
-    type: String
-  },
-  country_code: {
-    type: String
-  },
-  customerId: {
-    type: String
-  },
-  planId: {
-    type: String
-  },
-  subcriptionId: {
-    type: String
-  },
-  planId: {
-    type: String
-  },
-  subcriptionStatus: {
-    type: Boolean,
-    default: false
-  },
-  providerPublic: {
-    type: Boolean,
-    default: false
-  },
 }, {
   timestamps: true,
 });
@@ -180,7 +66,7 @@ userSchema.pre('save', async function save(next) {
 userSchema.method({
   transform() {
     const transformed = {};
-    const fields = ['id', 'firstName', 'lastName', 'email', 'phoneNumber','planId', 'subcriptionId', 'subcriptionStatus', 'providerPublic', 'room', 'cmp', 'socketId', 'peerId', 'role', 'permission', 'status', 'state', 'image', 'connection', 'calling', 'createdAt'];
+    const fields = ['id', 'email', 'role','createdAt'];
 
     fields.forEach((field) => {
       transformed[field] = this[field];
@@ -263,9 +149,9 @@ userSchema.statics = {
    * @returns {Promise<User[]>}
    */
   list({
-    page = 1, perPage = 30, id, firstName, lastName, room, cmp, socketId, peerId, email, role, permission, status, state, providerPublic, date, subcriptionId, subcriptionStatus
+    page = 1, perPage = 30, id, email, role,createdAt
   }) {
-    const options = omitBy({ id, firstName, lastName, room, cmp, socketId, peerId, email, role, permission, status, state, providerPublic, date, subcriptionId, subcriptionStatus }, isNil);
+    const options = omitBy({ id,  email, role, createdAt }, isNil);
 
     return this.find(options)
       .sort({ createdAt: -1 })

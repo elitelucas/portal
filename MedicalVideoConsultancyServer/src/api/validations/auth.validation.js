@@ -5,18 +5,10 @@ module.exports = {
   register: {
     body: {
       email: Joi.string()
-        .min(10)
         .required(),
       password: Joi.string()
         .required()
-        .min(6)
         .max(128),
-      cmp: Joi.number()
-        .required(),
-      room: Joi.string()
-        .required(),
-      phoneNumber: Joi.string()
-        .required()
     },
   },
 
@@ -24,7 +16,6 @@ module.exports = {
   login: {
     body: {
       email: Joi.string()
-        .min(9)
         .required(),
       password: Joi.string()
         .required()

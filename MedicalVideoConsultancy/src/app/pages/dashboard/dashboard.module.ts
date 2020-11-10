@@ -6,7 +6,7 @@ import { SharedModule } from "../shared/shared.module";
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { AdminComponent } from './admin/admin.component';
 import { SuperComponent } from './super/super.component';
-import { HealthProviderComponent, InviteBySms } from './health-provider/health-provider.component';
+import { HealthProviderComponent } from './health-provider/health-provider.component';
 import { DialogBoxComponent } from './dialog-box/dialog-box.component';
 import { ReactiveFormsModule } from "@angular/forms";
 import { DemoMaterialModule } from "../demo-material-module";
@@ -40,6 +40,8 @@ import { SubscriptionOldComponent } from './subscription-old/subscription-old.co
 import { SubscriptionNewComponent } from './subscription-new/subscription-new.component';
 import { SuperUpdateComponent } from './super-providers/super-update/super-update.component';
 import { AdminUpdateComponent } from './super-administrators/admin-update/admin-update.component';
+import { SuperUploadedFilesComponent } from './super-uploaded-files/super-uploaded-files.component';
+import { UploadEditComponent } from './super-uploaded-files/upload-edit/upload-edit.component';
 
 
 @NgModule({
@@ -49,7 +51,6 @@ import { AdminUpdateComponent } from './super-administrators/admin-update/admin-
     HealthProviderComponent,
     DialogBoxComponent, 
     ProfileComponent, 
-    InviteBySms, 
     EditRoomComponent, 
     HealthRoomComponent,
     SignatureComponent, 
@@ -66,7 +67,7 @@ import { AdminUpdateComponent } from './super-administrators/admin-update/admin-
     ConsultListComponent,              
     SuperProvidersComponent, SuperAdministratorsComponent, SuperFeedbacksComponent, 
     SuperPlansComponent, SubscriptionPlanComponent, SubscriptionOldComponent, 
-    SubscriptionNewComponent, SuperUpdateComponent, AdminUpdateComponent],
+    SubscriptionNewComponent, SuperUpdateComponent, AdminUpdateComponent, SuperUploadedFilesComponent, UploadEditComponent],
   imports: [
     SharedModule,
     ReactiveFormsModule,

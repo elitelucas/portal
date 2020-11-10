@@ -11,11 +11,40 @@ const bcrypt = require('bcryptjs');
 const { env, baseUrl } = require('../../config/vars');
 const Bucket = require("../services/awsbucket/bucket");
 const logger = require('../../config/logger')
-const Site = require('../models/site.model');
 /**
  * Load user and append to req.
  * @public
  */
+//portal start
+exports.list = async (req, res, next) => {
+  try {
+
+    const userData = await User.list(req.query);
+    const transformedUsers = userData.map(user => {
+        return user.transform()
+    });
+    res.json(transformedUsers);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getUserById=(req,res)=>{
+  User.findById(req.params.userId).then((user) => {
+    res.status(httpStatus.OK).json(user)
+  })
+  .catch(e => next(e));
+}
+
+exports.updatePermission = async (req, res, next) => {
+
+  User.findOneAndUpdate({ _id: req.params.userId }, req.body, { new: true })
+    .then(savedUser => res.json(savedUser))
+    .catch(e => next(userModel.checkDuplicateField(e)));
+};
+//portal end
+
+
 exports.load = async (req, res, next, id) => {
   try {
     const userData = await User.findById(id);
@@ -34,9 +63,8 @@ exports.load = async (req, res, next, id) => {
  * @public
  */
 exports.update = async (req, res, next) => {
-  const user = await User.findOne({ _id: req.body.userId });
-  const userModel = user ? User : Admin;
-  userModel.findOneAndUpdate({ _id: req.body.userId }, req.body, { new: true })
+
+  User.findOneAndUpdate({ _id: req.body.userId }, req.body, { new: true })
     .then(savedUser => res.json(savedUser))
     .catch(e => next(userModel.checkDuplicateField(e)));
 };
@@ -45,31 +73,9 @@ exports.update = async (req, res, next) => {
  * Get user list
  * @public
  */
-exports.list = async (req, res, next) => {
-  try {
 
-    const userData = await User.list(req.query);
-    const adminData = await Admin.list(req.query);
-    const users = adminData.concat(userData);
-    const transformedUsers = users.map(user => {
-      if (user.role === "SuperAdmin") {
-        console.log("super admin", user)
-      } else {
-        return user.transform()
-      }
-    });
-    res.json(transformedUsers);
-  } catch (error) {
-    next(error);
-  }
-};
 
-exports.getUserById=(req,res)=>{
-  User.findById(req.params.userId).then((user) => {
-    res.status(httpStatus.OK).json(user)
-  })
-  .catch(e => next(e));
-}
+
 
 exports.createUser = async (req, res, next) => {
   try {
@@ -132,28 +138,25 @@ exports.deleteProvider = async (req, res, next) => {
 }
 
 exports.getAdmins = (req, res, next) => {
-  Site.find()
-    .then((site) => {
-      console.log('site')
-      console.log(site)
-      res.status(httpStatus.OK).json(site)
+  Admin.find()
+    .then((admin) => {
+      res.status(httpStatus.OK).json(admin)
     })
     .catch(e => next(e));
 };
 
-exports.getSiteById = (req, res, next) => {
-  Site.findById(req.params.adminId)
-    .then((site) => {
-      res.status(httpStatus.OK).json(site)
+exports.getAdminById = (req, res, next) => {
+  Admin.findById(req.params.adminId)
+    .then((admin) => {
+      res.status(httpStatus.OK).json(admin)
     })
     .catch(e => next(e));
 };
 
 exports.createAdmin = async (req, res, next) => {
   try {
-    console.log('req.body')
-    console.log(req.body)
-    new Site(req.body).save().then(result => {
+
+    new User(req.body).save().then(result => {
       console.log('result')
       console.log(result)
       res.status(httpStatus.OK).json(result);
@@ -170,7 +173,7 @@ exports.updateAdmin = async (req, res, next) => {
     console.log(req.body)
     console.log('req.params.adminId')
     console.log(req.params.adminId)
-    await Site.findByIdAndUpdate(req.params.adminId, req.body);
+    await Admin.findByIdAndUpdate(req.params.adminId, req.body);
     res.status(httpStatus.OK).json('ok');
   } catch (error) {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
@@ -196,7 +199,7 @@ exports.getFilterAdmin = (req, res, next) => {
 exports.deleteAdmin = async (req, res, next) => {
   try {
     const providerId = req.params.providerId;
-    const site = await Site.findByIdAndDelete(providerId);
+    const user = await User.findByIdAndDelete(providerId);
     res.status(httpStatus.OK).send();
   } catch (error) {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send(error);
@@ -384,8 +387,6 @@ exports.sigImgUpload = async (req, res) => {
  * */
 
 exports.updateProfile = async (req, res) => {
-  const user = await User.findOne({ _id: req.params.userId });
-  const userModel = user ? User : Admin;
   const userOldData = req.locals.user;
   let userNewData = req.body.profile;
   if (userNewData.password !== undefined) {
@@ -399,7 +400,7 @@ exports.updateProfile = async (req, res) => {
     }
   }
 
-  userModel.findOneAndUpdate({ _id: req.params.userId }, userNewData, { new: true }).then(result => {
+  User.findOneAndUpdate({ _id: req.params.userId }, userNewData, { new: true }).then(result => {
     res.status(httpStatus.OK).json(result);
   }).catch(e => {
     return res.send(e)

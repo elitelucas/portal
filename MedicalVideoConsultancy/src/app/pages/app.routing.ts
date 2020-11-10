@@ -9,7 +9,8 @@ import { MeetPatientComponent } from './meet-patient/meet-patient.component';
 export const AppRoutes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./front/front.module').then(m => m.FrontModule)
+    redirectTo: 'auth/sign-in',
+    pathMatch: 'full'
   },
 
   {

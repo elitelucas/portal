@@ -7,12 +7,8 @@ import Swal from 'sweetalert2';
 
 export interface UsersData {
   userId: number;
-  name: string;
-  role: string;
   email: string;
-  phoneNumber: string;
-  permission: string;
-  status: string;
+  role: string;
   createdAt: Date;
 }
 
@@ -25,7 +21,7 @@ export interface UsersData {
 
 export class SuperAdministratorsComponent implements OnInit {
 
-  displayedColumns: string[] = ['userId', 'name', 'role','email', 'phoneNumber','permission', 'status', 'createdAt', 'action'];
+  displayedColumns: string[] = ['userId', 'email', 'role', 'createdAt','action'];
   noDataToDisplay: boolean = false;
   dataSource: any;
   tmpData:any;
@@ -47,7 +43,7 @@ export class SuperAdministratorsComponent implements OnInit {
   }
 
   initData() {
-    this.userService.getAdmins().subscribe(res=> {
+    this.userService.getUsers().subscribe(res=> {
       if(res) {
         console.log("user data s>>>>>>>>>>>>>", res)
        if(res.name) {
@@ -68,9 +64,10 @@ export class SuperAdministratorsComponent implements OnInit {
     const userData: UsersData[] = [];
     data.forEach(function(item){
       if(item) {
-        userData.push({userId: item._id, name: item.firstName +" " + item.lastName, role: item.role, email: item.email, phoneNumber: item.phoneNumber, status: item.status,permission: item.permission, createdAt: item.createdAt});
+        userData.push({userId: item.id,email:item.email, role: item.role, createdAt: item.createdAt});
       }
     });
+
 
     this.dataSource = new MatTableDataSource<UsersData>(userData);
     this.dataSource.paginator = this.paginator;
@@ -98,22 +95,13 @@ export class SuperAdministratorsComponent implements OnInit {
   }
 
   changePermission(element, event) {
-    const permission = event.value;
-    element.permission = permission;
+
+    const permission = event.target.value;
     //Check if email or phone number.
-    this.userService.updateUserData(element)
+    this.userService.updatePermission(element.userId, permission)
       .subscribe(res=> {
-        if(permission.includes("Email")) {
-          this.userService.sendEmail(element)
-            .subscribe(res=> {
-              console.log("Email verification success", res)
-          })
-        } else if (permission.includes("SMS")){
-          this.userService.sendSMS(element)
-            .subscribe(res=> {
-              console.log("SMS verification success", res);
-            })
-        }
+        Swal.fire('Permission is changed.')
+     
       })
   }
 
@@ -125,29 +113,11 @@ export class SuperAdministratorsComponent implements OnInit {
       data: obj
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if(result) {
-        if (result.event == 'Update') {
-          this.updateRowData(result.data);
-        } else if (result.event == 'Delete') {
-          this.deleteRowData(result.data);
-        }
-      }
-    });
+   
   }
 
 
-  updateRowData(row_obj) {
-    this.dataSource = this.dataSource.filteredData.filter((value, key) => {
-      if (value.userId == row_obj.userId) {
-        value.role = row_obj.role;
-        value.room = row_obj.room;
-        this.userService.updateUserData(value).subscribe(res=> {console.log("Updated successfully", res)})
-      }
-      return value;
-    });
-    this.arrangeDataSource();
-  }
+  
 
   deleteRowData(row_obj) {
     console.log("data source", this.dataSource)

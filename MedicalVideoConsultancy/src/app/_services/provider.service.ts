@@ -15,6 +15,67 @@ export class ProviderService {
   baseUrl = environment.baseUrl;
   constructor(private http: HttpClient) {
   }
+//portal start
+public uploadFile(formData) {
+  const fileUrl = this.baseUrl + "provider/uploadFile";
+  return this.http.post<any>(fileUrl, formData, {
+    reportProgress: true,
+    observe: 'events'
+  });
+}
+
+public uploadReportFile(formData) {
+  const fileUrl = this.baseUrl + "provider/uploadReportFile";
+  return this.http.post<any>(fileUrl, formData, {
+    reportProgress: true,
+    observe: 'events'
+  });
+}
+
+public getFileType() {
+  const fileUrl = this.baseUrl + "provider/fileType";
+  return this.http.get<any>(fileUrl);
+}
+public getUplodedFiles(provider) {
+  const fileUrl = this.baseUrl + "provider/uploadedFiles/"+provider;
+  return this.http.get<any>(fileUrl);
+}
+
+public getAllFiles() {
+  const fileUrl = this.baseUrl + "provider/uploadedFiles/";
+  return this.http.get<any>(fileUrl);
+}
+
+public getFileById(fileId) {
+  const fileUrl = this.baseUrl + "provider/oneFile/"+fileId;
+  return this.http.get<any>(fileUrl);
+}
+
+public download(fileName: string): Observable<Blob> {
+  return this.http.get(baseUrl+fileName, {
+    responseType: 'blob'
+  })
+}
+
+public changeStatus(fileId,status) {
+  const fileUrl = this.baseUrl + "provider/changeStatus/";
+  return this.http.put(fileUrl,{fileId,status});
+}
+
+public changeType(fileId,type) {
+  const fileUrl = this.baseUrl + "provider/changeType/";
+  return this.http.put<any>(fileUrl,{fileId,type});
+}
+
+public deleteFile(fileId) {
+  console.log('fileId')
+  console.log(fileId)
+  const fileUrl = this.baseUrl + "provider/deleteFile/"+fileId;
+  return this.http.delete(fileUrl);
+}
+//portal end
+
+
 
 
   sendSMS(smsData) {

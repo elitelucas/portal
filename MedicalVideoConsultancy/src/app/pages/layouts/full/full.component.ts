@@ -6,7 +6,6 @@ import {
   AfterViewInit, OnInit
 } from '@angular/core';
 import { MenuItems } from '../../shared/menu-items/menu-items';
-import * as $ from 'jquery';
 
 /** @title Responsive sidenav */
 @Component({
@@ -34,6 +33,5 @@ export class FullComponent implements OnInit, OnDestroy, AfterViewInit {
     this.mobileQuery.removeListener(this._mobileQueryListener);
   }
   ngAfterViewInit() {
-    console.log($('.mat-drawer-inner-container').first().html())
   }
 }

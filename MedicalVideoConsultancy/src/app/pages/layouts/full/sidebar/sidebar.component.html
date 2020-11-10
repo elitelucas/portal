@@ -2,95 +2,9 @@
 <!-- sidebar -->
 <!-- ============================================================== -->
 <ng-container >
-  <mat-nav-list appAccordion style="background-color: #005662;">
-    <ng-container>
-      <div class="navbar-header">
-        <a class="navbar-brand" href="index.html">
-            <!-- Logo icon --><b>
-                <!--You can put here icon as well // <i class="wi wi-sunset"></i> //-->
-                <!-- Dark Logo icon -->
-                <!-- <img src="assets/images/logo-icon.png" alt="homepage" class="dark-logo"> -->
-                <!-- Light Logo icon -->
-                <img src="assets/images/logo.png" alt="homepage" class="light-logo">
-            </b>
-            <!--End Logo icon -->
-            <!-- Logo text -->
-          <!-- <span fxShow="false" fxShow.gt-xs class="text-dark"> -->
-             <!-- dark Logo text -->
-             <!-- <img src="assets/images/logo-text.png" alt="homepage" class="dark-logo"> -->
-            <!-- Light Logo text -->
-            <!--                 <img src="assets/images/logo-light-text.png" class="" alt="homepage">-->
-            <!-- MEVICO
-          </span> -->
-        </a>
-    </div>
-    </ng-container>
- 
-    <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>
-    <mat-list-item appAccordionLink *ngFor="let menuitem of firstMenuItems" routerLinkActive="selected" group="{{menuitem.state}}">
-    
-        <a class="p-2 w-100" appAccordionToggle [routerLink]="[ menuitem.state]" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" *ngIf="menuitem.type === 'link'">
-          <ng-container *ngIf="menuitem.icon === 'av_timer'">
-            <mat-icon>{{ menuitem.icon }}</mat-icon>
-          </ng-container>
-          <ng-container *ngIf="menuitem.icon !== 'av_timer'">
-            <img class="super-icon-size" src="{{menuitem.icon}}">
-          </ng-container>
-          <span class="ml-3">{{ menuitem.name }}</span>
-          <span fxFlex></span>
-          <span class="label label-{{ badge.type }}" *ngFor="let badge of menuitem.badge">{{ badge.value }}</span>
-        </a> 
-    </mat-list-item>
-
-    <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>
-    <div class="">
-      <ng-container >
-        <div class="pl-4 pt-3 pb-4 d-block">
-          <div class="patients-queue">
-            <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnActive (click)="active()" *ngIf="btnActiveShow" >Active</button>
-            <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnDesactive (click)="desactive()" *ngIf="btnDesactiveShow" >Desactive</button>
-            <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnActive (click)="publicMe()" >Public</button>
-            <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #btnDesactive (click)="privateMe()" >Private</button>
-            <button mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" #alarmButton (click)="alarm()" *ngIf="alarmButtonKey" >Alarm</button>
-          </div>
-        </div>
-      </ng-container>
-    </div>
-
-    <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>
-    <div class="">
-      <ng-container *ngIf="(currentUserRole !== 'SuperAdmin') && (currentUserRole !== 'Admin') && (currentUserRole !== 'Patient')">
-        <mat-list-item>PATIENT QUEUE</mat-list-item>
-        <mat-divider class="bg-white"></mat-divider>
-        <div class="pl-4 pt-3 pb-4 d-block">
-
-          <div>
-            <button *ngIf="waitingPatientsData && waitingPatientsData.length" mat-raised-button class="mr-1 text-dark px-1 py-0 " color="primary" (click)="nextAttetion()">Next Atettion<img src="https://img.icons8.com/color/48/000000/video-call.png" alt="start-call"/></button>
-          </div>
-
-          <div class="patients-queue">
-            <ng-container *ngIf="waitingPatientsData && waitingPatientsData.length">
-              <ng-container *ngFor="let patient of waitingPatientsData">
-                <div class="d-flex justify-content-between align-items-center">
-                  <!--img class="profile-image" [src]="initPatientAvatar(patient)" alt="patient-avatar" />-->
-                  <div class="mr-1 d-block mt-1">
-                    <div class="text-black-50">
-                      <b class="mr-1 font-bold">Name:</b> {{patient.fullName}} <br>
-                      <b class="mr-1 font-bold">Email:</b> {{patient.email}}
-                    </div>                    
-                  </div>
-                </div>
-                <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>
-              </ng-container>
-            </ng-container>
-          </div>
-        </div>
-      </ng-container>
-    </div>
-
-    <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>
-    <mat-list-item appAccordionLink2 *ngFor="let menuitem of secondMenuItems" routerLinkActive="selected" group="{{menuitem.state}}">
-      <a class="p-2 w-100" appAccordionToggle2 [routerLink]="[ menuitem.state]" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" *ngIf="menuitem.type === 'link'">
+  <mat-nav-list appAccordion>
+    <mat-list-item appAccordionLink *ngFor="let menuitem of menuItems.getMenuitem(currentUserRole)" routerLinkActive="selected" group="{{menuitem.state}}">
+      <a class="p-2 w-100" appAccordionToggle [routerLink]="[ menuitem.state]" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}" *ngIf="menuitem.type === 'link'">
         <ng-container *ngIf="menuitem.icon === 'av_timer'">
           <mat-icon>{{ menuitem.icon }}</mat-icon>
         </ng-container>
@@ -102,6 +16,6 @@
         <span class="label label-{{ badge.type }}" *ngFor="let badge of menuitem.badge">{{ badge.value }}</span>
       </a>
     </mat-list-item>
-    <mat-divider class="mt-1 mb-2 bg-dark"></mat-divider>
+
   </mat-nav-list>
 </ng-container>

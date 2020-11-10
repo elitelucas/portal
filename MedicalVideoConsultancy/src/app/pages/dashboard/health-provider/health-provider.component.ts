@@ -1,12 +1,26 @@
-import { Component, Inject, NgZone, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, Inject, NgZone, OnInit, ViewChild, OnDestroy, ElementRef } from '@angular/core';
 import { MatDialog, MatPaginator, MatSort, MatTable, MatTableDataSource, MAT_DIALOG_DATA, MatDialogRef } from "@angular/material";
 import { AuthService } from "../../../_services/auth.service";
 import { environment } from "../../../../environments/environment";
 import { ProviderService } from "../../../_services/provider.service";
 import { Router } from "@angular/router";
-import { MeetRoomService } from "../../../_services/meet-room.service";
-import { WebcamInitError, WebcamUtil } from "ngx-webcam";
-import { Patient, Consult } from "../../../_model/user";
+
+import { HttpErrorResponse, HttpEventType } from "@angular/common/http";
+import { catchError, map } from "rxjs/operators";
+import { of } from "rxjs";
+import Swal from 'sweetalert2';
+
+export interface UploadData {
+  index: number;
+  id: string;
+  type: string;
+  name: string;
+  provider: string;
+  reportFile: string;
+  status: string;
+  createdAt: string;
+}
+
 
 @Component({
   selector: 'app-health-provider',
@@ -16,23 +30,27 @@ import { Patient, Consult } from "../../../_model/user";
 export class HealthProviderComponent implements OnInit {
   currentUser: any;
 
-  listLastAttetions: Consult[] = null;
-
   patientsData = [];
   roomUrl: string;
   domain = environment.domain;
   smsData: any;
   noDevice: boolean = true;
-  private webCamError = [];
+
+  typeData: any;
+  userData: any;
+  sendType: any;
+  fileName = [];
+  tmpData = [];
 
 
-  displayedColumns: string[] = ['dni', 'fullName', 'payment', 'payAmount', 'detail'];
+  displayedColumns: string[] = ['index', 'type', 'name', 'provider', 'reportFile', 'status', 'createdDate'];
   noDataToDisplay: boolean = false;
   dataSource: any;
 
   @ViewChild(MatTable) table: MatTable<any>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild("fileUpload", { static: false }) fileUpload: ElementRef; files = [];
 
   constructor(
     private authService: AuthService,
@@ -41,159 +59,122 @@ export class HealthProviderComponent implements OnInit {
     private router: Router,
     //private meetRoomService: MeetRoomService,
     private _ngZone: NgZone) {
-    this.currentUser = this.authService.getCurrentUser;
+    this.userData = JSON.parse(localStorage.getItem('currentUser'));
+    console.log('this.userData')
+    console.log(this.userData)
   }
 
 
   ngOnInit(): void {
-    this.initProviderRoom();
-  }
-
-  initProviderRoom() {
-    this.roomUrl = this.domain + this.currentUser.room;
-    this.checkConnectionStatus();
-    this.getWaitingPatientsData();
-    WebcamUtil.getAvailableVideoInputs()
-      .then((mediaDevices: MediaDeviceInfo[]) => {
-        this.noDevice = !mediaDevices.length;
-      });
-    this.loadLastAttetions();
-  }
-
-  loadLastAttetions() {
-    this.providerService.getLastAttetionsPatientsDataProvider(this.currentUser.id)
-      .subscribe(result => {
-        const patientData: Consult[] = [];
-        result.forEach(function (item) {
-          if (item) {
-            console.log(item);
-            patientData.push(item);
-          }
-        });
-        this.dataSource = new MatTableDataSource<Consult>(patientData);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      });
-    /*
-   */
-  }
-
-  checkConnectionStatus() {
-    //this.meetRoomService.setUpConnection(this.currentUser);
-  }
-
-  getWaitingPatientsData() {
-    this.providerService.getWaitingPatientsData(this.currentUser.room)
-      .subscribe(result => {
-        this.patientsData = result;
-        //console.log("waiting room patients", result) 
-      });
-  }
-
-  copyRoomAddress(inputRoom) {
-    inputRoom.select();
-    document.execCommand('copy');
-    inputRoom.setSelectionRange(0, 0);
-  }
-
-  saveRoomAddress(inputRoom) {
-
-  }
-
-  sendInvite(option) {
-    switch (option) {
-      case 'sms':
-        this.providerService.sendSMS(this.smsData.data).subscribe(result => {
-          if (!result.errorCode) {
-            console.log("Invite sent by SMS", result)
-          }
-        });
-        break;
-      case 'gmail':
-        this.sendMail('GMail');
-        break;
-      case 'outlook':
-        this.sendMail('OMail');
-        break;
-      default:
-        this.sendMail('defaultMail');
-    }
-  }
-
-  sendMail(option) {
-    const subject = "Telemedicine meeting invitation";
-    const body = "Hello, this is " + this.currentUser.role + "." + this.currentUser.lastName + " - please join me for a secure video call: \n" + "https://pasatra.com/"
-      + this.currentUser.room + "\n" + "%0a" + "%0a" +
-      "Use a computer or device with a good internet connection and webcam. If you run into issues connecting, restart your computer " + "%0a" + "%0a" + "or check out the pasatra.com http://help.pasatra.com \n" +
-      "Simple, free, and secure telemedicine powered by https://Pasatra.com \n";
-    const mailUrl = option === 'GMail' ? 'https://mail.google.com/mail/?view=cm&fs=1&su=' + subject + '&body=' + body :
-      (option === "OMail" ? "https://outlook.live.com/owa/?path=/mail/action/compose&?&subject=" + subject + '&body=' + body : "mailto:?Subject=" + subject + '&body=' + body);
-    this.router.navigate([]).then(result => { window.open(mailUrl, '_blank') })
-  }
-
-
-  openDialogue(option): void {
-    const smsContent = "Hello, this is " + this.currentUser.role + "." + this.currentUser.lastName + " - please join me for a secure video call: \n" + "https://pasatra.com/"
-      + this.currentUser.room + "\n" +
-      "Use a computer or device with a good internet connection and webcam. If you run into issues connecting, restart your computer or check out the pasatra.com http://help.pasatra.com \n" +
-      "Simple, free, and secure telemedicine powered by https://Pasatra.com \n";
-    const dialogRef = this.dialog.open(InviteBySms, {
-      width: '400px',
-      data: { phoneNumber: '', room: this.roomUrl, smsContent: smsContent }
+    this.providerService.getFileType().subscribe(res => {
+      console.log('type')
+      console.log(res)
+      this.typeData = res;
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      this.smsData = result;
-      this.sendInvite(option);
+    this.providerService.getUplodedFiles(this.userData.id).subscribe(res => {
+      console.log('fies')
+      console.log(res)
+      if (res) {
+        this.tmpData = res;
+        this.initDataSource(res)
+        this.noDataToDisplay = false;
+      } else {
+        this.noDataToDisplay = true;
+      }
     })
+
   }
 
+  uploadFile(file) {
 
-  handleInitError(error: WebcamInitError) {
-    this.webCamError.push(error);
-    console.log('camera error', this.webCamError)
+    const formData = new FormData();
+    formData.append('file', file.data);
+    formData.append('provider', this.userData.id);
+    formData.append('type', this.sendType);
+    file.inProgress = true;
+    this.providerService.uploadFile(formData).pipe(
+      map(event => {
+        switch (event.type) {
+          case HttpEventType.UploadProgress:
+            file.progress = Math.round(event.loaded * 100 / event.total);
+            break;
+          case HttpEventType.Response:
+            return event;
+        }
+      }),
+      catchError((error: HttpErrorResponse) => {
+        file.inProgress = false;
+        return of(`${file.data.name} upload failed.`);
+      })).subscribe((event: any) => {
+        if (typeof (event) === 'object') {
+          console.log('event')
+          console.log(event)
+          
+
+          this.tmpData.push(event.body);
+          this.initDataSource(this.tmpData);
+          Swal.fire('Successfully uploaded!')
+          setTimeout(() => {
+            file.inProgress = false;
+            file.progress = 0;
+            this.files = [];
+          }, 1000);
+          this.fileName.push(event.body)
+        }
+      });
   }
-  detail(param) {
-    this.router.navigateByUrl('/dashboard/patient/' + param.id );
+
+  private uploadFiles() {
+
+    this.fileUpload.nativeElement.value = '';
+    this.files.forEach(file => {
+      this.uploadFile(file);
+    });
   }
 
+  handleUpload(type) {
 
-}
-
-
-@Component({
-  selector: 'invite-by-sms',
-  templateUrl: 'invite-by-sms.html',
-})
-export class InviteBySms {
-  isValidNumber: boolean = true;
-  isInvited: boolean = false;
-  constructor(
-    public dialogRef: MatDialogRef<HealthProviderComponent>,
-    @Inject(MAT_DIALOG_DATA) public data) {
-    console.log('data')
-    console.log(data)
-  }
-  onCancelClick(): void {
-    this.isValidNumber = true;
-    this.dialogRef.close({ event: 'cancel' });
-  }
-
-  inviteBySms() {
-    this.isInvited = true;
-    if (!this.data.phoneNumber || (!this.isValidNumber)) {
+    if (type === undefined) {
+      Swal.fire('Select the type!')
       return;
     }
-    this.dialogRef.close({ event: 'sendSms', data: this.data })
+    this.sendType = type;
+
+    const fileUpload = this.fileUpload.nativeElement;
+    fileUpload.onchange = () => {
+      for (const f of fileUpload.files) {
+        const file = f;
+        this.files.push({ data: file, inProgress: false, progress: 0 });
+      }
+      this.uploadFiles();
+    };
+    fileUpload.click();
   }
 
-  hasError(status: boolean) {
-    this.isValidNumber = status;
+
+  initDataSource(data) {
+    const UploadData: UploadData[] = [];
+    data.forEach(function (item, idx) {
+      if (item) {
+        UploadData.push({
+          index: idx + 1, id: item._id, type: item.typeCollection.name, name:
+            item.fileName, provider: item.user.email, reportFile: item.reportFile, status: item.status, createdAt: item.createdAt
+        });
+      }
+    });
+    this.dataSource = new MatTableDataSource<UploadData>(UploadData);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
-  getNumber(phoneNumber: any) {
-    this.data.phoneNumber = phoneNumber;
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
-
+  arrangeDataSource() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
 
 }

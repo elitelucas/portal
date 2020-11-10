@@ -5,6 +5,7 @@ const Patient = require('../models/patient.model');
 const RefreshToken = require('../models/refreshToken.model');
 const moment = require('moment-timezone');
 const { jwtExpirationInterval } = require('../../config/vars');
+const { findOne } = require('../models/user.model');
 
 /**
  * Returns a formated object with tokens
@@ -30,12 +31,16 @@ exports.register = async (req, res) => {
   let userModel;
   try {
     const userData = req.body;
-    userModel = userData.role === 'Admin' ? Admin : User;
-    userData.cmp = userModel === Admin ? '-' : userData.cmp;
-    const user = await new userModel(userData).save();
-    const userTransformed = user.transform();
-    const token = generateTokenResponse(user, user.token());
-    return res.json({ token, user: userTransformed, status: httpStatus.CREATED });
+    const existUser= await User.findOne({email:req.body.email});
+    if(!existUser){
+      const user = await new User({email:req.body.email, password:req.body.password, role:'User'}).save();
+      const userTransformed = user.transform();
+      const token = generateTokenResponse(user, user.token());
+      return res.json({ token, user: userTransformed, status: httpStatus.CREATED });
+    }else{
+      res.json('duplicate');
+    }
+  
   } catch (error) {
     console.log("register:", error);
     return res.json(userModel.checkDuplicateField(error));

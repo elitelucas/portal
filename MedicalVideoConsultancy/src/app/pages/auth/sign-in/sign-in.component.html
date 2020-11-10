@@ -1,7 +1,7 @@
 <div class="vh-100  d-flex justify-content-center align-items-center">
   <div>
     <h1 style="text-align:center">
-      Welcome to MEVICO
+      Welcome
     </h1>
     <ng-container *ngIf="isLoginFailed">
       <div  class="text-center text-danger" >
@@ -25,16 +25,26 @@
       </p> <div *ngIf="isSubmitted && formControls.email.errors" class="help-block">
         <div *ngIf="formControls.email.errors.required">Email is required</div>
         <div *ngIf="formControls.email.errors.email">Please type valid email</div>
-      </div> <p [ngClass]="{ 'has-error': isSubmitted && formControls.password.errors }">
+      </div> 
+      <p [ngClass]="{ 'has-error': isSubmitted && formControls.password.errors }">
         <input type="password" placeholder="Password" formControlName="password">
-      </p> <div *ngIf="isSubmitted && formControls.password.errors" class="help-block">
+      </p> 
+      <div *ngIf="isSubmitted && formControls.password.errors" class="help-block">
         <div *ngIf="formControls.password.errors.required">Password is required</div>
-        <div *ngIf="formControls.password.errors.minlength">Password must be over than 8 letters</div>
         <div *ngIf="formControls.password.errors.maxlength">Password must be less than 100 letters</div>
-      </div> <p>
-        <input type="submit" value="Log in As Admin">
-      </p>
+      </div> 
+      <div class="row">
+        <div class="col-6">
+          <button class="btn btn-primary" type="submit" style="float:left;">Log in</button>
+
+        </div>
+        <div class="col-6">
+          <button class="btn btn-warning" style="float:right;" (click)="gotoRegister()">Register</button>
+
+        </div>
+      </div>
       </form>
+      
     </div>
   </div>
 </div>

@@ -75,6 +75,11 @@ export class UserService {
     let updateUrl = baseUrl+ "/"+userData.userId;
     return this.http.patch<any>(updateUrl, userData)
   }
+  updatePermission(userId,permission) {
+
+    let updateUrl = baseUrl+ "/updatePermission/"+userId;
+    return this.http.put<any>(updateUrl, {role:permission})
+  }
 
   deleteUserData(userData) {
     let deleteUrl = baseUrl + "/" + userData.userId;

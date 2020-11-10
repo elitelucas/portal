@@ -14,7 +14,7 @@ const router = express.Router();
  */
 router.param('userId', controller.load);
 
-
+//portal start
 router
   .route('/')
   /**
@@ -88,12 +88,25 @@ router
    */
   .delete(authorize(ADMIN), controller.remove);
 
+  router.route('/getUserById/:userId')
+  .get(controller.getUserById);
+
+
+   /**
+   * api/v1/users/update-profile/:userId
+   * */
+  router.route('/update-profile/:userId')
+    .put(authorize(), controller.updateProfile);
+  router.route('/super-admins')
+    .post(controller.createAdmin);
+    router.route('/updatePermission/:userId')
+    .put(controller.updatePermission);
+  //portal end
 
   router.route('/super-providers')
   .get(controller.getProviders);
 
-  router.route('/getUserById/:userId')
-  .get(controller.getUserById);
+
 
   router.route('/super-providers')
   .post(controller.createUser);
@@ -111,10 +124,9 @@ router
   .get(controller.getAdmins);
 
   router.route('/super-admins/:adminId')
-  .get(controller.getSiteById);
+  .get(controller.getAdminById);
 
-  router.route('/super-admins')
-  .post(controller.createAdmin);
+
 
   router.route('/super-admins/:adminId')
   .put(controller.updateAdmin);
@@ -149,11 +161,7 @@ router
   router.route('/sigImages')
   .post(authorize(),controller.sigImgUpload);
 
-  /**
-   * api/v1/users/update-profile/:userId
-   * */
-  router.route('/update-profile/:userId')
-    .put(authorize(), controller.updateProfile);
+ 
 
 
     /**

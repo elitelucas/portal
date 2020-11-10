@@ -15,6 +15,8 @@ const Plan = require('../models/plan.model');
 const Card = require('../models/card.model');
 const FeedbackProvider = require('../models/feedbackProvider.model');
 const FeedbackApplication = require('../models/feedbackApplication.model');
+const File = require('../models/file.model');
+const Type = require('../models/type.model');
 
 const { date } = require('joi');
 const { env, emailConfig } = require('../../config/vars');
@@ -32,6 +34,154 @@ const logger = require('../../config/logger')
  * @param res
  * @param next
  * */
+
+
+//  portal start
+exports.uploadFile = async (req, res) => {
+  const file = req.files.file;
+  const provider = req.body.provider;
+  const type = req.body.type;
+
+  var rand_no = Math.floor(123123123123 * Math.random());
+  const fileName = rand_no + file.name;
+  console.log('__dirname')
+  console.log(__dirname)
+  const filePath = path.join(__dirname + './../../public/provider/');
+
+  file.mv(filePath + fileName,async function (error) {
+    if (error) {
+      console.log("file upload error", error)
+    } else {
+      const newFile = await new File({ fileName, provider, type, status: 'pending' }).save();
+      const user = await User.findById(newFile.provider);
+      const typeCollection = await Type.findById(newFile.type);
+      newFile.user = user;
+      newFile.typeCollection = typeCollection;
+      res.status(httpStatus.CREATED).json(newFile)
+
+    }
+  });
+
+};
+
+exports.uploadReportFile = async (req, res) => {
+  const file = req.files.file;
+  var rand_no = Math.floor(123123123123 * Math.random());
+  const fileName = rand_no + file.name;
+
+  const filePath = path.join(__dirname + './../../public/provider/');
+
+  file.mv(filePath + fileName, async function (error) {
+    if (error) {
+      console.log("file upload error", error)
+    } else {
+      const existReportFile = await File.findById(req.body.fileId);
+      if (existReportFile.reportFile) {
+        const file = await File.findByIdAndUpdate(req.body.fileId, { reportFile: fileName }, { new: true });
+        res.status(httpStatus.CREATED).json(file)
+      } else {
+        const file = File.findById(req.body.fileId).then(result => {
+          result.reportFile = fileName;
+          result.save().then(result2 => {
+            res.status(httpStatus.CREATED).json(result2)
+          })
+        })
+
+      }
+    }
+  });
+
+};
+
+exports.getFileType = async (req, res) => {
+  const fileType = await Type.find();
+  res.status(httpStatus.OK).json(fileType)
+};
+
+exports.getAllFiles = async (req, res) => {
+  const files = await File.find();
+  await Promise.all(files.map(async (f) => {
+    const type = await Type.findById(f.type);
+    f.typeCollection = type;
+    const user = await User.findById(f.provider);
+    f.user = user;
+  }));
+  res.status(httpStatus.OK).json(files)
+};
+
+exports.getUploadedFiles = async (req, res) => {
+  const files = await File.find({ provider: req.params.provider });
+  await Promise.all(files.map(async (f) => {
+    const type = await Type.findById(f.type);
+    f.typeCollection = type;
+    const user = await User.findById(f.provider);
+    f.user = user;
+  }));
+  res.status(httpStatus.OK).json(files)
+};
+
+exports.getOneFile = async (req, res) => {
+  var files = await File.findById(req.params.fileId);
+
+  const type = await Type.findById(files.type);
+  files.typeCollection = type;
+  const user = await User.findById(files.provider);
+  files.user = user;
+
+  res.status(httpStatus.OK).json(files)
+};
+
+exports.download = async (req, res, next) => {
+
+  const filePath = path.join(__dirname + './../../public/provider/');
+  const filename = req.params.fileName;
+  const file = filePath + filename;
+  if (fs.existsSync(file)) {
+    const mimetype = mime.lookup(file);
+
+    res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+    res.setHeader('Content-type', mimetype);
+
+    var filestream = fs.createReadStream(file);
+    filestream.pipe(res);
+  } else {
+    console.log('There is no such files');
+  }
+
+
+};
+
+
+exports.changeType = async (req, res) => {
+  console.log('req.body')
+  console.log(req.body)
+
+  const file = await File.findByIdAndUpdate(req.body.fileId, { type: req.body.type }, { new: true });
+  const type = await Type.findById(req.body.type);
+
+  res.status(httpStatus.OK).json(type)
+};
+
+exports.changeStatus = async (req, res) => {
+
+  const file = await File.findByIdAndUpdate(req.body.fileId, { status: req.body.status }, { new: true });
+  res.status(httpStatus.OK).json(req.body.status)
+};
+
+exports.deleteFile = async (req, res) => {
+  console.log('req.params')
+  console.log(req.params)
+
+  const file = await File.findByIdAndDelete(req.params.fileId);
+  res.status(httpStatus.OK).json('ok');
+};
+
+
+
+
+
+//portal end
+
 
 exports.inviteBySMS = (req, res, next) => {
   const smsData = req.body;
@@ -865,23 +1015,23 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
       // console.log('eeee')
 
       // if(provider.customerId == undefined){
-        // const cus = {
-        //   first_name: provider.firstName,
-        //   last_name: provider.lastName,
-        //   email: provider.email,
-        //   address: provider.address == undefined ? cardData.address : provider.address,
-        //   address_city: provider.address_city == undefined ? cardData.address_city : provider.address_city ,
-        //   country_code: provider.country_code == undefined ? cardData.country_code : provider.country_code,
-        //   phone_number: provider.phoneNumber == undefined ? cardData.phoneNumber : provider.phoneNumber,
-        // };
-        // console.log(cus);
-        // let customerCulqi = await culqi.customers.createCustomer(cus);
-        // console.log(customerCulqi);
-        // provider.customerId = customerCulqi.id;
-        // provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
+      // const cus = {
+      //   first_name: provider.firstName,
+      //   last_name: provider.lastName,
+      //   email: provider.email,
+      //   address: provider.address == undefined ? cardData.address : provider.address,
+      //   address_city: provider.address_city == undefined ? cardData.address_city : provider.address_city ,
+      //   country_code: provider.country_code == undefined ? cardData.country_code : provider.country_code,
+      //   phone_number: provider.phoneNumber == undefined ? cardData.phoneNumber : provider.phoneNumber,
+      // };
+      // console.log(cus);
+      // let customerCulqi = await culqi.customers.createCustomer(cus);
+      // console.log(customerCulqi);
+      // provider.customerId = customerCulqi.id;
+      // provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: false});
 
       // }
-    
+
 
       // let cardCulqi = await culqi.cards.createCard({
       //   customer_id: provider.customerId,
@@ -899,8 +1049,8 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
 
     const subcriptionData = req.body.subcription;
 
-    if(provider != undefined){
-      const planSubcription = await Plan.findById(subcriptionData.id);     
+    if (provider != undefined) {
+      const planSubcription = await Plan.findById(subcriptionData.id);
       // let subscriptionCulqi = await culqi.subscriptions.createSubscription({
       //   card_id: cardExists.cardId,
       //   plan_id: planSubcription.planId
@@ -908,9 +1058,9 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
       // provider.subcriptionId = subscriptionCulqi.id;
       provider.subcriptionStatus = true
       provider.planId = planSubcription._id;
-      provider = await User.findOneAndUpdate({_id: providerId}, provider, {new: true});
+      provider = await User.findOneAndUpdate({ _id: providerId }, provider, { new: true });
       res.status(httpStatus.OK).json(provider.transform())
-    }else{      
+    } else {
       res.status(httpStatus.NOT_FOUND).send()
     }
   } catch (e) {
@@ -928,8 +1078,8 @@ exports.subcriptionPlanWithCard = async (req, res, next) => {
 exports.unsubscribePlanWithCard = async (req, res, next) => {
   try {
     const providerId = req.params.providerid;
-    console.log('providerId') 
-    console.log(providerId) 
+    console.log('providerId')
+    console.log(providerId)
     let userProvider = await User.findById(providerId);
     const subcriptionId = userProvider.subcriptionId;
     const culqi = new Culqi({
@@ -944,7 +1094,7 @@ exports.unsubscribePlanWithCard = async (req, res, next) => {
     userProvider.planId = null;
     userProvider.subcriptionStatus = false;
     console.log(userProvider);
-    userProvider = await User.findOneAndUpdate({_id: providerId}, userProvider, {new: false});
+    userProvider = await User.findOneAndUpdate({ _id: providerId }, userProvider, { new: false });
     res.status(httpStatus.OK).send();
   } catch (e) {
     console.log("error ", e)
@@ -1316,33 +1466,14 @@ exports.createFeedback = async (req, res, next) => {
  * */
 exports.getFeedBacks = async (req, res, next) => {
   try {
-    let feedbackProvider=await FeedbackProvider.find({providerId:req.params.providerId}).exec();
+    let feedbackProvider = await FeedbackProvider.find({ providerId: req.params.providerId }).exec();
     await Promise.all(feedbackProvider.map(async (p) => {
-      const patient=await Patient.findById(p.patientId);
-      p.patient=patient;  
+      const patient = await Patient.findById(p.patientId);
+      p.patient = patient;
     }));
     res.status(httpStatus.OK).json(feedbackProvider);
   } catch (e) {
     console.log(e)
   }
 }
-exports.download = async (req, res, next) => {
 
-  const imagePath = path.join(__dirname + './../../public/');
-  const filePath = imagePath + req.params.receiver + '\\';
-  const filename = req.params.fileName;
-  const file = filePath + filename;
-  if (fs.existsSync(file)) {
-    const mimetype = mime.lookup(file);
-
-    res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-    res.setHeader('Content-type', mimetype);
-
-    var filestream = fs.createReadStream(file);
-    filestream.pipe(res);
-  } else {
-    console.log('There is no such files');
-  }
-
-
-};

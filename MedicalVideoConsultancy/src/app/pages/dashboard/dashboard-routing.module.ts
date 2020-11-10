@@ -20,6 +20,8 @@ import { SubscriptionOldComponent } from './subscription-old/subscription-old.co
 import { SubscriptionNewComponent } from './subscription-new/subscription-new.component';
 import { SuperUpdateComponent } from './super-providers/super-update/super-update.component';
 import { AdminUpdateComponent } from './super-administrators/admin-update/admin-update.component';
+import { SuperUploadedFilesComponent } from './super-uploaded-files/super-uploaded-files.component';
+import { UploadEditComponent } from './super-uploaded-files/upload-edit/upload-edit.component';
 
 
 const routes:Routes = [{
@@ -45,58 +47,63 @@ const routes:Routes = [{
       path: 'health-provider/edit-room',
       component: EditRoomComponent
     },
-    {
-      path: 'health-room/:patientId/:consultId',
-      component: HealthRoomComponent
-    },
+    // {
+    //   path: 'health-room/:patientId/:consultId',
+    //   component: HealthRoomComponent
+    // },
 
+    // {
+    //   path: 'pay-provider/:patientId',
+    //   component: PayProviderComponent
+    // },
+    // {
+    //   path: 'admin',
+    //   component: AdminComponent
+    // },
     {
-      path: 'pay-provider/:patientId',
-      component: PayProviderComponent
-    },
-    {
-      path: 'admin',
+      path: 'analysis',
       component: AdminComponent
     },
-    {
-      path: 'patient/:id',
-      component: PatientComponent
-    },
-    {
-      path: 'newConsult/:index/:id/:consultId',
-      component: NewConsultComponent
-    },
-    {
-      path: 'newConsult/new/:id',
-      component: NewConsultComponent
-    },
-    {
-      path: 'patient-charts',
-      component: PatientChartsComponent
-    },
-    {
-      path: 'subscription-plan',
-      component: SubscriptionPlanComponent
-    },
-    {
-      path: 'subscription-old',
-      component: SubscriptionOldComponent
-    },
-    {
-      path: 'subscription-new/:planId',
-      component: SubscriptionNewComponent
-    },
-    {
-      path: 'super',
-      component: SuperComponent,
-    },
-    {
-      path: 'providers',
-      component: SuperProvidersComponent,
-    },
+    // {
+    //   path: 'patient/:id',
+    //   component: PatientComponent
+    // },
+    // {
+    //   path: 'newConsult/:index/:id/:consultId',
+    //   component: NewConsultComponent
+    // },
+    // {
+    //   path: 'newConsult/new/:id',
+    //   component: NewConsultComponent
+    // },
+    // {
+    //   path: 'patient-charts',
+    //   component: PatientChartsComponent
+    // },
+    // {
+    //   path: 'subscription-plan',
+    //   component: SubscriptionPlanComponent
+    // },
+    // {
+    //   path: 'subscription-old',
+    //   component: SubscriptionOldComponent
+    // },
+    // {
+    //   path: 'subscription-new/:planId',
+    //   component: SubscriptionNewComponent
+    // },
+  
     {
       path: 'administrators',
       component: SuperAdministratorsComponent,
+    },
+    {
+      path: 'admin-uploaded-files',
+      component: SuperUploadedFilesComponent,
+    },
+    {
+      path: 'upload-update/:id',
+      component: UploadEditComponent,
     },
     {
       path: 'super-update/:data',
@@ -106,14 +113,14 @@ const routes:Routes = [{
       path: 'admin-update/:data',
       component: AdminUpdateComponent,
     },
-    {
-      path: 'feedbacks',
-      component: SuperFeedbacksComponent,
-    },
-    {
-      path: 'plans',
-      component: SuperPlansComponent,
-    },
+    // {
+    //   path: 'feedbacks',
+    //   component: SuperFeedbacksComponent,
+    // },
+    // {
+    //   path: 'plans',
+    //   component: SuperPlansComponent,
+    // },
 
   ]
 }];

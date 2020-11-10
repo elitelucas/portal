@@ -4,87 +4,21 @@
     <div class="card-title text-center mt-5">
       <a class="navbar-brand" href="index.html">
         <!-- Logo icon -->
-        <!-- Light Logo icon -->
-        <img src="assets/images/logo.png" alt="homepage" class="w-25 light-logo radius-50">
-        <!--End Logo icon -->
+ 
         <!-- Logo text -->
         <span fxShow="false" fxShow.gt-xs class="mx-3 text-white-50">
-          MEVICO
+          PORTAL
         </span>
       </a>
     </div>
     <div class="card-body text-white">
-      <ng-container *ngIf="isPending">
-        <p class="mt-3 text-info text-center">
-          Successfully registered.  Your account is in<br/>
-         pending status. Please check your email or phone.
+      <ng-container *ngIf="duplicatedKey">
+        <p class="mt-3 text-danger text-center">
+          Duplicated Email.
         </p>
       </ng-container>
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-        <div class="form-row ">
-          <!--
-          <div class="form-group col">
-            <label>Title</label>
-            <select formControlName="role" class="form-control cursor p-0"
-                    [ngClass]="{ 'is-invalid': submitted && f.role.errors }">
-              <option value="Admin">Admin</option>
-              <option value="Dr">Dr</option>
-              <option value="Mr">Mr</option>
-              <option value="Mrs">Mrs</option>
-              <option value="Miss">Miss</option>
-              <option value="Ms">Ms</option>
-              <option value="Other">Other</option>
-            </select>
-            <div *ngIf="submitted && f.role.errors" class="invalid-feedback">
-              <div *ngIf="f.role.errors.required">Title is required</div>
-            </div>
-          </div> -->
-          <div class="form-group col-6">
-            <label>First Name</label>
-            <input type="text" formControlName="firstName" class="form-control"
-                   [ngClass]="{ 'is-invalid': submitted && f.firstName.errors }"/>
-            <div *ngIf="submitted && f.firstName.errors" class="invalid-feedback">
-              <div *ngIf="f.firstName.errors.required">First Name is required</div>
-              <div *ngIf="f.firstName.errors.pattern">First Name must be alphabetic</div>
-            </div>
-          </div>
-          <div class="form-group col-6">
-            <label>Last Name</label>
-            <input type="text" formControlName="lastName" class="form-control"
-                   [ngClass]="{ 'is-invalid': submitted && f.lastName.errors }"/>
-            <div *ngIf="submitted && f.lastName.errors" class="invalid-feedback">
-              <div *ngIf="f.lastName.errors.required">Last Name is required</div>
-              <div *ngIf="f.lastName.errors.pattern">Last Name must be alphabetic</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-row ">
-          <div class="form-group col-6">
-            <label>Room name</label>
-            <input type="text" formControlName="room" class="form-control"
-                   [ngClass]="{ 'is-invalid': submitted && f.room.errors }"/>
-            <div *ngIf="submitted && f.room.errors" class="invalid-feedback">
-              <div *ngIf="f.room.errors.required">Room name is required</div>
-              <div *ngIf="f.room.errors.pattern">Room name is alphabetic</div>
-              <div *ngIf="f.room.errors.maxlength">Room must be less than 40 characters</div>
-            </div>
-            <div class="invalid-feedback d-block" *ngIf="isDuplicatedRoom">This room name is already in use</div>
-          </div>
-          <div class="form-group col-6">
-            <label>CMP</label>
-            <input type="text" formControlName="cmp" class="form-control"
-                   [ngClass]="{ 'is-invalid': submitted && f.cmp.errors }"/>
-            <div *ngIf="submitted && f.cmp.errors" class="invalid-feedback">
-              <div *ngIf="f.cmp.errors.required">CMP is required</div>
-              <div *ngIf="f.cmp.errors.pattern">CMP is number</div>
-              <div *ngIf="f.cmp.errors.minlength">CMP must be larger than 4 characters</div>
-              <div *ngIf="f.cmp.errors.maxlength">CMP must be less than 8 caracters</div>
-            </div>
-            <div class="invalid-feedback d-block" *ngIf="isDuplicatedRoom">This room name is already in use</div>
-          </div>
-        </div>
-
+     
         <div class="form-row">
           <div class="form-group col">
             <label>Email</label>
@@ -97,18 +31,7 @@
             </div>
             <div class="invalid-feedback d-block" *ngIf="isDuplicatedEmail">Email is already in use</div>
           </div>
-          <div class="form-group col text-black-50">
-            <label class="text-white">Phone Number</label>
-            <input type="text" ng2TelInput  formControlName="phoneNumber" class="form-control  text-black-50"
-                   [ngClass]="{ 'is-invalid': submitted && f.phoneNumber.errors }"
-                   (hasError)="hasError($event)"
-                   (ng2TelOutput)="getNumber($event)"
-                   (intlTelInputObject)="telInputObject($event)"
-                   (countryChange)="onCountryChange($event)"/>
-            <div class="invalid-feedback d-block" *ngIf="isEmptyPhoneNumber">Phone Number is required</div>
-            <div class="invalid-feedback d-block" *ngIf="isDuplicatedPhone">Phone Number is already in use</div>
-            <div class="invalid-feedback d-block" *ngIf="!isValidNumber">Please type valid number</div>
-          </div>
+      
         </div>
 
         <div class="form-row">
@@ -118,9 +41,9 @@
                    [ngClass]="{ 'is-invalid': submitted && f.password.errors }"/>
             <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
               <div *ngIf="f.password.errors.required">Password is required</div>
-              <div *ngIf="f.password.errors.minlength">Password must be at least 8 characters</div>
             </div>
           </div>
+
           <div class="form-group col">
             <label>Confirm password</label>
             <input type="password" formControlName="confirmPassword" class="form-control"
@@ -132,16 +55,8 @@
           </div>
         </div>
 
-        <div class="form-group form-check">
-          <input type="checkbox" formControlName="acceptTerms" id="acceptTerms" class="form-check-input cursor"
-                 [ngClass]="{ 'is-invalid': submitted && f.acceptTerms.errors }"/>
-          <label for="acceptTerms" class="form-check-label">Accept Terms & Conditions</label>
-          <div *ngIf="submitted && f.acceptTerms.errors" class="invalid-feedback">Accept Ts & Cs is required</div>
-        </div>
         <div class="text-center">
           <button class="btn btn-primary mr-1">Register</button>
-          <button class="btn btn-secondary ml-3" type="reset" (click)="onReset()">Cancel</button>
-          <a class="ml-3" routerLink="/"> <i class="fa fa-arrow-circle-o-left"></i> Go back</a>
         </div>
       </form>
     </div>

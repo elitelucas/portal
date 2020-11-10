@@ -24,8 +24,18 @@ export class AuthService {
   public signUp(userData) {
     const signUpUrl = baseUrl + 'auth/register';
     return this.http.post<any>(signUpUrl, userData).pipe(map(res=> {
+      if(res.token) {
+ 
+        this.setToken(res);
+        this.setCurrentUser(res);
+      }
       return res;
-    }));
+    }), catchError( (error: HttpErrorResponse) => {
+        if(error && error.status === 401) {
+          return throwError( error );
+        }
+      })
+    );
   }
 
   public signIn(userData: User){

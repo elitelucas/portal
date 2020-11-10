@@ -7,6 +7,43 @@ const { authorize } = require('../../middlewares/auth');
  * @param userData
  * */
 
+ //portal start
+
+router.route('/uploadFile')
+  .post(controller.uploadFile);
+
+
+router.route('/uploadReportFile')
+  .post(controller.uploadReportFile);
+
+
+router.route('/fileType')
+  .get(controller.getFileType);
+
+router.route('/uploadedFiles/')
+  .get(controller.getAllFiles);
+
+router.route('/uploadedFiles/:provider')
+  .get(controller.getUploadedFiles);
+
+router.route('/oneFile/:fileId')
+  .get(controller.getOneFile);
+
+router.route('/download/:fileName')
+  .get(authorize(), controller.download);
+
+router.route('/changeType/')
+  .put(controller.changeType);
+
+router.route('/changeStatus/')
+  .put(controller.changeStatus);
+
+router.route('/deleteFile/:fileId')
+  .delete(controller.deleteFile);
+//portal end
+
+
+
 router.route('/invite-by-sms')
   .post(authorize(), controller.inviteBySMS);
 
@@ -82,12 +119,10 @@ router.route('/oneConsult')
 router.route('/consultInChat')
   .get(authorize(), controller.getConsultInChat);
 
-router.route('/uploadFile')
-  .post(authorize(), controller.fileUpload);
+// router.route('/uploadFile')
+//   .post(authorize(), controller.fileUpload);
 
 
-router.route('/download/:receiver/:fileName')
-  .get(authorize(), controller.download);
 
 router.route('/mail')
   .post(authorize(), controller.mail);

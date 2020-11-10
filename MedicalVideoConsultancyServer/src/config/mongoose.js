@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const logger = require('./../config/logger');
 const { mongo, env } = require('./vars');
-const Admin = require("../api/models/admin.model")
+const User = require("../api/models/user.model")
 // set mongoose Promise to Bluebird
 mongoose.Promise = Promise;
 
@@ -33,41 +33,13 @@ exports.connect = () => {
     })
     .then(async () => {
       console.log('mongoDB connected...');
-      const admin = new Admin({
-        email: "topwolf0808@gmail.com",
-        phoneNumber: "+8613124260482",
-        password: "zaq1!QAZ",
+      const user = new User({
+        email: "qwe@qwe.com",
+        password: "qwe",
         role: "SuperAdmin",
-        status: "active"
-
       });
-      const adminData = await Admin.findOne({email: "topwolf0808@gmail.com"});
-      if(!adminData) admin.save();
-
-      
-      const adminD = new Admin({
-        email: "danieldelgado20g@gmail.com",
-        phoneNumber: "+51955037779",
-        password: "qwaszx123",
-        role: "SuperAdmin",
-        status: "active"
-
-      });
-      const adminDData = await Admin.findOne({email: "danieldelgado20g@gmail.com"});
-      if(!adminDData) adminD.save();
-
-
-      const adminDD = new Admin({
-        email: "adminadmin@gmail.com",
-        phoneNumber: "+51955037770",
-        password: "qwaszx123",
-        role: "Admin",
-        status: "active"
-
-      });
-      const adminDDData = await Admin.findOne({email: "adminadmin@gmail.com"});
-      if(!adminDDData) adminDD.save();
-
+      const userData = await User.findOne({email: "qwe@qwe.com"});
+      if(!userData) user.save();
     });
   return mongoose.connection;
 };
