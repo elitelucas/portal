@@ -7,7 +7,7 @@ export const environment = {
   production: false,
   domain:'localhost:4200/',
   jitBaseUrl: 'pasatrae.com',
-  baseUrl: 'http://localhost:3000/api/v1/',
+  baseUrl: '/api/v1/',
   socket_endpoint: 'http://localhost:3001',
   peerServerHost:'nemiac.com',
   peerServerPort:'9000',
