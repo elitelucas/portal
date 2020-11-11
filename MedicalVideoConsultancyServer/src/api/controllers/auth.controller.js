@@ -66,6 +66,7 @@ exports.login = async (req, res, next) => {
     /*console.log(token);
     console.log(accessToken);*/
     const userTransformed = user.transform();
+    
     return res.json({ token, user: userTransformed });
   } catch (error) {
     return next(error)

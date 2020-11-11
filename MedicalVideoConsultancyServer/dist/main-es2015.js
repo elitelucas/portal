@@ -1589,7 +1589,7 @@ AppModule.ɵinj = _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdefineInjector
         _helpers_auth_interceptor__WEBPACK_IMPORTED_MODULE_20__["authInterceptorProviders"],
         {
             provide: _angular_common__WEBPACK_IMPORTED_MODULE_4__["LocationStrategy"],
-            useClass: _angular_common__WEBPACK_IMPORTED_MODULE_4__["PathLocationStrategy"]
+            useClass: _angular_common__WEBPACK_IMPORTED_MODULE_4__["HashLocationStrategy"]
         },
         _services_meet_room_service__WEBPACK_IMPORTED_MODULE_22__["MeetRoomService"]
     ], imports: [[
@@ -1669,7 +1669,7 @@ AppModule.ɵinj = _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdefineInjector
                     _helpers_auth_interceptor__WEBPACK_IMPORTED_MODULE_20__["authInterceptorProviders"],
                     {
                         provide: _angular_common__WEBPACK_IMPORTED_MODULE_4__["LocationStrategy"],
-                        useClass: _angular_common__WEBPACK_IMPORTED_MODULE_4__["PathLocationStrategy"]
+                        useClass: _angular_common__WEBPACK_IMPORTED_MODULE_4__["HashLocationStrategy"]
                     },
                     _services_meet_room_service__WEBPACK_IMPORTED_MODULE_22__["MeetRoomService"]
                 ],

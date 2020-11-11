@@ -2849,7 +2849,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       },
       providers: [_helpers_auth_interceptor__WEBPACK_IMPORTED_MODULE_20__["authInterceptorProviders"], {
         provide: _angular_common__WEBPACK_IMPORTED_MODULE_4__["LocationStrategy"],
-        useClass: _angular_common__WEBPACK_IMPORTED_MODULE_4__["PathLocationStrategy"]
+        useClass: _angular_common__WEBPACK_IMPORTED_MODULE_4__["HashLocationStrategy"]
       }, _services_meet_room_service__WEBPACK_IMPORTED_MODULE_22__["MeetRoomService"]],
       imports: [[_angular_platform_browser__WEBPACK_IMPORTED_MODULE_0__["BrowserModule"], _angular_platform_browser_animations__WEBPACK_IMPORTED_MODULE_11__["BrowserAnimationsModule"], _demo_material_module__WEBPACK_IMPORTED_MODULE_12__["DemoMaterialModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_21__["FormsModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_21__["ReactiveFormsModule"], _angular_flex_layout__WEBPACK_IMPORTED_MODULE_8__["FlexLayoutModule"], _angular_common_http__WEBPACK_IMPORTED_MODULE_3__["HttpClientModule"], _shared_shared_module__WEBPACK_IMPORTED_MODULE_13__["SharedModule"], _ckeditor_ckeditor5_angular__WEBPACK_IMPORTED_MODULE_15__["CKEditorModule"], _angular_router__WEBPACK_IMPORTED_MODULE_2__["RouterModule"].forRoot(_app_routing__WEBPACK_IMPORTED_MODULE_5__["AppRoutes"], {
         useHash: true
@@ -2877,7 +2877,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           })],
           providers: [_helpers_auth_interceptor__WEBPACK_IMPORTED_MODULE_20__["authInterceptorProviders"], {
             provide: _angular_common__WEBPACK_IMPORTED_MODULE_4__["LocationStrategy"],
-            useClass: _angular_common__WEBPACK_IMPORTED_MODULE_4__["PathLocationStrategy"]
+            useClass: _angular_common__WEBPACK_IMPORTED_MODULE_4__["HashLocationStrategy"]
           }, _services_meet_room_service__WEBPACK_IMPORTED_MODULE_22__["MeetRoomService"]],
           bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_6__["AppComponent"]]
         }]
